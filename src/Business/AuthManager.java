@@ -14,15 +14,12 @@ public class AuthManager {
         return null;
     }
 
-    void logout(String userId){
+    void logout(int userId){
         //TODO: Implement
     }
 
-    void deleteAccount(String userId) {
+    void deleteAccount(int userId) {
         //TODO: Implement
     }
 
-    void getPendingNotifications(String userId){
-        //TODO: Implement
-    }
 }

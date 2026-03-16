@@ -8,19 +8,19 @@ public class ParkingSpaceController {
         //TODO: Implement
     }
 
-    void editSpace(int code, int floor) {
+    void editSpace(int spaceId) {
         //TODO: Implement
     }
 
-    void deleteSpace(int code, int floor) {
+    void deleteSpace(int spaceId) {
         //TODO: Implement
     }
 
-    void getSpaceDetails(int code, int floor) {
+    void getSpaceDetails(int spaceId) {
         //TODO: Implement
     }
 
-    void cancelReservationFromAdmin(int code, int floor) {
+    void cancelReservationFromAdmin(int spaceId) {
         //TODO: implement
     }
 }

@@ -4,20 +4,12 @@ import Business.Entities.User;
 
 public class AuthController {
 
-    User logIn(String user_name, String email, String password) {
-        User current_user = null; // delete "null"
-
+    void logIn(String user_name, String email, String password) {
         //TODO: Implement
-
-        return current_user;
     }
 
-    User register(String user_name, String email, String password) {
-        User current_user = null; // delete "null"
-
+    void register(String user_name, String email, String password) {
         //TODO: Implement
-
-        return current_user;
     }
 
     void logOut() {

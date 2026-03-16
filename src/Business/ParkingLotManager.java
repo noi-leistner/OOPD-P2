@@ -11,17 +11,19 @@ public class ParkingLotManager {
         //TODO: Implement
         return null;
     }
-    ParkingSpace editSpace(int code, int floor) {
+
+    void editSpace(int spaceId) {
+        //TODO: Implement
+    }
+
+    void deleteSpace(int spaceId) {
+        //TODO: Implement
+    }
+
+
+    ParkingSpace getSpaceDetails(int spaceId) {
         //TODO: Implement
         return null;
-    }
-
-    void deleteSpace(int code, int floor) {
-        //TODO: Implement
-    }
-
-    void getSpaceDetails(int code, int floor) {
-        //TODO: Implement
     }
 
     List<ParkingSpace> getAllSpaces() {
@@ -48,7 +50,7 @@ public class ParkingLotManager {
         //TODO: Implement
     }
 
-    Reservation reserve(String licensePlate, String vehicleType, int code, int floor) {
+    Reservation reserve(String licensePlate, String vehicleType, int spaceId) {
         //TODO: Implement
         return null;
     }
@@ -57,7 +59,7 @@ public class ParkingLotManager {
         //TODO: Implement
     }
 
-    void cancelReservationByAdmin(int code, int floor) {
+    void cancelReservationByAdmin(int spaceId) {
         //TODO: Implement
     }
 
