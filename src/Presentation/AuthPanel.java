@@ -37,6 +37,7 @@ public class AuthPanel extends JPanel {
         header.setBackground(Color.BLUE);
         header.setForeground(Color.WHITE);
         header.setHorizontalAlignment(SwingConstants.CENTER);
+        header.setPreferredSize(new Dimension(0, 50));
         return header;
     }
 }

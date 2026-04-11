@@ -1,17 +1,24 @@
 package Business;
 
 import Business.Entities.User;
+import Persistance.UserDAO;
 
 public class AuthManager {
 
-    User login(String username, String Email, String password) {
+    private UserDAO userDAO;
+
+    public AuthManager(UserDAO userDAO) {
+        this.userDAO = userDAO;
+    }
+
+    User login(User user) {
         //TODO: Implement
         return null;
     }
 
-    User register(String username, String email, String password) {
-        //TODO: Implement
-        return null;
+    public AuthResult signUp(User user) {
+        if (user == null) return AuthResult.DATABASE_ERROR;
+        return userDAO.addUser(user);
     }
 
     void logout(int userId){

@@ -1,10 +1,13 @@
 package Presentation;
 
+import Business.AuthManager;
+import Business.SessionManager;
+import Persistance.UserDAO;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class MainWindow extends JFrame {
-    //TODO: Implement
 
     private CardLayout cardLayout;
     private JPanel mainPanel;
@@ -21,7 +24,11 @@ public class MainWindow extends JFrame {
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-        AuthController authController = new AuthController();
+        UserDAO userDAO             = new UserDAO();
+        AuthManager authManager     = new AuthManager(userDAO);
+        SessionManager sessionManager = SessionManager.getInstance();
+        AuthController authController = new AuthController(authManager, sessionManager);
+
 
         mainPanel.add(new AuthPanel(this, authController), AUTH_SCREEN);
         //mainPanel.add(new DashboardPanel(this), DASHBOARD_SCREEN);
