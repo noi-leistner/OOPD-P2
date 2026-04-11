@@ -8,8 +8,9 @@ public class AuthController {
         //TODO: Implement
     }
 
-    void register(String user_name, String email, String password) {
+    boolean register(String name, String surname, String email, String password) {
         //TODO: Implement
+        return true;
     }
 
     void logOut() {
