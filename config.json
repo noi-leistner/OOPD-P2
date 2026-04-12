@@ -1,0 +1,9 @@
+{
+    "db_port": 3036,
+    "db_host": "localhost",
+    "db_name": "mydb",
+    "db_username": "user",
+    "db_password": "userpassowrd",
+    "admin_password": "adminpassword",
+    "vehicle_delay": 0
+}
