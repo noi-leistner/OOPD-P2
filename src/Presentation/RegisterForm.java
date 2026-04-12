@@ -22,7 +22,7 @@ public class RegisterForm extends JPanel {
         });
 
         JButton goToLogin = new JButton("Have an account? Login");
-        //goToLogin.addActionListener(e -> authPanel.showLogin(app, auth));
+        goToLogin.addActionListener(e -> authPanel.showLogin(app, auth));
 
         add(new JLabel("First name"));
         add(nameField);

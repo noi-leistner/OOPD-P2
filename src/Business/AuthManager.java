@@ -1,11 +1,11 @@
 package Business;
 
 import Business.Entities.User;
+import Persistance.UserDAO;
 
 public class AuthManager {
 
-    User login(String username, String Email, String password) {
-        //TODO: Implement
+    public User login(String Email, String password) {
         return null;
     }
 
