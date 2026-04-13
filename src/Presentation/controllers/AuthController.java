@@ -29,11 +29,21 @@ public class AuthController {
     }
 
     void logOut() {
-        //TODO: Implement
+        sessionManager.logout();
     }
 
-    void deleteAccount(){
-        //TODO: Implement
+    public boolean deleteAccount(){
+        Business.Entities.User currentUser = sessionManager.getCurrentUser();
+        if (currentUser == null) return false;
+
+        boolean deleted = authManager.deleteAccount(currentUser.getId());
+        if (deleted) {
+            sessionManager.logout();
+        }
+        return deleted;
     }
+
+    // When implementing the button for logging out / delete account, just call these two functions.
+    // Before calling them call DeleteAccountDialog, to make sure the action is what the user wants.
 
 }

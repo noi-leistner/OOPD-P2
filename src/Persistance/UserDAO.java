@@ -5,7 +5,7 @@ import Business.Entities.User;
 
 public interface UserDAO {
     AuthResult addUser(User user);
-    void deleteUser(int id);
+    boolean deleteUser(int id);
     User getUserById(int id);
     boolean existsByEmail(String email);
 }
