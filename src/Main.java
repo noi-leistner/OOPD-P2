@@ -1,4 +1,4 @@
-import Presentation.MainWindow;
+import Presentation.views.MainWindow;
 
 import javax.swing.*;
 
