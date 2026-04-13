@@ -53,7 +53,7 @@ public class DeleteAccountDialog extends JDialog {
         }
         else {
             title_text = "Are you sure you want to log out?";
-            subtitle_text = "<html>You will be able to <b>log back in</b>,<br> after going back to the authentification menu.</html>";
+            subtitle_text = "<html>You will be able to <b>log back in</b>, after going back to the authentification menu.</html>";
             button_text = "LogOut";
         }
 
@@ -105,13 +105,4 @@ public class DeleteAccountDialog extends JDialog {
         return confirmed;
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            DeleteAccountDialog logoutDialog = new DeleteAccountDialog(null, false);
-            System.out.println("Logout confirmed: " + logoutDialog.isConfirmed());
-
-            DeleteAccountDialog deleteDialog = new DeleteAccountDialog(null, true);
-            System.out.println("Delete confirmed: " + deleteDialog.isConfirmed());
-        });
-    }
 }
