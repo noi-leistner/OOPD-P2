@@ -1,31 +1,32 @@
 package Presentation;
 
 import Business.AuthManager;
+import Business.AuthResult;
 import Business.Entities.User;
+import Business.SessionManager;
 
 import javax.swing.*;
 
 public class AuthController {
 
     private AuthManager authManager;
-    private MainWindow app;
+    private SessionManager sessionManager;
 
-    public boolean logIn(String email, String password) {
-        User user = authManager.login(email, password);
-        if (user != null) {
-            app.switchTo(MainWindow.DASHBOARD_SCREEN);
-        } else {
-            JOptionPane.showMessageDialog(app,
-                    "Incorrect username or password",
-                    "Login failed",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-        return true; //Change this logic later
+    public AuthController(AuthManager authManager, SessionManager sessionManager) {
+        this.authManager = authManager;
+        this.sessionManager = sessionManager;
     }
 
-    boolean register(String name, String surname, String email, String password) {
+    void logIn(String user_name, String email, String password) {
         //TODO: Implement
-        return true;
+    }
+
+    public AuthResult signUp(User user) {
+        if (user == null) return AuthResult.DATABASE_ERROR;
+
+        AuthResult result = authManager.signUp(user);
+        if (result == AuthResult.SUCCESS) sessionManager.login(user);
+        return result;
     }
 
     void logOut() {
