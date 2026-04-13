@@ -1,6 +1,4 @@
-package Presentation;
-
-import Business.Entities.ParkingSpace;
+package Presentation.controllers;
 
 public class ParkingSpaceController {
 
