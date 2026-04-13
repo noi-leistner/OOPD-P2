@@ -25,8 +25,8 @@ public class AuthManager {
         //TODO: Implement
     }
 
-    void deleteAccount(int userId) {
-        //TODO: Implement
+    public boolean deleteAccount(int userId) {
+        return userDAO.deleteUser(userId);
     }
 
 }

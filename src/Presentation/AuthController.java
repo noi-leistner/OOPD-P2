@@ -31,11 +31,18 @@ public class AuthController {
     }
 
     void logOut() {
-        //TODO: Implement
+        sessionManager.logout();
     }
 
-    void deleteAccount(){
-        //TODO: Implement
+    public boolean deleteAccount(){
+        Business.Entities.User currentUser = sessionManager.getCurrentUser();
+        if (currentUser == null) return false;
+
+        boolean deleted = authManager.deleteAccount(currentUser.getId());
+        if (deleted) {
+            sessionManager.logout();
+        }
+        return deleted;
     }
 
 }
