@@ -5,6 +5,8 @@ import Business.AuthResult;
 import Business.Entities.User;
 import Business.SessionManager;
 
+import javax.swing.*;
+
 public class AuthController {
 
     private AuthManager authManager;
@@ -34,4 +36,10 @@ public class AuthController {
     void deleteAccount(){
         //TODO: Implement
     }
+
+    public AuthController(MainWindow mainWindow, AuthManager authManager, AuthPanel authPanel) {
+        this.app = mainWindow;
+        this.authManager = authManager;
+    }
+
 }

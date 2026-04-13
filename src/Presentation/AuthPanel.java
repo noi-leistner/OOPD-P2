@@ -14,15 +14,15 @@ public class AuthPanel extends JPanel {
         contentArea = new JPanel();
         add(contentArea, BorderLayout.CENTER);
 
-        showRegister(app, authController);
+        showLogin(app, authController);
     }
 
-//    public void showLogin(MainWindow app, AuthController authController) {
-//        contentArea.removeAll();
-//        contentArea.add(new LoginForm(app, authController, this));
-//        contentArea.revalidate();
-//        contentArea.repaint();
-//    }
+    public void showLogin(MainWindow app, AuthController authController) {
+        contentArea.removeAll();
+        contentArea.add(new LoginForm(app, authController, this));
+        contentArea.revalidate();
+        contentArea.repaint();
+   }
 
     public void showRegister(MainWindow app, AuthController authController) {
         contentArea.removeAll();

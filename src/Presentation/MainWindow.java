@@ -12,6 +12,7 @@ public class MainWindow extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainPanel;
 
+
     public static final String AUTH_SCREEN = "AUTH";
     public static final String DASHBOARD_SCREEN = "DASHBOARD";
 
