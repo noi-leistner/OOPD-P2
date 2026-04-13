@@ -17,8 +17,9 @@ public class AuthController {
         this.sessionManager = sessionManager;
     }
 
-    void logIn(String user_name, String email, String password) {
+    boolean logIn(String email, String password) {
         //TODO: Implement
+        return true;
     }
 
     public AuthResult signUp(User user) {
@@ -35,11 +36,6 @@ public class AuthController {
 
     void deleteAccount(){
         //TODO: Implement
-    }
-
-    public AuthController(MainWindow mainWindow, AuthManager authManager, AuthPanel authPanel) {
-        this.app = mainWindow;
-        this.authManager = authManager;
     }
 
 }
