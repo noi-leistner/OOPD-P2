@@ -38,7 +38,7 @@ public class AuthController {
 
         boolean deleted = authManager.deleteAccount(currentUser.getId());
         if (deleted) {
-            sessionManager.logout();
+            logOut();
         }
         return deleted;
     }
