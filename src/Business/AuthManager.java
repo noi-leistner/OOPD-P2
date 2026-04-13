@@ -1,13 +1,13 @@
 package Business;
 
 import Business.Entities.User;
-import Persistance.UserDAO;
+import Persistance.UserDAOSql;
 
 public class AuthManager {
 
-    private UserDAO userDAO;
+    private UserDAOSql userDAO;
 
-    public AuthManager(UserDAO userDAO) {
+    public AuthManager(UserDAOSql userDAO) {
         this.userDAO = userDAO;
     }
 

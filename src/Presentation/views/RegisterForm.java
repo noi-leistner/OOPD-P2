@@ -1,7 +1,8 @@
-package Presentation;
+package Presentation.views;
 
 import Business.AuthResult;
 import Business.Entities.User;
+import Presentation.controllers.AuthController;
 
 import javax.swing.*;
 import java.awt.*;

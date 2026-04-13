@@ -1,4 +1,4 @@
-package Presentation;
+package Presentation.controllers;
 
 public class SimulatorController {
 

@@ -1,11 +1,9 @@
-package Presentation;
+package Presentation.controllers;
 
 import Business.AuthManager;
 import Business.AuthResult;
 import Business.Entities.User;
 import Business.SessionManager;
-
-import javax.swing.*;
 
 public class AuthController {
 

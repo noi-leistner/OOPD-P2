@@ -1,4 +1,6 @@
-package Presentation;
+package Presentation.views;
+
+import Presentation.controllers.AuthController;
 
 import javax.swing.*;
 import java.awt.*;
