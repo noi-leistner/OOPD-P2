@@ -11,6 +11,7 @@ public class RegisterForm extends JPanel {
 
     public RegisterForm(MainWindow app, AuthController auth, AuthPanel authPanel) {
         setLayout(new GridLayout(12, 1, 5, 5));
+        setPreferredSize(new Dimension(340, 370));
 
         JTextField nameField = new JTextField(20);
         JTextField surnameField = new JTextField(20);
