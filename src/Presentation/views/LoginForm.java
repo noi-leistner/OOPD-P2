@@ -9,10 +9,11 @@ public class LoginForm extends JPanel {
 
     public LoginForm(MainWindow mainWindow, AuthController auth, AuthPanel authPanel) {
 
+
         setLayout(new GridBagLayout());
 
         JPanel inner = new JPanel(new GridLayout(0, 1, 5, 5));
-        inner.setPreferredSize(new Dimension(300, 220));
+        inner.setPreferredSize(new Dimension(340, 200));
 
         JTextField email = new JTextField(20);
         JPasswordField password = new JPasswordField(20);

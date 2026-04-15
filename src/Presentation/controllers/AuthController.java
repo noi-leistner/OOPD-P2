@@ -15,7 +15,7 @@ public class AuthController {
         this.sessionManager = sessionManager;
     }
 
-    boolean logIn(String email, String password) {
+    public boolean logIn(String email, String password) {
         //TODO: Implement
         return true;
     }
