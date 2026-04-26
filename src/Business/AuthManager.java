@@ -1,13 +1,13 @@
 package Business;
 
 import Business.Entities.User;
-import Persistance.UserDAO;
+import Persistance.UserDAOSql;
 
 public class AuthManager {
 
-    private UserDAO userDAO;
+    private UserDAOSql userDAO;
 
-    public AuthManager(UserDAO userDAO) {
+    public AuthManager(UserDAOSql userDAO) {
         this.userDAO = userDAO;
     }
 
@@ -21,12 +21,9 @@ public class AuthManager {
         return userDAO.addUser(user);
     }
 
-    void logout(int userId){
-        //TODO: Implement
-    }
 
-    void deleteAccount(int userId) {
-        //TODO: Implement
+    public boolean deleteAccount(int userId) {
+        return userDAO.deleteUser(userId);
     }
 
 }

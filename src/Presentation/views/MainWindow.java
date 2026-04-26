@@ -1,8 +1,9 @@
-package Presentation;
+package Presentation.views;
 
 import Business.AuthManager;
 import Business.SessionManager;
-import Persistance.UserDAO;
+import Persistance.UserDAOSql;
+import Presentation.controllers.AuthController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,7 +26,7 @@ public class MainWindow extends JFrame {
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-        UserDAO userDAO             = new UserDAO();
+        UserDAOSql userDAO             = new UserDAOSql();
         AuthManager authManager     = new AuthManager(userDAO);
         SessionManager sessionManager = SessionManager.getInstance();
         AuthController authController = new AuthController(authManager, sessionManager);
