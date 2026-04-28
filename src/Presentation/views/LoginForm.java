@@ -27,7 +27,7 @@ public class LoginForm extends JPanel {
                 case AuthResult.EMPTY_FIELDS -> JOptionPane.showMessageDialog(LoginForm.this, "Please fill all the fields!");
                 case AuthResult.INVALID_CREDENTIALS -> JOptionPane.showMessageDialog(LoginForm.this, "Invalid credentials!");
                 case AuthResult.DATABASE_ERROR -> JOptionPane.showMessageDialog(LoginForm.this, "Something went wrong, please try again!");
-                default -> JOptionPane.showMessageDialog(LoginForm.this, "Something went wrong! I dont know where :c");
+                default -> JOptionPane.showMessageDialog(LoginForm.this, "Something went wrong!");
             }
         });
 

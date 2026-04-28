@@ -14,7 +14,7 @@ public class UserDAOSql implements UserDAO {
         if (existsByEmail(user.getEmail())) return AuthResult.EMAIL_ALREADY_EXISTS;
 
         String sql = "INSERT INTO users (name, surname, email, password) VALUES (?, ?, ?, ?)";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, user.getName());
@@ -33,7 +33,7 @@ public class UserDAOSql implements UserDAO {
     @Override
     public boolean deleteUser(int id) {
         String sql = "DELETE FROM users WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
@@ -49,7 +49,7 @@ public class UserDAOSql implements UserDAO {
     @Override
     public User getUserById(int id) {
         String sql = "SELECT id, name, surname, email, password FROM users WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
@@ -71,32 +71,32 @@ public class UserDAOSql implements UserDAO {
 
     public User getUserByEmail(String email) {
         String sql = "SELECT id, name, surname, email, password FROM users WHERE email = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        User user = null;
+        try (Connection conn = ConfigDAO.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);){
 
-            User user = null;
-
+            if (conn == null) return null;
             stmt.setString(1, email);
-            var rs = stmt.executeQuery();
-            if (rs.next()) {
-                user = new User(
-                    rs.getInt("id"),
-                    rs.getString("name"),
-                    rs.getString("surname"),
-                    rs.getString("email"),
-                    rs.getString("password")
+            try(var rs = stmt.executeQuery();) {
+                if (rs.next()) {
+                    user = new User(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            rs.getString("surname"),
+                            rs.getString("email"),
+                            rs.getString("password")
                     );
+                }
             }
-            return user;
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
         }
+        return user;
     }
 
     public boolean existsByEmail(String email) {
         String sql = "SELECT 1 FROM users WHERE email = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, email);

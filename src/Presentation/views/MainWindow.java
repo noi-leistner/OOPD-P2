@@ -33,8 +33,11 @@ public class MainWindow extends JFrame {
 
 
         mainPanel.add(new AuthPanel(this, authController), AUTH_SCREEN);
-        //mainPanel.add(new DashboardPanel(this), DASHBOARD_SCREEN);
 
+
+
+        DashboardPanel dashboardPanel = new DashboardPanel(this, authController);
+        mainPanel.add(new DashboardPanel(this, authController), DASHBOARD_SCREEN);
         add(mainPanel);
 
         cardLayout.show(mainPanel, AUTH_SCREEN);
@@ -42,5 +45,7 @@ public class MainWindow extends JFrame {
 
     public void switchTo(String screen) {
         cardLayout.show(mainPanel, screen);
+        this.revalidate();
+        this.repaint();
     }
 }

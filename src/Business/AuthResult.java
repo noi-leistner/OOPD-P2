@@ -14,7 +14,7 @@ public enum AuthResult {
 
     public String toDisplayMessage () {
         return switch (this) {
-            case SUCCESS -> "Logout Successful";
+            case SUCCESS -> "Login Successful";
             case INVALID_CREDENTIALS -> "Invalid Credentials";
             case ACCOUNT_INACTIVE -> "Account Inactive";
             case EMPTY_FIELDS -> "Empty Fields";
