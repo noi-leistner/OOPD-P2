@@ -52,6 +52,7 @@ public class RegisterForm extends JPanel {
                         "Something went wrong. Please try again.",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
+                case WEAK_PASSWORD ->  JOptionPane.showMessageDialog(this, "Password must contain 8 letters and a special character");
             }
         });
 

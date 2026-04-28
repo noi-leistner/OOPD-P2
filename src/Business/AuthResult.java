@@ -6,7 +6,8 @@ public enum AuthResult {
     ACCOUNT_INACTIVE,                   /*Account deactivated */
     EMPTY_FIELDS,                       /*1 or more field that are null */
     EMAIL_ALREADY_EXISTS,               /*Email already created when registering */
-    DATABASE_ERROR;                     /*Error in the database*/
+    DATABASE_ERROR,                     /*Error in the database*/
+    WEAK_PASSWORD;                      /*The password does not contain a special char and be +8 in length
 
     /**
      * Translates enumeration into a readable message:
@@ -20,6 +21,7 @@ public enum AuthResult {
             case EMPTY_FIELDS -> "Empty Fields";
             case EMAIL_ALREADY_EXISTS -> "Email Already Exists";
             case DATABASE_ERROR -> "Database Error";
+            case WEAK_PASSWORD -> "Password must contain 8 letters and a special character";
         };
     }
 

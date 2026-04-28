@@ -32,6 +32,9 @@ public class AuthManager {
 
     public AuthResult signUp(User user) {
         if (user == null) return AuthResult.DATABASE_ERROR;
+        String passwordPattern = "^(?=.*[0-9])(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{8,}$";
+        if (!user.getPassword().matches(passwordPattern)) {return AuthResult.WEAK_PASSWORD;}
+        if (userDAO.existsByEmail(user.getEmail())) return AuthResult.EMAIL_ALREADY_EXISTS;
         String hashedPass = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
         user.setPassword(hashedPass);
         return userDAO.addUser(user);
