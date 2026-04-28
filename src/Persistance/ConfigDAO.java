@@ -1,4 +1,4 @@
-package Persistance;
+/*package Persistance;
 
 import Business.Entities.Config;
 import com.google.gson.Gson;
@@ -11,4 +11,4 @@ public class ConfigDAO {
         Gson gson = new Gson();
         return gson.fromJson(new FileReader(FILE_PATH), Config.class);
     }
-}
+}*/

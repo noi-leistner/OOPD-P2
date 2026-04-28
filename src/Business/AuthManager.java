@@ -11,9 +11,17 @@ public class AuthManager {
         this.userDAO = userDAO;
     }
 
-    User login(User user) {
-        //TODO: Implement
-        return null;
+    public AuthResult login(String email, String password) {
+        if (email == null || email.isEmpty() || password == null || password.isEmpty()) {return AuthResult.EMPTY_FIELDS;}
+
+        User user = userDAO.getUserByEmail(email);
+        if (user == null) {return AuthResult.INVALID_CREDENTIALS;}
+        if (!password.equals(user.getPassword())) {
+            return AuthResult.INVALID_CREDENTIALS;
+        } else {
+            SessionManager.getInstance().login(user);
+            return AuthResult.SUCCESS;
+        }
     }
 
     public AuthResult signUp(User user) {

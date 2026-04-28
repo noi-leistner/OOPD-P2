@@ -15,9 +15,9 @@ public class AuthController {
         this.sessionManager = sessionManager;
     }
 
-    public boolean logIn(String email, String password) {
-        //TODO: Implement
-        return true;
+    public AuthResult logIn(String email, String password) {
+        if (email.isEmpty() && password.isEmpty()) {return AuthResult.EMPTY_FIELDS;}
+        return authManager.login(email, password);
     }
 
     public AuthResult signUp(User user) {

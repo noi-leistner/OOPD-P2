@@ -69,6 +69,31 @@ public class UserDAOSql implements UserDAO {
         return null;
     }
 
+    public User getUserByEmail(String email) {
+        String sql = "SELECT id, name, surname, email, password FROM users WHERE email = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);){
+
+            User user = null;
+
+            stmt.setString(1, email);
+            var rs = stmt.executeQuery();
+            if (rs.next()) {
+                user = new User(
+                    rs.getInt("id"),
+                    rs.getString("name"),
+                    rs.getString("surname"),
+                    rs.getString("email"),
+                    rs.getString("password")
+                    );
+            }
+            return user;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public boolean existsByEmail(String email) {
         String sql = "SELECT 1 FROM users WHERE email = ?";
         try (Connection conn = DatabaseConnection.getConnection();

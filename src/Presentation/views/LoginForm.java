@@ -1,5 +1,6 @@
 package Presentation.views;
 
+import Business.AuthResult;
 import Presentation.controllers.AuthController;
 
 import javax.swing.*;
@@ -20,7 +21,14 @@ public class LoginForm extends JPanel {
 
         JButton loginButton = new JButton("Login");
         loginButton.addActionListener(e -> {
-            boolean success = auth.logIn(email.getText(), new String(password.getPassword()));
+            AuthResult result = auth.logIn(email.getText(), new String(password.getPassword()));
+            switch (result) {
+                case AuthResult.SUCCESS -> mainWindow.switchTo(MainWindow.DASHBOARD_SCREEN);
+                case AuthResult.EMPTY_FIELDS -> JOptionPane.showMessageDialog(LoginForm.this, "Please fill all the fields!");
+                case AuthResult.INVALID_CREDENTIALS -> JOptionPane.showMessageDialog(LoginForm.this, "Invalid credentials!");
+                case AuthResult.DATABASE_ERROR -> JOptionPane.showMessageDialog(LoginForm.this, "Something went wrong, please try again!");
+                default -> JOptionPane.showMessageDialog(LoginForm.this, "Something went wrong! I dont know where :c");
+            }
         });
 
         JButton goToRegister = new JButton("Register if you do not have an account here");
