@@ -13,7 +13,7 @@ public class UserDAOSql implements UserDAO {
     public AuthResult addUser(User user) {
         if (existsByEmail(user.getEmail())) return AuthResult.EMAIL_ALREADY_EXISTS;
 
-        String sql = "INSERT INTO users (name, surname, email, password) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO users (name, surname, email, password, role) VALUES (?, ?, ?, ?,?)";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -21,6 +21,7 @@ public class UserDAOSql implements UserDAO {
             stmt.setString(2, user.getSurname());
             stmt.setString(3, user.getEmail());
             stmt.setString(4, user.getPassword());
+            stmt.setString(5, user.getRole());
             stmt.executeUpdate();
             return AuthResult.SUCCESS;
 
@@ -48,19 +49,20 @@ public class UserDAOSql implements UserDAO {
 
     @Override
     public User getUserById(int id) {
-        String sql = "SELECT id, name, surname, email, password FROM users WHERE id = ?";
+        String sql = "SELECT id, name, surname, email, password, role FROM users WHERE id = ?";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
             var rs = stmt.executeQuery();
             if (rs.next()) {
-                return new Business.Entities.User(
+                User user =  new User (
                         rs.getInt("id"),
                         rs.getString("name"),
                         rs.getString("surname"),
                         rs.getString("email"),
-                        rs.getString("password")
+                        rs.getString("password"),
+                        rs.getString("role")
                 );
             }
         } catch (SQLException e) {
@@ -70,7 +72,7 @@ public class UserDAOSql implements UserDAO {
     }
 
     public User getUserByEmail(String email) {
-        String sql = "SELECT id, name, surname, email, password FROM users WHERE email = ?";
+        String sql = "SELECT id, name, surname, email, password, role FROM users WHERE email = ?";
         User user = null;
         try (Connection conn = ConfigDAO.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);){
@@ -84,7 +86,8 @@ public class UserDAOSql implements UserDAO {
                             rs.getString("name"),
                             rs.getString("surname"),
                             rs.getString("email"),
-                            rs.getString("password")
+                            rs.getString("password"),
+                            rs.getString("role")
                     );
                 }
             }

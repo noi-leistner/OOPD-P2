@@ -20,24 +20,24 @@ public class MainWindow extends JFrame {
     public MainWindow() {
         setTitle("Parking");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 500);
+        setSize(600, 550);
         setLocationRelativeTo(null);
 
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-        UserDAOSql userDAO             = new UserDAOSql();
-        AuthManager authManager     = new AuthManager(userDAO);
+        UserDAOSql userDAO            = new UserDAOSql();
+        AuthManager authManager       = new AuthManager(userDAO);
         SessionManager sessionManager = SessionManager.getInstance();
         AuthController authController = new AuthController(authManager, sessionManager);
 
 
-        mainPanel.add(new AuthPanel(this, authController), AUTH_SCREEN);
+        AuthPanel authPanel = new AuthPanel(this, authController);
+        DashboardPanel dashboardPanel = new  DashboardPanel(this, authController);
 
+        mainPanel.add(AUTH_SCREEN, authPanel);
+        mainPanel.add(DASHBOARD_SCREEN, dashboardPanel);
 
-
-        DashboardPanel dashboardPanel = new DashboardPanel(this, authController);
-        mainPanel.add(new DashboardPanel(this, authController), DASHBOARD_SCREEN);
         add(mainPanel);
 
         cardLayout.show(mainPanel, AUTH_SCREEN);

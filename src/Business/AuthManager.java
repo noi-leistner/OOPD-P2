@@ -2,6 +2,7 @@ package Business;
 
 import Business.Entities.User;
 import Persistance.UserDAOSql;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class AuthManager {
 
@@ -12,35 +13,35 @@ public class AuthManager {
     }
 
     public AuthResult login(String email, String password) {
-        // 1. Validación de campos (Muy bien hecho)
         if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
             return AuthResult.EMPTY_FIELDS;
         }
-
-        // 2. Intento de recuperar usuario
         User user = userDAO.getUserByEmail(email.trim());
 
-        // Si el DAO devuelve null (porque no existe o por error de SQL)
         if (user == null) {
-            System.out.println("DEBUG: EMAIL NOT FOUND");
             return AuthResult.INVALID_CREDENTIALS;
         }
 
-        // 3. Verificación de contraseña (texto plano de momento)
-        if (!password.equals(user.getPassword())) {
-            System.out.println("DEBUG: USER PASSWORD NOT FOUND");
-            return AuthResult.INVALID_CREDENTIALS;
-        } else {
-            System.out.println("USER FOUND");
-            // 4. ÉXITO: Guardamos en la sesión ANTES de devolver el resultado
+        if (BCrypt.checkpw(password, user.getPassword())) {
             SessionManager.getInstance().login(user);
-            System.out.println("✅ Sesión iniciada para: " + user.getEmail());
             return AuthResult.SUCCESS;
         }
+        return AuthResult.INVALID_CREDENTIALS;
     }
 
     public AuthResult signUp(User user) {
         if (user == null) return AuthResult.DATABASE_ERROR;
+        // Check for email requirements:
+        String emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
+        if (!user.getEmail().matches(emailPattern)) {return AuthResult.INVALID_EMAIL;}
+
+        //Check for password requirements:
+        String passwordPattern = "^(?=.*[0-9])(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{8,}$";
+        if (!user.getPassword().matches(passwordPattern)) {return AuthResult.WEAK_PASSWORD;}
+
+        if (userDAO.existsByEmail(user.getEmail())) return AuthResult.EMAIL_ALREADY_EXISTS;
+        String hashedPass = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+        user.setPassword(hashedPass);
         return userDAO.addUser(user);
     }
 

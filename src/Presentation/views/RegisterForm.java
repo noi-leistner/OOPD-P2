@@ -10,14 +10,16 @@ import java.awt.*;
 public class RegisterForm extends JPanel {
 
     public RegisterForm(MainWindow app, AuthController auth, AuthPanel authPanel) {
-        setLayout(new GridLayout(12, 1, 5, 5));
-        setPreferredSize(new Dimension(340, 370));
+        setLayout(new GridLayout(14, 1, 5, 5));
+        setPreferredSize(new Dimension(340, 420));
 
         JTextField nameField = new JTextField(20);
         JTextField surnameField = new JTextField(20);
         JTextField emailField = new JTextField(20);
         JPasswordField passField = new JPasswordField(20);
         JPasswordField confirmField = new JPasswordField(20);
+        String[] roles = { "Client", "Worker", "Admin" };
+        JComboBox<String> roleCombo = new JComboBox<>(roles);
 
         JButton registerBtn = new JButton("Register");
         registerBtn.addActionListener(e -> {
@@ -26,6 +28,7 @@ public class RegisterForm extends JPanel {
             String email    = emailField.getText().trim();
             String password = new String(passField.getPassword()).trim();
             String confirm  = new String(confirmField.getPassword()).trim();
+            String role = roleCombo.getSelectedItem().toString().trim();
 
             if (name.isBlank() || surname.isBlank() || email.isBlank() || password.isBlank() || confirm.isBlank()) {
                 JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Missing fields", JOptionPane.WARNING_MESSAGE);
@@ -37,7 +40,7 @@ public class RegisterForm extends JPanel {
                 return;
             }
 
-            User user = new User(name, surname, email, password);
+            User user = new User(name, surname, email, password, role);
             AuthResult result = auth.signUp(user);
             switch (result) {
                 case SUCCESS -> app.switchTo(MainWindow.DASHBOARD_SCREEN);
@@ -49,6 +52,14 @@ public class RegisterForm extends JPanel {
                         "Something went wrong. Please try again.",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
+                case WEAK_PASSWORD ->  JOptionPane.showMessageDialog(this,
+                        "Password must contain 8 letters and a special character",
+                        "Invalid Password",
+                        JOptionPane.WARNING_MESSAGE);
+                case INVALID_EMAIL ->  JOptionPane.showMessageDialog(this,
+                        "Enter a real email address.",
+                        "Invalid email",
+                        JOptionPane.WARNING_MESSAGE);
             }
         });
 
@@ -65,6 +76,8 @@ public class RegisterForm extends JPanel {
         add(passField);
         add(new JLabel("Confirm password"));
         add(confirmField);
+        add(new JLabel("Select Role"));
+        add(roleCombo);
         add(registerBtn);
         add(goToLogin);
     }
