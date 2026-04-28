@@ -7,7 +7,8 @@ public enum AuthResult {
     EMPTY_FIELDS,                       /*1 or more field that are null */
     EMAIL_ALREADY_EXISTS,               /*Email already created when registering */
     DATABASE_ERROR,                     /*Error in the database*/
-    WEAK_PASSWORD;                      /*The password does not contain a special char and be +8 in length
+    WEAK_PASSWORD,                      /*The password does not contain a special char and be +8 in length*/
+    INVALID_EMAIL;                      /*Email does not contain '@' or '.'*/
 
     /**
      * Translates enumeration into a readable message:
@@ -22,10 +23,9 @@ public enum AuthResult {
             case EMAIL_ALREADY_EXISTS -> "Email Already Exists";
             case DATABASE_ERROR -> "Database Error";
             case WEAK_PASSWORD -> "Password must contain 8 letters and a special character";
+            case INVALID_EMAIL -> "Email must be a real email";
         };
     }
-
-    public boolean isSuccess () {return this == SUCCESS;}
 
 }
 
