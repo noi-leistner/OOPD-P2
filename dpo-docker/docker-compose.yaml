@@ -19,7 +19,7 @@ services:
     container_name: phpmyadmin
     restart: always
     ports:
-      - "8080:80"
+      - "3306:3306"
     environment:
       PMA_HOST: ${PMA_HOST}
       PMA_PORT: ${PMA_PORT}

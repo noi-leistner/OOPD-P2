@@ -1,14 +1,40 @@
 package Persistance;
 
-import Business.Entities.Config;
-import com.google.gson.Gson;
-import java.io.FileReader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
+/**
+ * Class charged with the configuration to stablish connection with the MySQL inside Docker:
+ */
 public class ConfigDAO {
-    private static final String FILE_PATH = "config.json";
+    /** URL from .env (inside .gitignore) from docker */
+    private static final String URL = "jdbc:mysql://localhost:3306/mydb?serverTimezone=UTC";
+    private static final String USER = "root";
+    private static final String PASS = "rootpassword";
 
-    public Config getConfig() throws Exception {
-        Gson gson = new Gson();
-        return gson.fromJson(new FileReader(FILE_PATH), Config.class);
+    /**
+     * Starts and returns an active MySQL connection:
+     * @returns a connection.
+     */
+    public static Connection getConnection() {
+        Connection connection = null;
+        try {
+            // Charge the Driver dynamically
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            // Connection try:
+            connection = DriverManager.getConnection(URL, USER, PASS);
+            System.out.println("Connected to database successfully");
+
+        } catch (ClassNotFoundException e) {
+            System.err.println("Driver not found:" + e.getMessage());
+        } catch (SQLException e) {
+            System.err.println("SQL Error:" + e.getMessage());
+        }
+        return connection;
     }
+
+
+
+
 }
