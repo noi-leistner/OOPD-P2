@@ -6,7 +6,7 @@ public class SessionManager {
     private static SessionManager instance;
     private User currentUser;
 
-    private SessionManager() {}
+    protected SessionManager() {}
 
     public static SessionManager getInstance() {
         if (instance == null) {

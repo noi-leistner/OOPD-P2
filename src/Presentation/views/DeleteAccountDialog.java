@@ -1,5 +1,8 @@
 package Presentation.views;
 
+import Business.SessionManager;
+import Presentation.controllers.AuthController;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -84,7 +87,7 @@ public class DeleteAccountDialog extends JDialog {
 
         JButton deleteBtn = new JButton(button_text);
         deleteBtn.setPreferredSize(new Dimension(90, 32));
-        deleteBtn.setBackground(new Color(220, 53, 69));
+        deleteBtn.setBackground(new Color(21, 20, 20));
         deleteBtn.setForeground(Color.WHITE);
         deleteBtn.setOpaque(true);
         deleteBtn.setBorderPainted(false);
