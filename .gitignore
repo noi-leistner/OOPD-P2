@@ -31,3 +31,10 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Secrets ###
+.env
+
+### Schema ###
+!schema.sql
+!init.sql
