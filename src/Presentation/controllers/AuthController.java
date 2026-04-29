@@ -28,7 +28,9 @@ public class AuthController {
         return result;
     }
 
+    // TODO: Delete everything!!!
     void logOut() {
+        System.out.println("\nUser logged out.");
         sessionManager.logout();
     }
 
@@ -40,10 +42,10 @@ public class AuthController {
         if (deleted) {
             logOut();
         }
+        System.out.println("\nAccount deleted!\n");
         return deleted;
     }
 
     // When implementing the button for logging out / delete account, just call these two functions.
-    // Before calling them call DeleteAccountDialog, to make sure the action is what the user wants.
 
 }
