@@ -33,4 +33,9 @@ public class User {
     public String getRole()    { return role; }
     public void setRole(String role) { this.role = role; }
     public void setPassword(String password) { this.password = password; }
+
+    public boolean isAdmin() {
+        //TODO: add logic
+        return true;
+    }
 }
