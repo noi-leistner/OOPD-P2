@@ -1,6 +1,7 @@
 package Presentation.views;
 
 import Business.Entities.ParkingSpace;
+import Presentation.theme.AppColors;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -27,18 +28,20 @@ public class ManageSlotsPanel extends JPanel {
 
         JLabel title = new JLabel("Parking Slots");
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        title.setFont(new Font("Arial", Font.BOLD, 16));
 
-        wrapper.add(Box.createVerticalStrut(15));
+        wrapper.add(title);
+        wrapper.add(Box.createVerticalStrut(15));   // Spacing between title and buttons
 
         JPanel threeButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
 
-        JButton addBtn = new JButton("Add Slot");
-        addBtn.addActionListener(e -> showSlotInfoDialog("Add slot"));
+        JButton addBtn = buildButton("Add Slot");
+        addBtn.addActionListener(e -> showSlotInfoDialog("Add slot", null));
 
-        JButton editBtn = new JButton("Edit Slot");
+        JButton editBtn = buildButton("Edit Slot");
         editBtn.addActionListener(e -> showEditSlotDialog());
 
-        JButton removeBtn = new JButton("Remove Slot");
+        JButton removeBtn = buildButton("Remove Slot");
         removeBtn.addActionListener(e -> showRemoveStatusDialog());
 
         threeButtons.add(addBtn);
@@ -48,6 +51,20 @@ public class ManageSlotsPanel extends JPanel {
 
         wrapper.add(Box.createVerticalStrut(15));
         return wrapper;
+    }
+
+    private JButton buildButton(String text) {
+        JButton btn = new JButton(text);
+
+        btn.setContentAreaFilled(false);
+        btn.setOpaque(true);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setBackground(AppColors.LIGHT_BLUE);
+        btn.setForeground(Color.WHITE);
+        btn.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+
+        return btn;
     }
 
     private JScrollPane buildTable() {
@@ -83,108 +100,160 @@ public class ManageSlotsPanel extends JPanel {
         }
     }
 
-    private void showSlotInfoDialog(String text) {
+    private void styleButton(JButton btn, boolean cancel) {
+        btn.setBackground(cancel ? AppColors.RED : AppColors.LIGHT_BLUE);
+        btn.setForeground(Color.WHITE);
+
+        btn.setOpaque(true);
+        btn.setContentAreaFilled(true);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+
+        btn.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
+
+        btn.setHorizontalAlignment(SwingConstants.CENTER);
+    }
+
+    private void showSlotInfoDialog(String text, String id) {
+        JPanel formPanel = new JPanel(new GridLayout(0, 1, 5, 5));
+        JButton okBtn = new JButton("OK");
+        JButton cancelBtn = new JButton("Cancel");
+
+        styleButton(okBtn, false);
+        styleButton(cancelBtn, true);
+
+        JDialog dialog = createBaseDialog(text, new Dimension(400, 500), formPanel, okBtn, cancelBtn);
+
         JTextField idField = new JTextField(15);
+        if (id != null) idField.setText(id);
+
         JTextField floorField = new JTextField(15);
         JComboBox<String> typeCombo = new JComboBox<>(new String[]{"Car", "Motorcycle", "Truck"});
         JTextField plateField = new JTextField(15);
         JComboBox<String> occStatusCombo = new JComboBox<>(new String[]{"Occupied", "Free"});
         JComboBox<String> resStatusCombo = new JComboBox<>(new String[]{"Reserved", "Unreserved"});
 
-        JPanel panel = new JPanel(new GridLayout(13, 1, 5, 5));
+        JLabel titleLabel = new JLabel(text.toUpperCase());
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        formPanel.add(titleLabel);
 
-        JLabel title = new JLabel(text);
-        Font font = new Font("Courier", Font.BOLD, 12);
-        title.setFont(font);
-        panel.add(title);
+        addField(formPanel, "Slot identifier:", idField);
+        addField(formPanel, "Floor:", floorField);
+        addField(formPanel, "Vehicle type:", typeCombo);
+        addField(formPanel, "Vehicle plate:", plateField);
+        addField(formPanel, "Occupational status:", occStatusCombo);
+        addField(formPanel, "Reservation status:", resStatusCombo);
 
-        panel.add(new JLabel("Slot identifier:"));
-        panel.add(idField);
-
-        panel.add(new JLabel("Floor:"));
-        panel.add(floorField);
-
-        panel.add(new JLabel("Vehicle type:"));
-        panel.add(typeCombo);
-
-        panel.add(new JLabel("Vehicle plate:"));
-        panel.add(plateField);
-
-        panel.add(new JLabel("Occupational status:"));
-        panel.add(occStatusCombo);
-
-        panel.add(new JLabel("Reservation status:"));
-        panel.add(resStatusCombo);
-
-
-
-        int result = JOptionPane.showConfirmDialog(
-                this, panel, text, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE
-        );
-
-        if (result == JOptionPane.OK_OPTION) {
-            if (idField.getText().isBlank() || floorField.getText().isBlank()) {
-                JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Missing fields", JOptionPane.WARNING_MESSAGE);
-                //TODO: go back to add slot screen
-                return;
+        okBtn.addActionListener(e -> {
+            if (idField.getText().isBlank() || floorField.getText().isBlank() || plateField.getText().isBlank()) {
+                JOptionPane.showMessageDialog(dialog, "Please fill in all fields.");
+            } else {
+                System.out.println("Saving: " + idField.getText());
+                if (id != null) {
+                    JOptionPane.showMessageDialog(dialog, "Slot edited successfully!");
+                } else {
+                    JOptionPane.showMessageDialog(dialog, "Slot added successfully!");
+                }
+                //TODO: pass to controller
+                dialog.dispose();
             }
-            JOptionPane.showMessageDialog(this, text + " - confirmation", "Confirmation", JOptionPane.INFORMATION_MESSAGE);
-            // TODO: pass to controller
-            System.out.println(text + ": " + idField.getText());
-        }
+        });
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
     }
 
     private void showEditSlotDialog() {
+        JPanel formPanel = new JPanel(new GridLayout(0, 1, 5, 5));
         JTextField idField = new JTextField(15);
+        JButton nextBtn = new JButton("Next");
+        JButton cancelBtn = new JButton("Cancel");
 
-        JPanel panel = new JPanel(new GridLayout(6, 1, 5, 5));
-        JLabel title = new JLabel("Edit Slot");
-        Font font = new Font("Courier", Font.BOLD, 12);
-        title.setFont(font);
-        panel.add(title);
+        styleButton(nextBtn, false);
+        styleButton(cancelBtn, true);
 
-        panel.add(new JLabel("Slot identifier:"));
-        panel.add(idField);
+        JDialog dialog = createBaseDialog("Edit Slot", new Dimension(350, 200), formPanel, nextBtn, cancelBtn);
 
-        int result = JOptionPane.showConfirmDialog(
-                this, panel, "Edit Parking Slot", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE
-        );
+        JLabel title = new JLabel("EDIT PARKING SLOT");
+        title.setFont(new Font("Arial", Font.BOLD, 14));
+        formPanel.add(title);
+        addField(formPanel, "Enter Slot Identifier:", idField);
 
-        if (result == JOptionPane.OK_OPTION) {
+        nextBtn.addActionListener(e -> {
             if (idField.getText().isBlank()) {
-                JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Missing fields", JOptionPane.WARNING_MESSAGE);
-                //TODO: go back to edit slot screen
-                return;
+                JOptionPane.showMessageDialog(dialog, "Please enter a slot ID.");
+            } else {
+                dialog.dispose();
+                //TODO: check if slot exists
+                showSlotInfoDialog("Edit slot", idField.getText());
             }
-            showSlotInfoDialog("Edit slot");
-            // TODO: pass to controller
-            System.out.println("Edit slot: " + idField.getText());
-        }
+        });
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
     }
 
     private void showRemoveStatusDialog() {
+        JPanel formPanel = new JPanel(new GridLayout(0, 1, 5, 5));
         JTextField idField = new JTextField(15);
+        JButton removeBtn = new JButton("Remove");
+        JButton cancelBtn = new JButton("Cancel");
 
-        JPanel panel = new JPanel(new GridLayout(6, 1, 5, 5));
-        JLabel title = new JLabel("Remove Slot");
-        Font font = new Font("Courier", Font.BOLD, 12);
-        title.setFont(font);
-        panel.add(title);
+        styleButton(removeBtn, true);
+        styleButton(cancelBtn, false);
 
-        panel.add(new JLabel("Slot identifier:"));
-        panel.add(idField);
+        JDialog dialog = createBaseDialog("Remove Slot", new Dimension(350, 200), formPanel, removeBtn, cancelBtn);
 
-        int result = JOptionPane.showConfirmDialog(
-                this,
-                "Are you sure you want to remove slot " + idField + "?",
-                "Confirm Remove",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE
-        );
+        JLabel title = new JLabel("REMOVE PARKING SLOT");
+        title.setFont(new Font("Arial", Font.BOLD, 14));
+        formPanel.add(title);
+        addField(formPanel, "Enter Slot Identifier to remove:", idField);
 
-        if (result == JOptionPane.YES_OPTION) {
-            // TODO: pass to controller
-            System.out.println("Remove slot: " + idField);
-        }
+        removeBtn.addActionListener(e -> {
+            String id = idField.getText().trim();
+            //TODO: check if slot exists
+            if (id.isBlank()) {
+                JOptionPane.showMessageDialog(dialog, "Please enter a slot ID.");
+            } else {
+                int confirm = JOptionPane.showConfirmDialog(dialog, "Delete slot " + id + "?", "Confirm", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    dialog.dispose();
+                }
+            }
+        });
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+    }
+
+    private JDialog createBaseDialog(String title, Dimension size, JPanel formPanel, JButton actionBtn, JButton cancelBtn) {
+        JDialog dialog = new JDialog((Frame) null, title, true);
+        dialog.setLayout(new BorderLayout());
+
+        formPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        formPanel.setPreferredSize(size);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 15));
+        Dimension btnSize = new Dimension(100, 35);
+
+        actionBtn.setPreferredSize(btnSize);
+        cancelBtn.setPreferredSize(btnSize);
+        cancelBtn.addActionListener(e -> dialog.dispose());
+
+        buttonPanel.add(actionBtn);
+        buttonPanel.add(cancelBtn);
+
+        dialog.add(formPanel, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        return dialog;
+    }
+
+    private void addField(JPanel panel, String label, JComponent field) {
+        panel.add(new JLabel(label));
+        panel.add(field);
     }
 }
