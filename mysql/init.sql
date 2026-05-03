@@ -1,0 +1,11 @@
+CREATE DATABASE IF NOT EXISTS mydb;
+USE mydb;
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    surname VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(60) NOT NULL, -- Importante: 60 para el Hash de BCrypt
+    role VARCHAR(20) NOT NULL
+);
