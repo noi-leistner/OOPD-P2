@@ -20,7 +20,7 @@ public class MainWindow extends JFrame {
     public MainWindow() {
         setTitle("Parking");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 550);
+        setSize(850, 600);
         setLocationRelativeTo(null);
 
         cardLayout = new CardLayout();
