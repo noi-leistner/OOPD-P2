@@ -35,9 +35,9 @@ CREATE TABLE reservations (
 );
 
 -- Insert test data
-INSERT INTO users (name, surname, email, password) VALUES
-    ('Admin', 'User', 'admin@lsparking.com', 'admin123'),
-    ('Test', 'User', 'test@lsparking.com', 'test123');
+INSERT INTO users (name, surname, email, password, role) VALUES
+    ('Admin', 'User', 'admin@lsparking.com', 'admin123', 'admin'),
+    ('Test', 'User', 'test@lsparking.com', 'test123', 'user');
 
 INSERT INTO vehicles (license_plate, vehicle_type) VALUES
     ('1234ABC', 'car'),
