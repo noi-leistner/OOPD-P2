@@ -1,15 +1,22 @@
 package Business.Entities;
 
 public class ParkingSpace {
-        int code;
+        int id;
         int floor;
         String current_status;
         String reservation_status;
         String type;
-        int spaceId;
 
-        public int getCode() {
-                return code;
+        public ParkingSpace (int id, int floor, String current_status, String reservation_status, String type) {
+                this.id = id;
+                this.floor = floor;
+                this.current_status = current_status;
+                this.reservation_status = reservation_status;
+                this.type = type;
+        }
+
+        public int getId() {
+                return id;
         }
 
         public int getFloor() {
@@ -26,10 +33,6 @@ public class ParkingSpace {
 
         public String getType() {
                 return type;
-        }
-
-        public int getSpaceId() {
-                return spaceId;
         }
 }
 

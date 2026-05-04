@@ -3,6 +3,7 @@ package Presentation.views;
 import Business.Entities.User;
 import Business.SessionManager;
 import Presentation.controllers.AuthController;
+import Presentation.controllers.ParkingSpaceController;
 import Presentation.theme.AppColors;
 
 import javax.swing.*;
@@ -16,7 +17,11 @@ public class DashboardPanel extends JPanel {
     private final java.util.List<JButton> buttons = new java.util.ArrayList<>();
     private JButton initialButton;
 
-    public DashboardPanel(MainWindow mainWindow, AuthController authController) {
+    private ParkingSpaceController slotController;
+
+    public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController) {
+        this.slotController = slotController;
+
         setLayout(new BorderLayout());
 
         cardLayout = new CardLayout();
@@ -44,7 +49,7 @@ public class DashboardPanel extends JPanel {
             addButton(sidebar, "Last Hour Occupancy",  "OCCUPANCY");
             addButton(sidebar, "Current Parking status", "STATUS");
 
-            contentArea.add(new ManageSlotsPanel(),   "SLOTS");
+            contentArea.add(new ManageSlotsPanel(slotController),   "SLOTS");
 //            contentArea.add(new ManageUsersPanel(),   "USERS");
 //            contentArea.add(new OccupancyPanel(),  "OCCUPANCY");
 //            contentArea.add(new CurrentStatusPanel(),  "STATUS");

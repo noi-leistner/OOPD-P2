@@ -1,14 +1,14 @@
 package Business;
 
 import Business.Entities.User;
-import Persistance.UserDAOSql;
+import Persistance.UserDAO;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class AuthManager {
 
-    private UserDAOSql userDAO;
+    private final UserDAO userDAO;
 
-    public AuthManager(UserDAOSql userDAO) {
+    public AuthManager(UserDAO userDAO) {
         this.userDAO = userDAO;
     }
 

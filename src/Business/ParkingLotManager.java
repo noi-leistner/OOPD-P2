@@ -2,73 +2,91 @@ package Business;
 
 import Business.Entities.ParkingSpace;
 import Business.Entities.Reservation;
+import Persistance.ParkingSpaceDAO;
 
 import java.util.List;
 
 public class ParkingLotManager {
 
-    ParkingSpace addSpace(int code, int floor, String vehicleType) {
+    private final ParkingSpaceDAO parkingSpaceDao;
+
+    public ParkingLotManager (ParkingSpaceDAO parkingSpaceDao) {
+        this.parkingSpaceDao = parkingSpaceDao;
+    }
+
+    public SpaceResult addSpace(ParkingSpace space) {
+        if (space == null) return SpaceResult.DATABASE_ERROR;
+        if (parkingSpaceDao.existsById(space.getId())) return SpaceResult.ALREADY_EXISTS;
+
+        boolean saved = parkingSpaceDao.addParkingSpace(space);
+        return saved ? SpaceResult.SUCCESS : SpaceResult.DATABASE_ERROR;
+    }
+
+    public SpaceResult editSpace(ParkingSpace space) {
+        if (space == null) return SpaceResult.DATABASE_ERROR;
+
+        boolean updated = parkingSpaceDao.updateParkingSpace(space);
+        return updated ? SpaceResult.SUCCESS : SpaceResult.DATABASE_ERROR;
+    }
+
+    public SpaceResult deleteSpace(int spaceId) {
+        boolean deleted = parkingSpaceDao.deleteParkingSpace(spaceId);
+        return deleted ? SpaceResult.SUCCESS : SpaceResult.DATABASE_ERROR;
+    }
+
+
+    public ParkingSpace getSpaceDetails(int spaceId) {
         //TODO: Implement
         return null;
     }
 
-    void editSpace(int spaceId) {
-        //TODO: Implement
-    }
-
-    void deleteSpace(int spaceId) {
-        //TODO: Implement
-    }
-
-
-    ParkingSpace getSpaceDetails(int spaceId) {
+    public List<ParkingSpace> getAllSpaces() {
         //TODO: Implement
         return null;
     }
 
-    List<ParkingSpace> getAllSpaces() {
+    public List<ParkingSpace> getAvailableSpacesForType(String vehicleType) {
         //TODO: Implement
         return null;
     }
 
-    List<ParkingSpace> getAvailableSpacesForType(String vehicleType) {
+    public ParkingSpace enterWithReservation(String licensePlate) {
         //TODO: Implement
         return null;
     }
 
-    ParkingSpace enterWithReservation(String licensePlate) {
+    public ParkingSpace enterWithoutReservation(String licensePlate, String vehicleType) {
         //TODO: Implement
         return null;
     }
 
-    ParkingSpace enterWithoutReservation(String licensePlate, String vehicleType) {
+    public void exit(String licensePlate){
+        //TODO: Implement
+    }
+
+    public Reservation reserve(String licensePlate, String vehicleType, int spaceId) {
         //TODO: Implement
         return null;
     }
 
-    void exit(String licensePlate){
+    public void cancelReservation(int reservationId, String licensePlate){
         //TODO: Implement
     }
 
-    Reservation reserve(String licensePlate, String vehicleType, int spaceId) {
+    public void cancelReservationByAdmin(int spaceId) {
+        //TODO: Implement
+    }
+
+    public List<Reservation> getUserReservations(int userId) {
         //TODO: Implement
         return null;
     }
 
-    void cancelReservation(int reservationId, String licensePlate){
+    public void getOccupancyLastHour() {
         //TODO: Implement
     }
 
-    void cancelReservationByAdmin(int spaceId) {
-        //TODO: Implement
-    }
-
-    List<Reservation> getUserReservations(int userId) {
-        //TODO: Implement
-        return null;
-    }
-
-    void getOccupancyLastHour() {
-        //TODO: Implement
+    public boolean slotExistsById(int id) {
+        return parkingSpaceDao.existsById(id);
     }
 }
