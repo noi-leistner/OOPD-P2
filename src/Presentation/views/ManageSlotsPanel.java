@@ -1,6 +1,7 @@
 package Presentation.views;
 
 import Business.Entities.ParkingSpace;
+import Presentation.controllers.ParkingSpaceController;
 import Presentation.theme.AppColors;
 
 import javax.swing.*;
@@ -12,8 +13,10 @@ public class ManageSlotsPanel extends JPanel {
 
     private DefaultTableModel tableModel;
     private JTable table;
+    private ParkingSpaceController slotController;
 
-    public ManageSlotsPanel() {
+    public ManageSlotsPanel(ParkingSpaceController slotController) {
+        this.slotController = slotController;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
@@ -90,12 +93,11 @@ public class ManageSlotsPanel extends JPanel {
         tableModel.setRowCount(0); // clear existing rows
         for (ParkingSpace space : spaces) {
             tableModel.addRow(new Object[]{
-                    space.getCode(),
+                    space.getId(),
                     space.getFloor(),
                     space.getCurrentStatus(),
                     space.getReservationStatus(),
-                    space.getType(),
-                    space.getSpaceId()
+                    space.getType()
             });
         }
     }
@@ -125,7 +127,11 @@ public class ManageSlotsPanel extends JPanel {
         JDialog dialog = createBaseDialog(text, new Dimension(400, 500), formPanel, okBtn, cancelBtn);
 
         JTextField idField = new JTextField(15);
-        if (id != null) idField.setText(id);
+        if (id != null) {
+            idField.setText(id);
+            idField.setEditable(false);
+            idField.setBackground(Color.LIGHT_GRAY);
+        }
 
         JTextField floorField = new JTextField(15);
         JComboBox<String> typeCombo = new JComboBox<>(new String[]{"Car", "Motorcycle", "Truck"});
@@ -137,6 +143,7 @@ public class ManageSlotsPanel extends JPanel {
         titleLabel.setFont(new Font("Arial", Font.BOLD, 14));
         formPanel.add(titleLabel);
 
+        // TODO: discuss if id is set by user or incremented by itself
         addField(formPanel, "Slot identifier:", idField);
         addField(formPanel, "Floor:", floorField);
         addField(formPanel, "Vehicle type:", typeCombo);
@@ -147,15 +154,34 @@ public class ManageSlotsPanel extends JPanel {
         okBtn.addActionListener(e -> {
             if (idField.getText().isBlank() || floorField.getText().isBlank() || plateField.getText().isBlank()) {
                 JOptionPane.showMessageDialog(dialog, "Please fill in all fields.");
-            } else {
-                System.out.println("Saving: " + idField.getText());
+                return;
+            }
+
+            try {
+                int code  = Integer.parseInt(idField.getText());
+                int floor = Integer.parseInt(floorField.getText());
+                String vehicleType = (String) typeCombo.getSelectedItem();
+                String occStatus   = (String) occStatusCombo.getSelectedItem();
+                String resStatus   = (String) resStatusCombo.getSelectedItem();
+
+                boolean success;
                 if (id != null) {
-                    JOptionPane.showMessageDialog(dialog, "Slot edited successfully!");
+                    // Edit existing slot
+                    switch (slotController.editSpace(code, floor, vehicleType, occStatus, resStatus)) {
+                        case SUCCESS        -> { JOptionPane.showMessageDialog(dialog, "Slot edited!"); dialog.dispose(); }
+                        case NOT_FOUND      -> JOptionPane.showMessageDialog(dialog, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
+                        case DATABASE_ERROR -> JOptionPane.showMessageDialog(dialog, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 } else {
-                    JOptionPane.showMessageDialog(dialog, "Slot added successfully!");
+                    // Add new slot
+                    switch (slotController.addSpace(code, floor, vehicleType, occStatus, resStatus)) {
+                        case SUCCESS        -> { JOptionPane.showMessageDialog(dialog, "Slot added!"); dialog.dispose(); }
+                        case ALREADY_EXISTS -> JOptionPane.showMessageDialog(dialog, "A slot with this ID already exists.", "Duplicate", JOptionPane.WARNING_MESSAGE);
+                        case DATABASE_ERROR -> JOptionPane.showMessageDialog(dialog, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
-                //TODO: pass to controller
-                dialog.dispose();
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(dialog, "Code and floor must be numbers.", "Invalid input", JOptionPane.WARNING_MESSAGE);
             }
         });
 
@@ -181,12 +207,26 @@ public class ManageSlotsPanel extends JPanel {
         addField(formPanel, "Enter Slot Identifier:", idField);
 
         nextBtn.addActionListener(e -> {
-            if (idField.getText().isBlank()) {
+            String input = idField.getText().trim();
+
+            if (input.isBlank()) {
                 JOptionPane.showMessageDialog(dialog, "Please enter a slot ID.");
-            } else {
+                return;
+            }
+
+            try {
+                int spaceId = Integer.parseInt(input);
+
                 dialog.dispose();
-                //TODO: check if slot exists
-                showSlotInfoDialog("Edit slot", idField.getText());
+
+                if (slotController.slotExists(spaceId)) {
+                    showSlotInfoDialog("Edit slot", input);
+                } else {
+                    JOptionPane.showMessageDialog(null, "There is no parking space with this ID.");
+                }
+
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(dialog, "Slot ID must be a number.", "Invalid input", JOptionPane.WARNING_MESSAGE);
             }
         });
 
@@ -212,15 +252,34 @@ public class ManageSlotsPanel extends JPanel {
         addField(formPanel, "Enter Slot Identifier to remove:", idField);
 
         removeBtn.addActionListener(e -> {
-            String id = idField.getText().trim();
-            //TODO: check if slot exists
-            if (id.isBlank()) {
+            String input = idField.getText().trim();
+            if (input.isBlank()) {
                 JOptionPane.showMessageDialog(dialog, "Please enter a slot ID.");
-            } else {
-                int confirm = JOptionPane.showConfirmDialog(dialog, "Delete slot " + id + "?", "Confirm", JOptionPane.YES_NO_OPTION);
-                if (confirm == JOptionPane.YES_OPTION) {
-                    dialog.dispose();
+                return;
+            }
+
+            try {
+                int spaceId = Integer.parseInt(input);
+
+                if (!slotController.slotExists(spaceId)) {
+                    JOptionPane.showMessageDialog(dialog, "There is no parking space with this ID.");
+                    return;
                 }
+
+                int confirm = JOptionPane.showConfirmDialog(dialog, "Delete slot " + spaceId + "?", "Confirm", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    switch (slotController.removeSpace(spaceId)) {
+                        case SUCCESS        -> {
+                            JOptionPane.showMessageDialog(dialog, "Slot removed!");
+                            dialog.dispose();
+                        }
+                        case NOT_FOUND      -> JOptionPane.showMessageDialog(dialog, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
+                        case DATABASE_ERROR -> JOptionPane.showMessageDialog(dialog, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(dialog, "Slot ID must be a number.", "Invalid input", JOptionPane.WARNING_MESSAGE);
             }
         });
 

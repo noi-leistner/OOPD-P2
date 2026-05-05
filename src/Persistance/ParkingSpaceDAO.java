@@ -4,27 +4,16 @@ import Business.Entities.ParkingSpace;
 
 import java.util.List;
 
-public class ParkingSpaceDAO {
+public interface ParkingSpaceDAO {
+    boolean addParkingSpace(ParkingSpace space);
 
-    void addParkingSpace(ParkingSpace space) {
-        //TODO: Implement
-    }
+    boolean updateParkingSpace(ParkingSpace space);
 
-    void editParkingSpace(ParkingSpace space) {
-        //TODO: Implement
-    }
+    boolean deleteParkingSpace(int id);
 
-    void removeParkingSpace(ParkingSpace space) {
-        //TODO: Implement
-    }
+    List<ParkingSpace> getAllParkingSpaces();
 
-    List<ParkingSpace> getAllParkingSpaces() {
-        //TODO: Implement
-        return null;
-    }
+    boolean existsById(int id);
 
-    ParkingSpace getParkingSpaceById(int id) {
-        //TODO: Implement
-        return null;
-    }
+    ParkingSpace getParkingSpaceById(int id);
 }
