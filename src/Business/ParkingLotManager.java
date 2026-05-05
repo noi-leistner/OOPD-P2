@@ -7,6 +7,7 @@ import Persistance.ParkingSpaceDAO;
 import Persistance.ReservationDAO;
 
 import java.util.List;
+import java.util.Map;
 
 public class ParkingLotManager {
 
@@ -105,8 +106,8 @@ public class ParkingLotManager {
         return null;
     }
 
-    public void getOccupancyLastHour() {
-        //TODO: Implement
+    public Map<Integer,Integer> getOccupancyLastHour() {
+        return reservationDao.getOccupancyLastHour();
     }
 
     public boolean slotExistsById(int id) {
