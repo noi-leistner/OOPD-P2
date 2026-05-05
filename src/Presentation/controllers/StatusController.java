@@ -27,3 +27,17 @@ public class StatusController {
         return manager.getOccupancyLastHour();
     }
 }
+/*
+/ To check if the map works:
+ (1) -> Insert reservations by MySQL:
+ - INSERT INTO reservations (user_id, vehicle_license_plate, parking_slot_id, date) VALUES
+    (user_id*, '1111ABC', 3, NOW() - INTERVAL 55 MINUTE);
+
+    *change user id by a real user
+  (2) -> Run the query inside the function lastHourOccupancy:
+    SELECT TIMESTAMPDIFF(MINUTE, date, NOW()) as minutes_ago, COUNT(*) as total
+    FROM reservations
+    WHERE date >= NOW() - INTERVAL 1 HOUR
+    GROUP BY TIMESTAMPDIFF(MINUTE, date, NOW())
+    ORDER BY minutes_ago ASC;
+ */
