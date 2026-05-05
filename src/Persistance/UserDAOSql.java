@@ -58,7 +58,7 @@ public class UserDAOSql implements UserDAO {
             stmt.setInt(1, id);
             var rs = stmt.executeQuery();
             if (rs.next()) {
-                User user =  new User (
+                return new User (
                         rs.getInt("id"),
                         rs.getString("name"),
                         rs.getString("surname"),

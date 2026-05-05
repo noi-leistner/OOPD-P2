@@ -1,9 +1,14 @@
 package Presentation.views;
 
 import Business.AuthManager;
+import Business.ParkingLotManager;
 import Business.SessionManager;
+import Persistance.ParkingSpaceDAO;
+import Persistance.ParkingSpaceDAOSql;
+import Persistance.UserDAO;
 import Persistance.UserDAOSql;
 import Presentation.controllers.AuthController;
+import Presentation.controllers.ParkingSpaceController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,21 +31,25 @@ public class MainWindow extends JFrame {
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-        UserDAOSql userDAO            = new UserDAOSql();
+        UserDAO userDAO = new UserDAOSql();
+        ParkingSpaceDAO parkingSpaceDAO = new ParkingSpaceDAOSql();
+
         AuthManager authManager       = new AuthManager(userDAO);
         SessionManager sessionManager = SessionManager.getInstance();
         AuthController authController = new AuthController(authManager, sessionManager);
+        ParkingLotManager parkingLotManager = new ParkingLotManager(parkingSpaceDAO);
+        ParkingSpaceController slotController = new ParkingSpaceController(parkingLotManager);
 
 
         AuthPanel authPanel = new AuthPanel(this, authController);
-        DashboardPanel dashboardPanel = new  DashboardPanel(this, authController);
+        DashboardPanel dashboardPanel = new  DashboardPanel(this, authController, slotController);
 
         mainPanel.add(AUTH_SCREEN, authPanel);
         mainPanel.add(DASHBOARD_SCREEN, dashboardPanel);
 
         add(mainPanel);
 
-        cardLayout.show(mainPanel, AUTH_SCREEN);
+        cardLayout.show(mainPanel, DASHBOARD_SCREEN);
     }
 
     public void switchTo(String screen) {
