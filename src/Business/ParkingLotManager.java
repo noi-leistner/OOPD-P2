@@ -2,16 +2,24 @@ package Business;
 
 import Business.Entities.ParkingSpace;
 import Business.Entities.Reservation;
+
 import Persistance.ParkingSpaceDAO;
+import Persistance.ReservationDAO;
 
 import java.util.List;
 
 public class ParkingLotManager {
 
-    private final ParkingSpaceDAO parkingSpaceDao;
+    private ParkingSpaceDAO parkingSpaceDao;
+    private ReservationDAO reservationDao;
 
-    public ParkingLotManager (ParkingSpaceDAO parkingSpaceDao) {
+    public ParkingLotManager (ParkingSpaceDAO parkingSpaceDao, ReservationDAO reservationDao) {
         this.parkingSpaceDao = parkingSpaceDao;
+        this.reservationDao = reservationDao;
+    }
+
+    public ParkingLotManager(ReservationDAO reservationDao) {
+
     }
 
     public SpaceResult addSpace(ParkingSpace space) {
@@ -36,13 +44,15 @@ public class ParkingLotManager {
 
 
     public ParkingSpace getSpaceDetails(int spaceId) {
-        //TODO: Implement
-        return null;
+        return parkingSpaceDao.getParkingSpaceById(spaceId);
     }
 
     public List<ParkingSpace> getAllSpaces() {
-        //TODO: Implement
-        return null;
+        return parkingSpaceDao.getAllParkingSpaces();
+    }
+
+    public boolean slotExistById(int slotId) {
+        return parkingSpaceDao.existsById(slotId);
     }
 
     public List<ParkingSpace> getAvailableSpacesForType(String vehicleType) {
@@ -74,7 +84,20 @@ public class ParkingLotManager {
     }
 
     public void cancelReservationByAdmin(int spaceId) {
-        //TODO: Implement
+        reservationDao.deleteReservation(spaceId);
+
+        ParkingSpace space = parkingSpaceDao.getParkingSpaceById(spaceId);
+        if (space != null) {
+            ParkingSpace updated = new ParkingSpace(
+                    getSpaceDetails(spaceId).getId(),
+                    getSpaceDetails(spaceId).getFloor(),
+                    "Free",
+                    "Free",
+                    getSpaceDetails(spaceId).getType()
+            );
+            parkingSpaceDao.updateParkingSpace(updated);
+
+        }
     }
 
     public List<Reservation> getUserReservations(int userId) {

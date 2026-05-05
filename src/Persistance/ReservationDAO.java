@@ -28,7 +28,7 @@ public class ReservationDAO {
         }
     }
 
-    void deleteReservation(int spotId) {
+    public void deleteReservation(int spotId) {
         String sql = "DELETE FROM reservations WHERE spot_id = ?";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)){
