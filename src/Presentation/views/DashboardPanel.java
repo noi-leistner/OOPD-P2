@@ -4,6 +4,7 @@ import Business.Entities.User;
 import Business.SessionManager;
 import Presentation.controllers.AuthController;
 import Presentation.controllers.ParkingSpaceController;
+import Presentation.controllers.StatusController;
 import Presentation.theme.AppColors;
 
 import javax.swing.*;
@@ -18,6 +19,7 @@ public class DashboardPanel extends JPanel {
     private JButton initialButton;
 
     private ParkingSpaceController slotController;
+    private StatusController statusController;
 
     public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController) {
         this.slotController = slotController;
@@ -52,7 +54,7 @@ public class DashboardPanel extends JPanel {
             contentArea.add(new ManageSlotsPanel(slotController),   "SLOTS");
 //            contentArea.add(new ManageUsersPanel(),   "USERS");
 //            contentArea.add(new OccupancyPanel(),  "OCCUPANCY");
-//            contentArea.add(new CurrentStatusPanel(),  "STATUS");
+            contentArea.add(new CurrentParkingStatusPanel(statusController),  "STATUS");
             addButton(sidebar, "Log Out", "LOGOUT");
 
             showContent("SLOTS");
