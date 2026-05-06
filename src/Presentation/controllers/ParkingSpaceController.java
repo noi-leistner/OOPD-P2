@@ -4,6 +4,8 @@ import Business.Entities.ParkingSpace;
 import Business.ParkingLotManager;
 import Business.SpaceResult;
 
+import java.util.List;
+
 public class ParkingSpaceController {
 
     private final ParkingLotManager manager;
@@ -39,5 +41,9 @@ public class ParkingSpaceController {
     // TODO: maybe not need this function
     public boolean slotExists(int id) {
         return manager.slotExistsById(id);
+    }
+
+    public List<ParkingSpace> getAllSpaces() {
+        return manager.getAllSpaces();
     }
 }

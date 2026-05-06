@@ -70,9 +70,8 @@ public class ManageSlotsPanel extends JPanel {
         return btn;
     }
 
-    //TODO: make table model and update on each insert/delete/edit
     private JScrollPane buildTable() {
-        String[] columns = { "Code", "Floor", "Current Status", "Reservation Status", "Type", "Space ID" };
+        String[] columns = { "Code", "Floor", "Current Status", "Reservation Status", "Type" };
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -89,15 +88,19 @@ public class ManageSlotsPanel extends JPanel {
         return new JScrollPane(table);
     }
 
-    // Call this to populate the table with data
+    public void refreshTable() {
+        List<ParkingSpace> spaces = slotController.getAllSpaces();
+        loadData(spaces);
+    }
+
     public void loadData(List<ParkingSpace> spaces) {
-        tableModel.setRowCount(0); // clear existing rows
+        tableModel.setRowCount(0);
         for (ParkingSpace space : spaces) {
             tableModel.addRow(new Object[]{
                     space.getId(),
                     space.getFloor(),
-                    space.isOccupied(),
-                    space.isReserved(),
+                    space.isOccupied() ? "Occupied" : "Free",
+                    space.isReserved() ? "Reserved" : "Unreserved",
                     space.getType()
             });
         }
@@ -178,14 +181,22 @@ public class ManageSlotsPanel extends JPanel {
             if (space != null) {
                 // Edit existing slot
                 switch (slotController.editSpace(code, floor, vehicleType, occStatus, resStatus)) {
-                    case SUCCESS        -> { JOptionPane.showMessageDialog(dialog, "Slot edited!"); dialog.dispose(); }
+                    case SUCCESS        -> {
+                        JOptionPane.showMessageDialog(dialog, "Slot edited!");
+                        dialog.dispose();
+                        refreshTable();
+                    }
                     case NOT_FOUND      -> JOptionPane.showMessageDialog(dialog, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
                     case DATABASE_ERROR -> JOptionPane.showMessageDialog(dialog, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } else {
                 // Add new slot
                 switch (slotController.addSpace(code, floor, vehicleType, occStatus, resStatus)) {
-                    case SUCCESS        -> { JOptionPane.showMessageDialog(dialog, "Slot added!"); dialog.dispose(); }
+                    case SUCCESS        -> {
+                        JOptionPane.showMessageDialog(dialog, "Slot added!");
+                        dialog.dispose();
+                        refreshTable();
+                    }
                     case ALREADY_EXISTS -> JOptionPane.showMessageDialog(dialog, "A slot with this ID already exists.", "Duplicate", JOptionPane.WARNING_MESSAGE);
                     case DATABASE_ERROR -> JOptionPane.showMessageDialog(dialog, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -280,6 +291,7 @@ public class ManageSlotsPanel extends JPanel {
                         case SUCCESS        -> {
                             JOptionPane.showMessageDialog(dialog, "Slot removed!");
                             dialog.dispose();
+                            refreshTable();
                         }
                         case NOT_FOUND      -> JOptionPane.showMessageDialog(dialog, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
                         case DATABASE_ERROR -> JOptionPane.showMessageDialog(dialog, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);

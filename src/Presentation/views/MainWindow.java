@@ -15,6 +15,7 @@ public class MainWindow extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainPanel;
 
+    private DashboardPanel dashboardPanel;
 
     public static final String AUTH_SCREEN = "AUTH";
     public static final String DASHBOARD_SCREEN = "DASHBOARD";
@@ -40,7 +41,7 @@ public class MainWindow extends JFrame {
 
 
         AuthPanel authPanel = new AuthPanel(this, authController);
-        DashboardPanel dashboardPanel = new  DashboardPanel(this, authController, slotController);
+        dashboardPanel = new  DashboardPanel(this, authController, slotController);
 
         mainPanel.add(AUTH_SCREEN, authPanel);
         mainPanel.add(DASHBOARD_SCREEN, dashboardPanel);
@@ -48,6 +49,10 @@ public class MainWindow extends JFrame {
         add(mainPanel);
 
         cardLayout.show(mainPanel, AUTH_SCREEN);
+    }
+
+    public DashboardPanel getDashboard() {
+        return dashboardPanel;
     }
 
     public void switchTo(String screen) {
