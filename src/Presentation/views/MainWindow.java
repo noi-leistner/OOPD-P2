@@ -3,10 +3,7 @@ package Presentation.views;
 import Business.AuthManager;
 import Business.ParkingLotManager;
 import Business.SessionManager;
-import Persistance.ParkingSpaceDAO;
-import Persistance.ParkingSpaceDAOSql;
-import Persistance.UserDAO;
-import Persistance.UserDAOSql;
+import Persistance.*;
 import Presentation.controllers.AuthController;
 import Presentation.controllers.ParkingSpaceController;
 
@@ -33,11 +30,12 @@ public class MainWindow extends JFrame {
 
         UserDAO userDAO = new UserDAOSql();
         ParkingSpaceDAO parkingSpaceDAO = new ParkingSpaceDAOSql();
+        ReservationDAO reservationDAO = new ReservationDAO();
 
         AuthManager authManager       = new AuthManager(userDAO);
         SessionManager sessionManager = SessionManager.getInstance();
         AuthController authController = new AuthController(authManager, sessionManager);
-        ParkingLotManager parkingLotManager = new ParkingLotManager(parkingSpaceDAO);
+        ParkingLotManager parkingLotManager = new ParkingLotManager(parkingSpaceDAO, reservationDAO);
         ParkingSpaceController slotController = new ParkingSpaceController(parkingLotManager);
 
 
