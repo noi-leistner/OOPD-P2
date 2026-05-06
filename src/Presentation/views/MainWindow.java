@@ -47,7 +47,7 @@ public class MainWindow extends JFrame {
 
         add(mainPanel);
 
-        cardLayout.show(mainPanel, DASHBOARD_SCREEN);
+        cardLayout.show(mainPanel, AUTH_SCREEN);
     }
 
     public void switchTo(String screen) {
