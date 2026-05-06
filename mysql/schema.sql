@@ -44,7 +44,7 @@ INSERT INTO vehicles (license_plate, vehicle_type) VALUES
 ('1234ABC', 'car'),
 ('5678DEF', 'motorcycle');
 
-INSERT INTO parking_slots (identifier, vehicle_type, occupation_status, reservation_status) VALUES
+INSERT INTO parking_slots (identifier, vehicle_type, occupation_status, reservation_status, floor) VALUES
 (1, 'car', FALSE, FALSE, 0),
 (2, 'car', FALSE, FALSE, 1),
 (3, 'motorcycle', FALSE, FALSE, 0),
