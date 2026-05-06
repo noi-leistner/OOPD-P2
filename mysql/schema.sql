@@ -17,6 +17,7 @@ CREATE TABLE vehicles (
 -- Create parking_slots table
 CREATE TABLE parking_slots (
     identifier INT PRIMARY KEY,
+    floor      INT NOT NULL,
     vehicle_type VARCHAR(30) NOT NULL,
     occupation_status BOOLEAN NOT NULL DEFAULT FALSE,
     reservation_status BOOLEAN NOT NULL DEFAULT FALSE

@@ -3,11 +3,11 @@ package Business.Entities;
 public class ParkingSpace {
         int id;
         int floor;
-        String current_status;
-        String reservation_status;
+        boolean current_status;
+        boolean reservation_status;
         String type;
 
-        public ParkingSpace (int id, int floor, String current_status, String reservation_status, String type) {
+        public ParkingSpace (int id, int floor, boolean current_status, boolean reservation_status, String type) {
                 this.id = id;
                 this.floor = floor;
                 this.current_status = current_status;
@@ -23,11 +23,11 @@ public class ParkingSpace {
                 return floor;
         }
 
-        public String getCurrentStatus() {
+        public boolean isOccupied() {
                 return current_status;
         }
 
-        public String getReservationStatus() {
+        public boolean isReserved() {
                 return reservation_status;
         }
 

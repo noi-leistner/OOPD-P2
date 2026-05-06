@@ -36,8 +36,7 @@ public class ParkingLotManager {
 
 
     public ParkingSpace getSpaceDetails(int spaceId) {
-        //TODO: Implement
-        return null;
+        return parkingSpaceDao.getParkingSpaceById(spaceId);
     }
 
     public List<ParkingSpace> getAllSpaces() {
@@ -86,6 +85,7 @@ public class ParkingLotManager {
         //TODO: Implement
     }
 
+    // TODO: maybe not need this function
     public boolean slotExistsById(int id) {
         return parkingSpaceDao.existsById(id);
     }
