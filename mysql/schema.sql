@@ -19,7 +19,8 @@ CREATE TABLE parking_slots (
     identifier INT PRIMARY KEY,
     vehicle_type VARCHAR(30) NOT NULL,
     occupation_status BOOLEAN NOT NULL DEFAULT FALSE,
-    reservation_status BOOLEAN NOT NULL DEFAULT FALSE
+    reservation_status BOOLEAN NOT NULL DEFAULT FALSE,
+    floor INT NOT NULL
 );
 
 -- Create reservations table (ternary relationship: User 1 - Vehicle 1 - Parking Slot N)
@@ -44,7 +45,7 @@ INSERT INTO vehicles (license_plate, vehicle_type) VALUES
     ('5678DEF', 'motorcycle');
 
 INSERT INTO parking_slots (identifier, vehicle_type, occupation_status, reservation_status) VALUES
-    (1, 'car', FALSE, FALSE),
-    (2, 'car', FALSE, FALSE),
-    (3, 'motorcycle', FALSE, FALSE),
-    (4, 'motorcycle', FALSE, FALSE);
+    (1, 'car', FALSE, FALSE, 0),
+    (2, 'car', FALSE, FALSE, 1),
+    (3, 'motorcycle', FALSE, FALSE, 0),
+    (4, 'motorcycle', FALSE, FALSE, 1);
