@@ -71,7 +71,7 @@ public class ManageSlotsPanel extends JPanel {
     }
 
     private JScrollPane buildTable() {
-        String[] columns = { "Code", "Floor", "Current Status", "Reservation Status", "Type", "Space ID" };
+        String[] columns = { "Code", "Floor", "Current Status", "Reservation Status", "Type" };
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -88,15 +88,19 @@ public class ManageSlotsPanel extends JPanel {
         return new JScrollPane(table);
     }
 
-    // Call this to populate the table with data
+    public void refreshTable() {
+        List<ParkingSpace> spaces = slotController.getAllSpaces();
+        loadData(spaces);
+    }
+
     public void loadData(List<ParkingSpace> spaces) {
-        tableModel.setRowCount(0); // clear existing rows
+        tableModel.setRowCount(0);
         for (ParkingSpace space : spaces) {
             tableModel.addRow(new Object[]{
                     space.getId(),
                     space.getFloor(),
-                    space.getCurrentStatus(),
-                    space.getReservationStatus(),
+                    space.isOccupied() ? "Occupied" : "Free",
+                    space.isReserved() ? "Reserved" : "Unreserved",
                     space.getType()
             });
         }
@@ -116,7 +120,7 @@ public class ManageSlotsPanel extends JPanel {
         btn.setHorizontalAlignment(SwingConstants.CENTER);
     }
 
-    private void showSlotInfoDialog(String text, String id) {
+    private void showSlotInfoDialog(String text, ParkingSpace space) {
         JPanel formPanel = new JPanel(new GridLayout(0, 1, 5, 5));
         JButton okBtn = new JButton("OK");
         JButton cancelBtn = new JButton("Cancel");
@@ -126,62 +130,76 @@ public class ManageSlotsPanel extends JPanel {
 
         JDialog dialog = createBaseDialog(text, new Dimension(400, 500), formPanel, okBtn, cancelBtn);
 
-        JTextField idField = new JTextField(15);
-        if (id != null) {
-            idField.setText(id);
-            idField.setEditable(false);
-            idField.setBackground(Color.LIGHT_GRAY);
-        }
-
-        JTextField floorField = new JTextField(15);
+        //TODO: only allow floors with enough slots free
+        JComboBox<Integer> floorCombo =new JComboBox<>(new Integer[]{0, 1, 2, 3, 4});
         JComboBox<String> typeCombo = new JComboBox<>(new String[]{"Car", "Motorcycle", "Truck"});
-        JTextField plateField = new JTextField(15);
         JComboBox<String> occStatusCombo = new JComboBox<>(new String[]{"Occupied", "Free"});
         JComboBox<String> resStatusCombo = new JComboBox<>(new String[]{"Reserved", "Unreserved"});
+
+        JTextField idField = new JTextField(15);
+        if (space != null) {
+            idField.setText(String.valueOf(space.getId()));
+            idField.setEditable(false);
+            idField.setBackground(Color.LIGHT_GRAY);
+
+            floorCombo.setSelectedItem(space.getFloor());
+            typeCombo.setSelectedItem(space.getType());
+            occStatusCombo.setSelectedItem(space.isOccupied() ? "Occupied" : "Free");
+            resStatusCombo.setSelectedItem(space.isReserved() ? "Reserved" : "Unreserved");
+        } else {
+            occStatusCombo.setSelectedItem("Free");
+            resStatusCombo.setSelectedItem("Unreserved");
+            occStatusCombo.setEnabled(false);
+            resStatusCombo.setEnabled(false);
+            occStatusCombo.setBackground(Color.LIGHT_GRAY);
+            resStatusCombo.setBackground(Color.LIGHT_GRAY);
+        }
 
         JLabel titleLabel = new JLabel(text.toUpperCase());
         titleLabel.setFont(new Font("Arial", Font.BOLD, 14));
         formPanel.add(titleLabel);
 
-        // TODO: discuss if id is set by user or incremented by itself
         addField(formPanel, "Slot identifier:", idField);
-        addField(formPanel, "Floor:", floorField);
+        addField(formPanel, "Floor:", floorCombo);
         addField(formPanel, "Vehicle type:", typeCombo);
-        addField(formPanel, "Vehicle plate:", plateField);
         addField(formPanel, "Occupational status:", occStatusCombo);
         addField(formPanel, "Reservation status:", resStatusCombo);
 
         okBtn.addActionListener(e -> {
-            if (idField.getText().isBlank() || floorField.getText().isBlank() || plateField.getText().isBlank()) {
-                JOptionPane.showMessageDialog(dialog, "Please fill in all fields.");
+            if (idField.getText().isBlank()) {
+                JOptionPane.showMessageDialog(dialog, "Please fill in the ID field!");
                 return;
             }
 
-            try {
-                int code  = Integer.parseInt(idField.getText());
-                int floor = Integer.parseInt(floorField.getText());
-                String vehicleType = (String) typeCombo.getSelectedItem();
-                String occStatus   = (String) occStatusCombo.getSelectedItem();
-                String resStatus   = (String) resStatusCombo.getSelectedItem();
 
-                boolean success;
-                if (id != null) {
-                    // Edit existing slot
-                    switch (slotController.editSpace(code, floor, vehicleType, occStatus, resStatus)) {
-                        case SUCCESS        -> { JOptionPane.showMessageDialog(dialog, "Slot edited!"); dialog.dispose(); }
-                        case NOT_FOUND      -> JOptionPane.showMessageDialog(dialog, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
-                        case DATABASE_ERROR -> JOptionPane.showMessageDialog(dialog, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
+            int code  = Integer.parseInt(idField.getText());
+            int floor = (Integer) floorCombo.getSelectedItem();
+            String vehicleType = (String) typeCombo.getSelectedItem();
+            boolean occStatus = occStatusCombo.getSelectedItem().equals("Occupied");
+            boolean resStatus = resStatusCombo.getSelectedItem().equals("Reserved");
+
+            if (space != null) {
+                // Edit existing slot
+                switch (slotController.editSpace(code, floor, vehicleType, occStatus, resStatus)) {
+                    case SUCCESS        -> {
+                        JOptionPane.showMessageDialog(dialog, "Slot edited!");
+                        dialog.dispose();
+                        refreshTable();
                     }
-                } else {
-                    // Add new slot
-                    switch (slotController.addSpace(code, floor, vehicleType, occStatus, resStatus)) {
-                        case SUCCESS        -> { JOptionPane.showMessageDialog(dialog, "Slot added!"); dialog.dispose(); }
-                        case ALREADY_EXISTS -> JOptionPane.showMessageDialog(dialog, "A slot with this ID already exists.", "Duplicate", JOptionPane.WARNING_MESSAGE);
-                        case DATABASE_ERROR -> JOptionPane.showMessageDialog(dialog, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
+                    case NOT_FOUND      -> JOptionPane.showMessageDialog(dialog, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
+                    case DATABASE_ERROR -> JOptionPane.showMessageDialog(dialog, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(dialog, "Code and floor must be numbers.", "Invalid input", JOptionPane.WARNING_MESSAGE);
+            } else {
+                // Add new slot
+                switch (slotController.addSpace(code, floor, vehicleType, occStatus, resStatus)) {
+                    case SUCCESS        -> {
+                        JOptionPane.showMessageDialog(dialog, "Slot added!");
+                        dialog.dispose();
+                        refreshTable();
+                    }
+                    case ALREADY_EXISTS -> JOptionPane.showMessageDialog(dialog, "A slot with this ID already exists.", "Duplicate", JOptionPane.WARNING_MESSAGE);
+                    case DATABASE_ERROR -> JOptionPane.showMessageDialog(dialog, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
@@ -219,8 +237,9 @@ public class ManageSlotsPanel extends JPanel {
 
                 dialog.dispose();
 
-                if (slotController.slotExists(spaceId)) {
-                    showSlotInfoDialog("Edit slot", input);
+                ParkingSpace space = slotController.getSpaceDetails(spaceId);
+                if (space != null) {
+                    showSlotInfoDialog("Edit slot", space);
                 } else {
                     JOptionPane.showMessageDialog(null, "There is no parking space with this ID.");
                 }
@@ -272,6 +291,7 @@ public class ManageSlotsPanel extends JPanel {
                         case SUCCESS        -> {
                             JOptionPane.showMessageDialog(dialog, "Slot removed!");
                             dialog.dispose();
+                            refreshTable();
                         }
                         case NOT_FOUND      -> JOptionPane.showMessageDialog(dialog, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
                         case DATABASE_ERROR -> JOptionPane.showMessageDialog(dialog, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
