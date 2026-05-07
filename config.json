@@ -1,5 +1,5 @@
 {
-    "db_port": 3036,
+    "db_port": 3306,
     "db_host": "localhost",
     "db_name": "mydb",
     "db_username": "user",

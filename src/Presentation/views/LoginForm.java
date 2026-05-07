@@ -23,7 +23,10 @@ public class LoginForm extends JPanel {
         loginButton.addActionListener(e -> {
             AuthResult result = auth.logIn(email.getText(), new String(password.getPassword()));
             switch (result) {
-                case AuthResult.SUCCESS -> mainWindow.switchTo(MainWindow.DASHBOARD_SCREEN);
+                case AuthResult.SUCCESS -> {
+                    mainWindow.getDashboard().refresh();
+                    mainWindow.switchTo(MainWindow.DASHBOARD_SCREEN);
+                }
                 case AuthResult.EMPTY_FIELDS -> JOptionPane.showMessageDialog(LoginForm.this, "Please fill all the fields!");
                 case AuthResult.INVALID_CREDENTIALS -> JOptionPane.showMessageDialog(LoginForm.this, "Invalid credentials!");
                 case AuthResult.DATABASE_ERROR -> JOptionPane.showMessageDialog(LoginForm.this, "Something went wrong, please try again!");

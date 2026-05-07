@@ -110,6 +110,7 @@ public class ParkingLotManager {
         return reservationDao.getOccupancyLastHour();
     }
 
+    // TODO: maybe not need this function
     public boolean slotExistsById(int id) {
         return parkingSpaceDao.existsById(id);
     }

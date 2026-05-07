@@ -16,11 +16,11 @@ CREATE TABLE vehicles (
 
 -- Create parking_slots table
 CREATE TABLE parking_slots (
-   identifier INT PRIMARY KEY,
-   vehicle_type VARCHAR(30) NOT NULL,
-   occupation_status BOOLEAN NOT NULL DEFAULT FALSE,
-   reservation_status BOOLEAN NOT NULL DEFAULT FALSE,
-   floor INT NOT NULL
+    identifier INT PRIMARY KEY,
+    floor      INT NOT NULL,
+    vehicle_type VARCHAR(30) NOT NULL,
+    occupation_status BOOLEAN NOT NULL DEFAULT FALSE,
+    reservation_status BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 -- Create reservations table (ternary relationship: User 1 - Vehicle 1 - Parking Slot N)

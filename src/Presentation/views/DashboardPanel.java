@@ -32,8 +32,18 @@ public class DashboardPanel extends JPanel {
         cardLayout = new CardLayout();
         contentArea = new JPanel(cardLayout);
 
+        add(contentArea, BorderLayout.CENTER);
+    }
+
+    public void refresh() {
+        removeAll();
+        buttons.clear();
+        contentArea.removeAll();
+
         add(buildSidebar(), BorderLayout.WEST);
         add(contentArea, BorderLayout.CENTER);
+        revalidate();
+        repaint();
     }
 
     private JPanel buildSidebar() {
@@ -44,8 +54,7 @@ public class DashboardPanel extends JPanel {
 
         User currentUser = SessionManager.getInstance().getCurrentUser();
 
-        //TODO: should be currentUser.isAdmin()
-        if (true) {
+        if (currentUser.isAdmin()) {
             sidebar.add(addTitle("Admin functionalities"));
             sidebar.add(Box.createRigidArea(new Dimension(0, 25)));
 
@@ -54,8 +63,9 @@ public class DashboardPanel extends JPanel {
             addButton(sidebar, "Last Hour Occupancy",  "OCCUPANCY");
             addButton(sidebar, "Current Parking status", "STATUS");
 
-
-            contentArea.add(new ManageSlotsPanel(slotController),   "SLOTS");
+            ManageSlotsPanel manageSlotsPanel = new ManageSlotsPanel(slotController);
+            manageSlotsPanel.refreshTable();
+            contentArea.add(manageSlotsPanel,   "SLOTS");
 //            contentArea.add(new ManageUsersPanel(),   "USERS");
 //            contentArea.add(new OccupancyPanel(),  "OCCUPANCY");
 //            contentArea.add(new CurrentStatusPanel(),  "STATUS");
