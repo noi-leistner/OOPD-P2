@@ -54,4 +54,4 @@ INSERT INTO parking_slots (identifier, vehicle_type, occupation_status, reservat
 ALTER TABLE reservations
     ADD COLUMN cancelled_by_admin BOOLEAN NOT NULL DEFAULT FALSE;
 
---
+--h
