@@ -3,7 +3,10 @@ package Presentation.controllers;
 import Business.AuthManager;
 import Business.AuthResult;
 import Business.Entities.User;
+import Business.ParkingLotManager;
 import Business.SessionManager;
+
+import javax.swing.*;
 
 public class AuthController {
 
@@ -48,4 +51,27 @@ public class AuthController {
 
     // When implementing the button for logging out / delete account, just call these two functions.
 
+    private ParkingLotManager parkingLotManager;
+
+    public void setParkingLotManager(ParkingLotManager parkingLotManager) {
+        this.parkingLotManager = parkingLotManager;
+    }
+
+    public void checkAndShowCancelledNotification() {
+        if (parkingLotManager == null) return;
+
+        User user = sessionManager.getCurrentUser();
+        if (user == null) return;
+
+        if (parkingLotManager.hasCancelledReservations(user.getId())) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "One or more of your reservations have been cancelled by an administrator.\n" +
+                            "Please make a new reservation if needed.",
+                    "Reservation Cancelled",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            parkingLotManager.clearCancelledNotifications(user.getId());
+        }
+    }
 }

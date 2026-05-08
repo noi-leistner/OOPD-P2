@@ -35,7 +35,7 @@ public class ParkingSpaceController {
     }
 
     public void cancelReservationFromAdmin(int spaceId) {
-        //TODO: implement
+        manager.cancelReservationByAdmin(spaceId);
     }
 
     // TODO: maybe not need this function

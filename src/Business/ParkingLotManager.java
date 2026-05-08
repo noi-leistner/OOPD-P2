@@ -92,8 +92,8 @@ public class ParkingLotManager {
             ParkingSpace updated = new ParkingSpace(
                     getSpaceDetails(spaceId).getId(),
                     getSpaceDetails(spaceId).getFloor(),
-                    "Free",
-                    "Free",
+                    false,
+                    false,
                     getSpaceDetails(spaceId).getType()
             );
             parkingSpaceDao.updateParkingSpace(updated);
@@ -113,5 +113,17 @@ public class ParkingLotManager {
     // TODO: maybe not need this function
     public boolean slotExistsById(int id) {
         return parkingSpaceDao.existsById(id);
+    }
+
+    public boolean hasCancelledReservations(int userId) {
+        List<Reservation> cancelled = reservationDao.getCancelledReservationsByUser(userId);
+        return !cancelled.isEmpty();
+    }
+
+    public void clearCancelledNotifications(int userId) {
+        List<Reservation> cancelled = reservationDao.getCancelledReservationsByUser(userId);
+        for (Reservation r : cancelled) {
+            reservationDao.deleteReservationBySpaceId(r.getParking_slot_id());
+        }
     }
 }

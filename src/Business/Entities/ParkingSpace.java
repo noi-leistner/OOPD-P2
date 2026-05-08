@@ -34,5 +34,13 @@ public class ParkingSpace {
         public String getType() {
                 return type;
         }
+
+        public void setOccupied(boolean occupied) {
+            this.current_status = occupied;
+        }
+
+        public void setReserved(boolean reserved) {
+            this.reservation_status = reserved;
+        }
 }
 

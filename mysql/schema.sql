@@ -49,3 +49,7 @@ INSERT INTO parking_slots (identifier, vehicle_type, occupation_status, reservat
 (2, 'car', FALSE, FALSE, 1),
 (3, 'motorcycle', FALSE, FALSE, 0),
 (4, 'motorcycle', FALSE, FALSE, 1);
+
+-- Add ADMIN CANCELLATION flag to RESERVATION table
+ALTER TABLE reservations
+    ADD COLUMN cancelled_by_admin BOOLEAN NOT NULL DEFAULT FALSE;

@@ -40,6 +40,8 @@ public class MainWindow extends JFrame {
         ParkingSpaceController slotController = new ParkingSpaceController(parkingLotManager);
 
 
+        authController.setParkingLotManager(parkingLotManager);
+
         AuthPanel authPanel = new AuthPanel(this, authController);
         dashboardPanel = new  DashboardPanel(this, authController, slotController);
 
