@@ -43,4 +43,3 @@ public class ParkingSpace {
             this.reservation_status = reserved;
         }
 }
-
