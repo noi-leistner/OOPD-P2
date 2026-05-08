@@ -14,6 +14,9 @@ public class DashboardPanel extends JPanel {
     private final CardLayout cardLayout;
     private final JPanel contentArea;
 
+    private MainWindow mainWindow;
+    private AuthController authController;
+
     private final java.util.List<JButton> buttons = new java.util.ArrayList<>();
     private JButton initialButton;
 
@@ -21,6 +24,8 @@ public class DashboardPanel extends JPanel {
 
     public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController) {
         this.slotController = slotController;
+        this.mainWindow = mainWindow;
+        this.authController = authController;
 
         setLayout(new BorderLayout());
 
@@ -65,6 +70,7 @@ public class DashboardPanel extends JPanel {
 //            contentArea.add(new OccupancyPanel(),  "OCCUPANCY");
 //            contentArea.add(new CurrentStatusPanel(),  "STATUS");
             addButton(sidebar, "Log Out", "LOGOUT");
+            contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");
 
             showContent("SLOTS");
             highlightButton(initialButton);
