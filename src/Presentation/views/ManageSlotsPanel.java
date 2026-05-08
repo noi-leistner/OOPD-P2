@@ -400,3 +400,5 @@ public class ManageSlotsPanel extends JPanel {
         panel.add(field);
     }
 }
+
+//
