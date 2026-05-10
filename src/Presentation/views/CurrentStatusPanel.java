@@ -1,8 +1,10 @@
 package Presentation.views;
 
+import Business.Entities.ParkingSpace;
 import Presentation.controllers.StatusController;
 import Presentation.theme.AppColors;
 
+import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -22,7 +24,7 @@ public class CurrentStatusPanel extends JPanel {
         add(buildHeader(), BorderLayout.NORTH);
         add(buildTable(), BorderLayout.CENTER);
 
-        //loadData();
+        loadData();
     }
 
     private JPanel buildHeader() {
@@ -100,7 +102,7 @@ public class CurrentStatusPanel extends JPanel {
         return new JScrollPane(table);
     }
 
-    /*private void loadData() {
+    private void loadData() {
         tableModel.setRowCount(0);
         List<ParkingSpace> spaces = statusController.getParkingTableData();
         for (ParkingSpace space : spaces) {
@@ -108,13 +110,13 @@ public class CurrentStatusPanel extends JPanel {
                     space.getId(),
                     space.getFloor(),
                     space.getType(),
-                    space.getCurrentStatus(),
-                    space.getReservationStatus(),
-                    // get licence plate
+                    space.isOccupied() ? "Occupied" : "Free",
+                    space.isReserved() ? "Reserved" : "Unreserved",
+                    "-" // get licence plate
             });
         }
     }
-*/
+
     private JButton buildButton(String text) {
         JButton btn = new JButton(text);
         btn.setContentAreaFilled(false);
