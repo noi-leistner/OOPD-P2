@@ -92,9 +92,9 @@ public class CurrentStatusPanel extends JPanel {
                 } else if (column == 4) {
                     String reservation = (String) tableModel.getValueAt(row, 4);
                     if ("Reserved".equalsIgnoreCase(reservation)) {
-                        c.setBackground(new Color(255, 200, 200)); // light red
+                        c.setBackground(new Color(255, 200, 200)); // light red, can be changed according to the palette we want
                     } else {
-                        c.setBackground(new Color(200, 255, 200)); // light green
+                        c.setBackground(new Color(200, 255, 200)); // light green, can be changed according to the palette we want
                     }
                 }
 
