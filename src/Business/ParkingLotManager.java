@@ -84,7 +84,7 @@ public class ParkingLotManager {
         //TODO: Implement
     }
 
-    /*public void cancelReservationByAdmin(int spaceId) {
+    public void cancelReservationByAdmin(int spaceId) {
         reservationDao.deleteReservation(spaceId);
 
         ParkingSpace space = parkingSpaceDao.getParkingSpaceById(spaceId);
@@ -99,7 +99,7 @@ public class ParkingLotManager {
             parkingSpaceDao.updateParkingSpace(updated);
 
         }
-    }*/
+    }
 
     public List<Reservation> getUserReservations(int userId) {
         //TODO: Implement
