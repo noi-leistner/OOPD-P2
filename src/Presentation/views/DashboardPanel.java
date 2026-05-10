@@ -24,10 +24,11 @@ public class DashboardPanel extends JPanel {
     private ParkingSpaceController slotController;
     private StatusController statusController;
 
-    public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController) {
+    public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController, StatusController statusController) {
         this.slotController = slotController;
         this.mainWindow = mainWindow;
         this.authController = authController;
+        this.statusController = statusController;
 
         setLayout(new BorderLayout());
 

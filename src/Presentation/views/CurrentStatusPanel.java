@@ -9,12 +9,14 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.HierarchyEvent;
 
 public class CurrentStatusPanel extends JPanel {
 
     private DefaultTableModel tableModel;
     private JTable table;
     private final StatusController statusController;
+    private Timer timer;
 
     public CurrentStatusPanel(StatusController statusController) {
         this.statusController = statusController;
@@ -25,6 +27,20 @@ public class CurrentStatusPanel extends JPanel {
         add(buildTable(), BorderLayout.CENTER);
 
         loadData();
+
+        // Timer that calls loadData() every 5 seconds
+        timer = new Timer(5000, e -> loadData());
+
+        // Timer only starts when currentStatusPanel is visible to optimize
+        addHierarchyListener(e -> {
+            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                if (isShowing()) {
+                    timer.start();
+                } else {
+                    timer.stop();
+                }
+            }
+        });
     }
 
     private JPanel buildHeader() {
@@ -36,14 +52,8 @@ public class CurrentStatusPanel extends JPanel {
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
         title.setFont(new Font("Arial", Font.BOLD, 20));
 
-        JButton refreshBtn = buildButton("Refresh");
-        refreshBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        //refreshBtn.addActionListener(e -> loadData());
-
         wrapper.add(title);
         wrapper.add(Box.createVerticalStrut(10));
-        wrapper.add(refreshBtn);
-        wrapper.add(Box.createVerticalStrut(5));
 
         return wrapper;
     }
@@ -66,14 +76,6 @@ public class CurrentStatusPanel extends JPanel {
         table.setShowGrid(true);
         table.setGridColor(new Color(200, 200, 200));
 
-        // Center-align all columns
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-        for (int i = 0; i < columns.length; i++) {
-            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
-        }
-
-        // Color rows based on occupation status
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable t, Object value,
@@ -81,19 +83,20 @@ public class CurrentStatusPanel extends JPanel {
                 Component c = super.getTableCellRendererComponent(t, value, isSelected, hasFocus, row, column);
                 setHorizontalAlignment(SwingConstants.CENTER);
 
-                if (!isSelected) {
-                    String occupation = (String) tableModel.getValueAt(row, 3);
-                    if ("Occupied".equalsIgnoreCase(occupation)) {
-                        c.setBackground(new Color(255, 230, 230)); // light red
-                    } else {
-                        c.setBackground(new Color(230, 255, 230)); // light green
-                    }
-                } else {
+                c.setBackground(Color.WHITE);
+                c.setForeground(Color.BLACK);
+
+                if (isSelected) {
                     c.setBackground(AppColors.LIGHT_BLUE);
                     c.setForeground(Color.WHITE);
+                } else if (column == 4) {
+                    String reservation = (String) tableModel.getValueAt(row, 4);
+                    if ("Reserved".equalsIgnoreCase(reservation)) {
+                        c.setBackground(new Color(255, 200, 200)); // light red
+                    } else {
+                        c.setBackground(new Color(200, 255, 200)); // light green
+                    }
                 }
-
-                if (!isSelected) c.setForeground(Color.BLACK);
 
                 return c;
             }
@@ -115,17 +118,5 @@ public class CurrentStatusPanel extends JPanel {
                     "-" // get licence plate
             });
         }
-    }
-
-    private JButton buildButton(String text) {
-        JButton btn = new JButton(text);
-        btn.setContentAreaFilled(false);
-        btn.setOpaque(true);
-        btn.setBorderPainted(false);
-        btn.setFocusPainted(false);
-        btn.setBackground(AppColors.LIGHT_BLUE);
-        btn.setForeground(Color.WHITE);
-        btn.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
-        return btn;
     }
 }
