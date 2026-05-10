@@ -92,8 +92,8 @@ public class ParkingLotManager {
             ParkingSpace updated = new ParkingSpace(
                     getSpaceDetails(spaceId).getId(),
                     getSpaceDetails(spaceId).getFloor(),
-                    "Free",
-                    "Free",
+                    false,
+                    false,
                     getSpaceDetails(spaceId).getType()
             );
             parkingSpaceDao.updateParkingSpace(updated);
