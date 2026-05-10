@@ -87,8 +87,7 @@ public class CurrentStatusPanel extends JPanel {
                 c.setForeground(Color.BLACK);
 
                 if (isSelected) {
-                    c.setBackground(AppColors.LIGHT_BLUE);
-                    c.setForeground(Color.WHITE);
+                    c.setBackground(table.getSelectionBackground());
                 } else if (column == 4) {
                     String reservation = (String) tableModel.getValueAt(row, 4);
                     if ("Reserved".equalsIgnoreCase(reservation)) {
@@ -104,6 +103,7 @@ public class CurrentStatusPanel extends JPanel {
 
         return new JScrollPane(table);
     }
+
 
     private void loadData() {
         tableModel.setRowCount(0);
