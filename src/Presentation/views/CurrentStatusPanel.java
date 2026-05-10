@@ -1,6 +1,5 @@
 package Presentation.views;
 
-import Business.Entities.ParkingSpace;
 import Presentation.controllers.StatusController;
 import Presentation.theme.AppColors;
 
@@ -8,15 +7,14 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.List;
 
-public class CurrentParkingStatusPanel extends JPanel {
+public class CurrentStatusPanel extends JPanel {
 
     private DefaultTableModel tableModel;
     private JTable table;
     private final StatusController statusController;
 
-    public CurrentParkingStatusPanel(StatusController statusController) {
+    public CurrentStatusPanel(StatusController statusController) {
         this.statusController = statusController;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
