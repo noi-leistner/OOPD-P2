@@ -35,7 +35,6 @@ public class User {
     public void setPassword(String password) { this.password = password; }
 
     public boolean isAdmin() {
-        //TODO: add logic
-        return true;
+        return this.role.equals("Admin");
     }
 }

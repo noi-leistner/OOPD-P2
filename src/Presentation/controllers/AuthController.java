@@ -29,7 +29,7 @@ public class AuthController {
     }
 
     // TODO: Delete everything!!!
-    void logOut() {
+    public void logOut() {
         System.out.println("\nUser logged out.");
         sessionManager.logout();
     }

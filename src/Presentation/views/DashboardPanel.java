@@ -15,6 +15,9 @@ public class DashboardPanel extends JPanel {
     private final CardLayout cardLayout;
     private final JPanel contentArea;
 
+    private MainWindow mainWindow;
+    private AuthController authController;
+
     private final java.util.List<JButton> buttons = new java.util.ArrayList<>();
     private JButton initialButton;
 
@@ -23,14 +26,26 @@ public class DashboardPanel extends JPanel {
 
     public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController) {
         this.slotController = slotController;
+        this.mainWindow = mainWindow;
+        this.authController = authController;
 
         setLayout(new BorderLayout());
 
         cardLayout = new CardLayout();
         contentArea = new JPanel(cardLayout);
 
+        add(contentArea, BorderLayout.CENTER);
+    }
+
+    public void refresh() {
+        removeAll();
+        buttons.clear();
+        contentArea.removeAll();
+
         add(buildSidebar(), BorderLayout.WEST);
         add(contentArea, BorderLayout.CENTER);
+        revalidate();
+        repaint();
     }
 
     private JPanel buildSidebar() {
@@ -41,8 +56,7 @@ public class DashboardPanel extends JPanel {
 
         User currentUser = SessionManager.getInstance().getCurrentUser();
 
-        //TODO: should be currentUser.isAdmin()
-        if (true) {
+        if (currentUser.isAdmin()) {
             sidebar.add(addTitle("Admin functionalities"));
             sidebar.add(Box.createRigidArea(new Dimension(0, 25)));
 
@@ -51,11 +65,14 @@ public class DashboardPanel extends JPanel {
             addButton(sidebar, "Last Hour Occupancy",  "OCCUPANCY");
             addButton(sidebar, "Current Parking status", "STATUS");
 
-            contentArea.add(new ManageSlotsPanel(slotController),   "SLOTS");
+            ManageSlotsPanel manageSlotsPanel = new ManageSlotsPanel(slotController);
+            manageSlotsPanel.refreshTable();
+            contentArea.add(manageSlotsPanel,   "SLOTS");
 //            contentArea.add(new ManageUsersPanel(),   "USERS");
 //            contentArea.add(new OccupancyPanel(),  "OCCUPANCY");
             contentArea.add(new CurrentParkingStatusPanel(statusController),  "STATUS");
             addButton(sidebar, "Log Out", "LOGOUT");
+            contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");
 
             showContent("SLOTS");
             highlightButton(initialButton);
