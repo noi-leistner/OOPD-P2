@@ -4,6 +4,7 @@ import Business.Entities.User;
 import Business.SessionManager;
 import Presentation.controllers.AuthController;
 import Presentation.controllers.ParkingSpaceController;
+import Presentation.controllers.StatusController;
 import Presentation.theme.AppColors;
 
 import javax.swing.*;
@@ -16,16 +17,18 @@ public class DashboardPanel extends JPanel {
 
     private MainWindow mainWindow;
     private AuthController authController;
+    private StatusController statusController;
 
     private final java.util.List<JButton> buttons = new java.util.ArrayList<>();
     private JButton initialButton;
 
     private ParkingSpaceController slotController;
 
-    public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController) {
+    public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController, StatusController statusController) {
         this.slotController = slotController;
         this.mainWindow = mainWindow;
         this.authController = authController;
+        this.statusController = statusController;
 
         setLayout(new BorderLayout());
 
@@ -65,9 +68,12 @@ public class DashboardPanel extends JPanel {
 
             ManageSlotsPanel manageSlotsPanel = new ManageSlotsPanel(slotController);
             manageSlotsPanel.refreshTable();
+
+            OccupancyPanel occupancyPanel = new OccupancyPanel(statusController);
+
             contentArea.add(manageSlotsPanel,   "SLOTS");
 //            contentArea.add(new ManageUsersPanel(),   "USERS");
-//            contentArea.add(new OccupancyPanel(),  "OCCUPANCY");
+            contentArea.add(occupancyPanel,  "OCCUPANCY");
 //            contentArea.add(new CurrentStatusPanel(),  "STATUS");
             addButton(sidebar, "Log Out", "LOGOUT");
             contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");

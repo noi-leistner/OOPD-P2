@@ -6,6 +6,7 @@ import Business.SessionManager;
 import Persistance.*;
 import Presentation.controllers.AuthController;
 import Presentation.controllers.ParkingSpaceController;
+import Presentation.controllers.StatusController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,6 +30,7 @@ public class MainWindow extends JFrame {
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
+
         UserDAO userDAO = new UserDAOSql();
         ParkingSpaceDAO parkingSpaceDAO = new ParkingSpaceDAOSql();
         ReservationDAO reservationDAO = new ReservationDAO();
@@ -36,12 +38,14 @@ public class MainWindow extends JFrame {
         AuthManager authManager       = new AuthManager(userDAO);
         SessionManager sessionManager = SessionManager.getInstance();
         AuthController authController = new AuthController(authManager, sessionManager);
+
         ParkingLotManager parkingLotManager = new ParkingLotManager(parkingSpaceDAO, reservationDAO);
         ParkingSpaceController slotController = new ParkingSpaceController(parkingLotManager);
+        StatusController statusController = new StatusController(parkingLotManager);
 
 
         AuthPanel authPanel = new AuthPanel(this, authController);
-        dashboardPanel = new  DashboardPanel(this, authController, slotController);
+        dashboardPanel = new  DashboardPanel(this, authController, slotController, statusController);
 
         mainPanel.add(AUTH_SCREEN, authPanel);
         mainPanel.add(DASHBOARD_SCREEN, dashboardPanel);

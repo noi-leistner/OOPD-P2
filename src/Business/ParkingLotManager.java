@@ -19,10 +19,6 @@ public class ParkingLotManager {
         this.reservationDao = reservationDao;
     }
 
-    public ParkingLotManager(ReservationDAO reservationDao) {
-
-    }
-
     public SpaceResult addSpace(ParkingSpace space) {
         if (space == null) return SpaceResult.DATABASE_ERROR;
         if (parkingSpaceDao.existsById(space.getId())) return SpaceResult.ALREADY_EXISTS;
@@ -106,8 +102,8 @@ public class ParkingLotManager {
         return null;
     }
 
-    public Map<Integer,Integer> getOccupancyLastHour() {
-        return reservationDao.getOccupancyLastHour();
+    public Map<Integer,Integer> getOccupancyLastDay() {
+        return reservationDao.getOccupancyLastDay();
     }
 
     // TODO: maybe not need this function

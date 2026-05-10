@@ -61,11 +61,15 @@ public class ReservationDAO {
         return list;
     }
 
-    public Map<Integer, Integer> getOccupancyLastHour() {
+    public Map<Integer, Integer> getOccupancyLastDay() {
         Map<Integer, Integer> result = new HashMap<>();
-        String sql = "SELECT TIMESTAMPDIFF(MINUTE, date, NOW()) as minutes_ago, Count(*) as total" +
-                     "FROM reservations" + "WHERE date >= NOW() - INTERVAL 1 HOUR" +
-                     "GROUPED BY TIMESTAMPDIFF(MINUTE, date, NOW())" + "ORDER BY minutes_ago DESC";
+        String sql = "SELECT TIMESTAMPDIFF(MINUTE, date, NOW()) as minutes_ago, " +
+                "COUNT(*) as total " +
+                "FROM reservations " +
+                "WHERE date <= NOW() " +
+                "AND DATE_ADD(date, INTERVAL 1 HOUR) >= NOW() - INTERVAL 1 HOUR " +
+                "GROUP BY TIMESTAMPDIFF(MINUTE, date, NOW()) " +
+                "ORDER BY minutes_ago DESC";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
