@@ -81,20 +81,7 @@ public class ParkingLotManager {
     }
 
     public void cancelReservationByAdmin(int spaceId) {
-        reservationDao.deleteReservation(spaceId);
-
-        ParkingSpace space = parkingSpaceDao.getParkingSpaceById(spaceId);
-        if (space != null) {
-            ParkingSpace updated = new ParkingSpace(
-                    getSpaceDetails(spaceId).getId(),
-                    getSpaceDetails(spaceId).getFloor(),
-                    false,
-                    false,
-                    getSpaceDetails(spaceId).getType()
-            );
-            parkingSpaceDao.updateParkingSpace(updated);
-
-        }
+        //TODO: Implement
     }
 
     public List<Reservation> getUserReservations(int userId) {
