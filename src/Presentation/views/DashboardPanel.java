@@ -4,6 +4,7 @@ import Business.Entities.User;
 import Business.SessionManager;
 import Presentation.controllers.AuthController;
 import Presentation.controllers.ParkingSpaceController;
+import Presentation.controllers.ReservationController;
 import Presentation.controllers.StatusController;
 import Presentation.theme.AppColors;
 
@@ -23,6 +24,7 @@ public class DashboardPanel extends JPanel {
     private JButton initialButton;
 
     private ParkingSpaceController slotController;
+    private ReservationController reservationController;
 
     public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController, StatusController statusController) {
         this.slotController = slotController;

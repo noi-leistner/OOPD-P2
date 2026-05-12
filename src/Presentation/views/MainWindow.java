@@ -30,15 +30,13 @@ public class MainWindow extends JFrame {
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-
         UserDAO userDAO = new UserDAOSql();
         ParkingSpaceDAO parkingSpaceDAO = new ParkingSpaceDAOSql();
-        ReservationDAO reservationDAO = new ReservationDAO();
+        ReservationDAO reservationDAO = new ReservationDAOSql();
 
         AuthManager authManager       = new AuthManager(userDAO);
         SessionManager sessionManager = SessionManager.getInstance();
         AuthController authController = new AuthController(authManager, sessionManager);
-
         ParkingLotManager parkingLotManager = new ParkingLotManager(parkingSpaceDAO, reservationDAO);
         ParkingSpaceController slotController = new ParkingSpaceController(parkingLotManager);
         StatusController statusController = new StatusController(parkingLotManager);
