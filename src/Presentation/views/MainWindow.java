@@ -6,6 +6,7 @@ import Business.ReservationManager;
 import Business.SessionManager;
 import Persistance.*;
 import Presentation.controllers.AuthController;
+import Presentation.controllers.EntryExitController;
 import Presentation.controllers.ParkingSpaceController;
 import Presentation.controllers.ReservationController;
 
@@ -34,18 +35,20 @@ public class MainWindow extends JFrame {
         UserDAO userDAO = new UserDAOSql();
         ParkingSpaceDAO parkingSpaceDAO = new ParkingSpaceDAOSql();
         ReservationDAO reservationDAO = new ReservationDAOSql();
+        VehicleDAO vehicleDAO = new VehicleDAOSql();
 
         AuthManager authManager       = new AuthManager(userDAO);
         SessionManager sessionManager = SessionManager.getInstance();
         AuthController authController = new AuthController(authManager, sessionManager);
-        ParkingLotManager parkingLotManager = new ParkingLotManager(parkingSpaceDAO, reservationDAO);
+        ParkingLotManager parkingLotManager = new ParkingLotManager(parkingSpaceDAO, reservationDAO, vehicleDAO);
         ParkingSpaceController slotController = new ParkingSpaceController(parkingLotManager);
+        EntryExitController entryExitController = new EntryExitController(parkingLotManager);
         ReservationManager reservationManager = new ReservationManager(reservationDAO);
         ReservationController reservationController = new ReservationController(reservationManager);
 
 
         AuthPanel authPanel = new AuthPanel(this, authController);
-        dashboardPanel = new  DashboardPanel(this, authController, slotController, reservationController);
+        dashboardPanel = new  DashboardPanel(this, authController, slotController, reservationController, entryExitController);
 
         mainPanel.add(AUTH_SCREEN, authPanel);
         mainPanel.add(DASHBOARD_SCREEN, dashboardPanel);

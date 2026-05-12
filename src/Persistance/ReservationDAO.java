@@ -11,4 +11,6 @@ public interface ReservationDAO {
     List<Reservation> getAllReservations();
     Map<Integer, Integer> getOccupancyLastHour();
     Reservation findReservationBySlotId(int id);
+    Reservation findReservationByPlate(String licensePlate);
+
 }
