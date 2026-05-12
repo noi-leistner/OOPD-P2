@@ -31,6 +31,7 @@ public class DashboardPanel extends JPanel {
         this.mainWindow = mainWindow;
         this.authController = authController;
         this.statusController = statusController;
+        this.reservationController = reservationController;
 
         setLayout(new BorderLayout());
 
@@ -68,7 +69,7 @@ public class DashboardPanel extends JPanel {
             addButton(sidebar, "Last Hour Occupancy",  "OCCUPANCY");
             addButton(sidebar, "Current Parking status", "STATUS");
 
-            ManageSlotsPanel manageSlotsPanel = new ManageSlotsPanel(slotController);
+            ManageSlotsPanel manageSlotsPanel = new ManageSlotsPanel(slotController, reservationController);
             manageSlotsPanel.refreshTable();
 
             OccupancyPanel occupancyPanel = new OccupancyPanel(statusController);

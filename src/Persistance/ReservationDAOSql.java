@@ -63,9 +63,27 @@ public class ReservationDAOSql implements ReservationDAO {
 
     public Map<Integer, Integer> getOccupancyLastHour() {
         Map<Integer, Integer> result = new HashMap<>();
-        String sql = "SELECT TIMESTAMPDIFF(MINUTE, date, NOW()) as minutes_ago, Count(*) as total" +
-                     "FROM reservations" + "WHERE date >= NOW() - INTERVAL 1 HOUR" +
-                     "GROUPED BY TIMESTAMPDIFF(MINUTE, date, NOW())" + "ORDER BY minutes_ago DESC";
+        String sql = "WITH RECURSIVE minutes AS (\n" +
+                "    SELECT 0 AS m\n" +
+                "    UNION ALL\n" +
+                "    SELECT m + 1 FROM minutes WHERE m < 59\n" +
+                ")\n" +
+                "SELECT\n" +
+                "    m.m AS minutes_ago,\n" +
+                "    COUNT(DISTINCT pl.license_plate) AS total\n" +
+                "FROM minutes m\n" +
+                "LEFT JOIN parking_log pl\n" +
+                "    ON pl.action = 'enter'\n" +
+                "    AND pl.timestamp <= NOW() - INTERVAL m.m MINUTE\n" +
+                "    AND NOT EXISTS (\n" +
+                "        SELECT 1 FROM parking_log ex\n" +
+                "        WHERE ex.license_plate = pl.license_plate\n" +
+                "        AND ex.action = 'exit'\n" +
+                "        AND ex.timestamp > pl.timestamp\n" +
+                "        AND ex.timestamp <= NOW() - INTERVAL m.m MINUTE\n" +
+                "    )\n" +
+                "GROUP BY m.m\n" +
+                "ORDER BY m.m ASC";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {

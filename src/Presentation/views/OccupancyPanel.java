@@ -23,7 +23,7 @@ public class OccupancyPanel extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         // Title
-        JLabel title = new JLabel("Last Day Occupancy");
+        JLabel title = new JLabel("Last Hour Occupancy");
         title.setFont(new Font("Arial", Font.BOLD, 16));
         title.setHorizontalAlignment(SwingConstants.CENTER);
         add(title, BorderLayout.NORTH);
@@ -151,7 +151,7 @@ public class OccupancyPanel extends JPanel {
                 g2.drawRect(x, y, (int) barWidth, barH);
 
                 // X label every 60 minutes
-                if (minute % 60 == 0 || barCount <= 24) {
+                if (minute % 2 == 0 || barCount <= 24) {
                     g2.setFont(new Font("Arial", Font.PLAIN, 9));
                     g2.setColor(Color.DARK_GRAY);
                     g2.drawString(minute + "m", x - 5, chartY + chartH + 15);

@@ -24,7 +24,7 @@ public class StatusController {
     }
 
     public Map<Integer, Integer> getOccupancyChartData(){
-        return manager.getOccupancyLastDay();
+        return manager.getOccupancyLastHour();
     }
 }
 /*
