@@ -129,7 +129,7 @@ public class CurrentStatusPanel extends JPanel {
         JPanel content = new JPanel(new GridLayout(0, 1, 5, 5));
         content.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        JLabel title = new JLabel("SPACE DETAILS");
+        JLabel title = new JLabel("Parking Space Information");
         title.setFont(new Font("Arial", Font.BOLD, 14));
         content.add(title);
 
@@ -144,12 +144,11 @@ public class CurrentStatusPanel extends JPanel {
         if (space.isReserved()) {
             content.add(new JSeparator());
 
-            JLabel reservationTitle = new JLabel("Reservation Space Information");
+            JLabel reservationTitle = new JLabel("Reservation Information");
             reservationTitle.setFont(new Font("Arial", Font.BOLD, 13));
             content.add(reservationTitle);
 
             content.add(makeField("User:", "— (not yet available)")); // TODO: get user by reservation
-            content.add(makeField("Plate:", "— (not yet available)")); // TODO: get license plate from reservation
 
             JButton cancelBtn = new JButton("Cancel Reservation");
             cancelBtn.setBackground(AppColors.RED);
