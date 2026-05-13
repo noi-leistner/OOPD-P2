@@ -2,7 +2,7 @@ package Presentation.controllers;
 
 import Business.Entities.ParkingSpace;
 import Business.ParkingLotManager;
-import Business.SpaceResult;
+import Business.DaoResult;
 
 import java.util.List;
 
@@ -14,18 +14,19 @@ public class ParkingSpaceController {
         this.manager = manager;
     }
 
-    public SpaceResult addSpace(int code, int floor, String vehicleType, boolean occStatus, boolean resStatus) {
+    public DaoResult addSpace(int code, int floor, String vehicleType, boolean occStatus, boolean resStatus) {
         ParkingSpace space = new ParkingSpace(code, floor, occStatus, resStatus, vehicleType);
         return manager.addSpace(space);
     }
 
-    public SpaceResult editSpace(int code, int floor, String vehicleType, boolean occStatus, boolean resStatus) {
-        ParkingSpace space = new ParkingSpace(code, floor, occStatus, resStatus, vehicleType);
+    public DaoResult editSpace(int code, int floor, String vehicleType, boolean resStatus) {
+        boolean occupied = getSpaceDetails(code).isOccupied();
+        ParkingSpace space = new ParkingSpace(code, floor, occupied, resStatus, vehicleType);
 
         return manager.editSpace(space);
     }
 
-    public SpaceResult removeSpace(int spaceId) {
+    public DaoResult removeSpace(int spaceId) {
         return manager.deleteSpace(spaceId);
     }
 

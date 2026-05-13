@@ -1,6 +1,6 @@
 package Business;
 
-public enum SpaceResult {
+public enum DaoResult {
     SUCCESS,
     ALREADY_EXISTS,
     NOT_FOUND,
