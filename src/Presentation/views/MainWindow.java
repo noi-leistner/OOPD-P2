@@ -7,6 +7,7 @@ import Business.SessionManager;
 import Persistance.*;
 import Presentation.controllers.AuthController;
 import Presentation.controllers.ParkingSpaceController;
+import Presentation.controllers.StatusController;
 import Presentation.controllers.ReservationController;
 
 import javax.swing.*;
@@ -40,6 +41,7 @@ public class MainWindow extends JFrame {
         AuthController authController = new AuthController(authManager, sessionManager);
         ParkingLotManager parkingLotManager = new ParkingLotManager(parkingSpaceDAO, reservationDAO);
         ParkingSpaceController slotController = new ParkingSpaceController(parkingLotManager);
+        StatusController statusController = new StatusController(parkingLotManager);
         ReservationManager reservationManager = new ReservationManager(reservationDAO);
         ReservationController reservationController = new ReservationController(reservationManager);
 
@@ -47,7 +49,9 @@ public class MainWindow extends JFrame {
         authController.setParkingLotManager(parkingLotManager);
 
         AuthPanel authPanel = new AuthPanel(this, authController);
-        dashboardPanel = new  DashboardPanel(this, authController, slotController, reservationController);
+
+        dashboardPanel = new  DashboardPanel(this, authController, slotController, reservationController, statusController);
+
 
         mainPanel.add(AUTH_SCREEN, authPanel);
         mainPanel.add(DASHBOARD_SCREEN, dashboardPanel);
