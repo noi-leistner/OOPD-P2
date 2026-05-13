@@ -5,6 +5,7 @@ import Business.SessionManager;
 import Presentation.controllers.AuthController;
 import Presentation.controllers.ParkingSpaceController;
 import Presentation.controllers.StatusController;
+import Presentation.controllers.ReservationController;
 import Presentation.theme.AppColors;
 
 import javax.swing.*;
@@ -23,11 +24,13 @@ public class DashboardPanel extends JPanel {
 
     private ParkingSpaceController slotController;
     private StatusController statusController;
+    private ReservationController reservationController;
 
-    public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController, StatusController statusController) {
+    public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController, ReservationController reservationController, StatusController statusController) {
         this.slotController = slotController;
         this.mainWindow = mainWindow;
         this.authController = authController;
+        this.reservationController = reservationController;
         this.statusController = statusController;
 
         setLayout(new BorderLayout());
@@ -66,7 +69,7 @@ public class DashboardPanel extends JPanel {
             addButton(sidebar, "Last Hour Occupancy",  "OCCUPANCY");
             addButton(sidebar, "Current Parking status", "STATUS");
 
-            ManageSlotsPanel manageSlotsPanel = new ManageSlotsPanel(slotController);
+            ManageSlotsPanel manageSlotsPanel = new ManageSlotsPanel(slotController, reservationController);
             manageSlotsPanel.refreshTable();
             contentArea.add(manageSlotsPanel,   "SLOTS");
 //            contentArea.add(new ManageUsersPanel(),   "USERS");

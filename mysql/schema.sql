@@ -11,6 +11,7 @@ CREATE TABLE users (
 -- Create vehicles table
 CREATE TABLE vehicles (
   license_plate VARCHAR(20) PRIMARY KEY,
+  user_id       int(11) NOT NULL,
   vehicle_type VARCHAR(30) NOT NULL
 );
 
@@ -35,6 +36,16 @@ CREATE TABLE reservations (
   FOREIGN KEY (parking_slot_id) REFERENCES parking_slots(identifier)
 );
 
+-- migration 001 — add parking_log table
+CREATE TABLE parking_log (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    parking_slot_id INT         NOT NULL,
+    license_plate   VARCHAR(20) NOT NULL,
+    user_id         INT         NOT NULL,
+    action          VARCHAR(10) NOT NULL,
+    timestamp       DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Insert test data
 INSERT INTO users (name, surname, email, password, role) VALUES
 ('Admin', 'User', 'admin@lsparking.com', 'admin123', 'admin'),
@@ -49,3 +60,9 @@ INSERT INTO parking_slots (identifier, vehicle_type, occupation_status, reservat
 (2, 'car', FALSE, FALSE, 1),
 (3, 'motorcycle', FALSE, FALSE, 0),
 (4, 'motorcycle', FALSE, FALSE, 1);
+
+-- Add ADMIN CANCELLATION flag to RESERVATION table
+ALTER TABLE reservations
+    ADD COLUMN cancelled_by_admin BOOLEAN NOT NULL DEFAULT FALSE;
+
+--h

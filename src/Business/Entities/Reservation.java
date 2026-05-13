@@ -9,11 +9,19 @@ public class Reservation {
     int parking_slot_id;
     Date date;
 
+    public Reservation (int id, int user_id, String vehicle_license_plate, int parking_slot_id, Date date) {
+        this.id = id;
+        this.user_id = user_id;
+        this.vehicle_license_plate = vehicle_license_plate;
+        this.parking_slot_id = parking_slot_id;
+        this.date = date;
+    }
+
     public int getId() {return id;}
 
     public int getUser_id() {return user_id;}
 
-    public String getVehicle_license_plate() {return vehicle_license_plate;}
+    public String getVehiclePlate() {return vehicle_license_plate;}
 
     public int getParking_slot_id() {return parking_slot_id;}
 
