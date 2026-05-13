@@ -2,11 +2,13 @@ package Presentation.views;
 
 import Business.AuthManager;
 import Business.ParkingLotManager;
+import Business.ReservationManager;
 import Business.SessionManager;
 import Persistance.*;
 import Presentation.controllers.AuthController;
 import Presentation.controllers.ParkingSpaceController;
 import Presentation.controllers.StatusController;
+import Presentation.controllers.ReservationController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,10 +42,15 @@ public class MainWindow extends JFrame {
         ParkingLotManager parkingLotManager = new ParkingLotManager(parkingSpaceDAO, reservationDAO);
         ParkingSpaceController slotController = new ParkingSpaceController(parkingLotManager);
         StatusController statusController = new StatusController(parkingLotManager);
+        ReservationManager reservationManager = new ReservationManager(reservationDAO);
+        ReservationController reservationController = new ReservationController(reservationManager);
 
+
+        authController.setParkingLotManager(parkingLotManager);
 
         AuthPanel authPanel = new AuthPanel(this, authController);
-        dashboardPanel = new  DashboardPanel(this, authController, slotController, statusController);
+        dashboardPanel = new  DashboardPanel(this, authController, slotController, reservationController, statusController);
+
 
         mainPanel.add(AUTH_SCREEN, authPanel);
         mainPanel.add(DASHBOARD_SCREEN, dashboardPanel);

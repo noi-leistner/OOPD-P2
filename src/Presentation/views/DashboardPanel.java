@@ -4,6 +4,7 @@ import Business.Entities.User;
 import Business.SessionManager;
 import Presentation.controllers.AuthController;
 import Presentation.controllers.ParkingSpaceController;
+import Presentation.controllers.StatusController;
 import Presentation.controllers.ReservationController;
 import Presentation.controllers.StatusController;
 import Presentation.theme.AppColors;
@@ -24,9 +25,10 @@ public class DashboardPanel extends JPanel {
     private JButton initialButton;
 
     private ParkingSpaceController slotController;
+    private StatusController statusController;
     private ReservationController reservationController;
 
-    public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController, StatusController statusController) {
+    public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController, ReservationController reservationController, StatusController statusController) {
         this.slotController = slotController;
         this.mainWindow = mainWindow;
         this.authController = authController;
@@ -76,8 +78,8 @@ public class DashboardPanel extends JPanel {
 
             contentArea.add(manageSlotsPanel,   "SLOTS");
 //            contentArea.add(new ManageUsersPanel(),   "USERS");
-            contentArea.add(occupancyPanel,  "OCCUPANCY");
-//            contentArea.add(new CurrentStatusPanel(),  "STATUS");
+//            contentArea.add(new OccupancyPanel(),  "OCCUPANCY");
+            contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
             addButton(sidebar, "Log Out", "LOGOUT");
             contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");
 
@@ -95,7 +97,7 @@ public class DashboardPanel extends JPanel {
 //            contentArea.add(new VehicleEntryPanel(), "VEHICLE_ENTRY");
 //            contentArea.add(new VehicleExitPanel(), "VEHICLE_EXIT");
 //            contentArea.add(new OccupancyPanel(), "OCCUPANCY");
-//            contentArea.add(new CurrentStatusPanel(),  "STATUS");
+            contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
             addButton(sidebar, "Log Out", "LOGOUT");
 
             showContent("VEHICLE_ENTRY");
