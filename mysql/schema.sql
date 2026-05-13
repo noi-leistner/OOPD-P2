@@ -11,6 +11,7 @@ CREATE TABLE users (
 -- Create vehicles table
 CREATE TABLE vehicles (
   license_plate VARCHAR(20) PRIMARY KEY,
+  user_id       int(11) NOT NULL,
   vehicle_type VARCHAR(30) NOT NULL
 );
 
@@ -35,6 +36,16 @@ CREATE TABLE reservations (
   FOREIGN KEY (user_id) REFERENCES users(id),
   FOREIGN KEY (vehicle_license_plate) REFERENCES vehicles(license_plate),
   FOREIGN KEY (parking_slot_id) REFERENCES parking_slots(identifier)
+);
+
+-- migration 001 — add parking_log table
+CREATE TABLE parking_log (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    parking_slot_id INT         NOT NULL,
+    license_plate   VARCHAR(20) NOT NULL,
+    user_id         INT         NOT NULL,
+    action          VARCHAR(10) NOT NULL,
+    timestamp       DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Insert test data
