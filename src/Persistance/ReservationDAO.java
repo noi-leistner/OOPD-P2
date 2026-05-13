@@ -12,7 +12,9 @@ public interface ReservationDAO {
     List<Reservation> getAllReservations();
     Map<Integer, Integer> getOccupancyLastHour();
     Reservation findReservationBySlotId(int id);
-
+    void markCancelledByAdmin(int reservationId);
+    void deleteReservationBySpaceId(int spaceId);
+    List<Reservation> getCancelledReservationsByUser(int userId);
 }
 
 //h

@@ -25,7 +25,6 @@ public class DashboardPanel extends JPanel {
     private JButton initialButton;
 
     private ParkingSpaceController slotController;
-    private StatusController statusController;
     private ReservationController reservationController;
 
     public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController, ReservationController reservationController, StatusController statusController) {
