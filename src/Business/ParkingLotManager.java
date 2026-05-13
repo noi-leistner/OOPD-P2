@@ -19,28 +19,24 @@ public class ParkingLotManager {
         this.reservationDao = reservationDao;
     }
 
-    public ParkingLotManager(ReservationDAO reservationDao) {
-
-    }
-
-    public SpaceResult addSpace(ParkingSpace space) {
-        if (space == null) return SpaceResult.DATABASE_ERROR;
-        if (parkingSpaceDao.existsById(space.getId())) return SpaceResult.ALREADY_EXISTS;
+    public DaoResult addSpace(ParkingSpace space) {
+        if (space == null) return DaoResult.DATABASE_ERROR;
+        if (parkingSpaceDao.existsById(space.getId())) return DaoResult.ALREADY_EXISTS;
 
         boolean saved = parkingSpaceDao.addParkingSpace(space);
-        return saved ? SpaceResult.SUCCESS : SpaceResult.DATABASE_ERROR;
+        return saved ? DaoResult.SUCCESS : DaoResult.DATABASE_ERROR;
     }
 
-    public SpaceResult editSpace(ParkingSpace space) {
-        if (space == null) return SpaceResult.DATABASE_ERROR;
+    public DaoResult editSpace(ParkingSpace space) {
+        if (space == null) return DaoResult.DATABASE_ERROR;
 
         boolean updated = parkingSpaceDao.updateParkingSpace(space);
-        return updated ? SpaceResult.SUCCESS : SpaceResult.DATABASE_ERROR;
+        return updated ? DaoResult.SUCCESS : DaoResult.DATABASE_ERROR;
     }
 
-    public SpaceResult deleteSpace(int spaceId) {
+    public DaoResult deleteSpace(int spaceId) {
         boolean deleted = parkingSpaceDao.deleteParkingSpace(spaceId);
-        return deleted ? SpaceResult.SUCCESS : SpaceResult.DATABASE_ERROR;
+        return deleted ? DaoResult.SUCCESS : DaoResult.DATABASE_ERROR;
     }
 
 
