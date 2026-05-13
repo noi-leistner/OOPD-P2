@@ -110,4 +110,18 @@ public class ParkingLotManager {
     public boolean slotExistsById(int id) {
         return parkingSpaceDao.existsById(id);
     }
+
+    public boolean hasCancelledReservations(int userId) {
+        List<Reservation> cancelled = reservationDao.getCancelledReservationsByUser(userId);
+        return !cancelled.isEmpty();
+    }
+
+    public void clearCancelledNotifications(int userId) {
+        List<Reservation> cancelled = reservationDao.getCancelledReservationsByUser(userId);
+        for (Reservation r : cancelled) {
+            reservationDao.deleteReservationBySpaceId(r.getParking_slot_id());
+        }
+    }
 }
+
+//h
