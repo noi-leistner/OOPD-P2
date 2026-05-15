@@ -30,4 +30,7 @@ public class ReservationController {
         return manager.getReservationBySlot(id);
     }
 
+    public void cancelReservationFromAdmin(int spaceId) {
+        manager.cancelReservationByAdmin(spaceId);
+    }
 }

@@ -72,7 +72,9 @@ public class DashboardPanel extends JPanel {
             ManageSlotsPanel manageSlotsPanel = new ManageSlotsPanel(slotController, reservationController);
             manageSlotsPanel.refreshTable();
             contentArea.add(manageSlotsPanel,   "SLOTS");
-//            contentArea.add(new ManageUsersPanel(),   "USERS");
+
+            ManageBookingsPanel manageBookingsPanel = new ManageBookingsPanel(reservationController);
+            contentArea.add(manageBookingsPanel,   "BOOKINGS");
 //            contentArea.add(new OccupancyPanel(),  "OCCUPANCY");
             contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
             addButton(sidebar, "Log Out", "LOGOUT");

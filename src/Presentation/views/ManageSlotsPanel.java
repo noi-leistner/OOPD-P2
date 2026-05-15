@@ -9,10 +9,7 @@ import Presentation.theme.AppColors;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.Date;
 import java.util.List;
-
-import static Business.DaoResult.*;
 
 public class ManageSlotsPanel extends JPanel {
 
@@ -52,15 +49,11 @@ public class ManageSlotsPanel extends JPanel {
         editBtn.addActionListener(e -> showEditSlotDialog());
 
         JButton removeBtn = buildButton("Remove Slot");
-        removeBtn.addActionListener(e -> showRemoveStatusDialog());
-
-        JButton cancelResBtn = buildButton("Cancel Reservation");
-        cancelResBtn.addActionListener(e -> showCancelReservationDialog());
+        removeBtn.addActionListener(e -> showRemoveSlotDialog());
 
         threeButtons.add(addBtn);
         threeButtons.add(editBtn);
         threeButtons.add(removeBtn);
-        threeButtons.add(cancelResBtn);
         wrapper.add(threeButtons);
 
         wrapper.add(Box.createVerticalStrut(15));
@@ -131,66 +124,6 @@ public class ManageSlotsPanel extends JPanel {
         btn.setHorizontalAlignment(SwingConstants.CENTER);
     }
 
-    private void showCancelReservationDialog() {
-        JPanel formPanel = new JPanel(new GridLayout(0, 1, 5, 5));
-        JTextField idField = new JTextField(15);
-        JButton cancelResBtn = new JButton("Cancel Reservation");
-        JButton closeBtn = new JButton("Close");
-
-        styleButton(cancelResBtn, true);
-        styleButton(closeBtn, false);
-
-        JDialog dialog = createBaseDialog("Cancel Reservation", new Dimension(350, 160), formPanel, cancelResBtn, closeBtn);
-
-        JLabel titleLabel = new JLabel("CANCEL RESERVATION ON SLOT");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        formPanel.add(titleLabel);
-        addField(formPanel, "Enter Slot Identifier:", idField);
-
-        cancelResBtn.addActionListener(e -> {
-            String input = idField.getText().trim();
-            if (input.isBlank()) {
-                JOptionPane.showMessageDialog(dialog, "Please enter a slot ID.");
-                return;
-            }
-            try {
-                int spaceId = Integer.parseInt(input);
-
-                if (!slotController.slotExists(spaceId)) {
-                    JOptionPane.showMessageDialog(dialog, "There is no parking space with this ID.");
-                    return;
-                }
-
-                ParkingSpace space = slotController.getSpaceDetails(spaceId);
-                if (space == null || !space.isReserved()) {
-                    JOptionPane.showMessageDialog(dialog, "This slot has no active reservation.", "Info", JOptionPane.INFORMATION_MESSAGE);
-                    return;
-                }
-
-                int confirm = JOptionPane.showConfirmDialog(
-                        dialog,
-                        "Cancel the reservation on slot " + spaceId + "?\nThe user will be notified on next login.",
-                        "Confirm",
-                        JOptionPane.YES_NO_OPTION
-                );
-
-                if (confirm == JOptionPane.YES_OPTION) {
-                    slotController.cancelReservationFromAdmin(spaceId);
-                    JOptionPane.showMessageDialog(dialog, "Reservation cancelled. The slot is now free.");
-                    dialog.dispose();
-                    refreshTable();
-                }
-
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(dialog, "Slot ID must be a number.", "Invalid input", JOptionPane.WARNING_MESSAGE);
-            }
-        });
-
-        dialog.pack();
-        dialog.setLocationRelativeTo(this);
-        dialog.setVisible(true);
-    }
-
     private void showSlotInfoDialog(String text, ParkingSpace space) {
         JPanel formPanel = new JPanel();
         formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
@@ -202,19 +135,29 @@ public class ManageSlotsPanel extends JPanel {
 
         JDialog dialog = createBaseDialog(text, new Dimension(400, 500), formPanel, okBtn, cancelBtn);
 
-        //TODO: only allow floors with enough slots free
-        JComboBox<Integer> floorCombo =new JComboBox<>(new Integer[]{0, 1, 2, 3, 4});
         JComboBox<String> typeCombo = new JComboBox<>(new String[]{"Car", "Motorcycle", "Truck"});
 
-
         JTextField idField = new JTextField(15);
+
+        List<Integer> availableFloors;
         if (space != null) {
             idField.setText(String.valueOf(space.getId()));
             idField.setEditable(false);
             idField.setBackground(Color.LIGHT_GRAY);
 
-            floorCombo.setSelectedItem(space.getFloor());
+            availableFloors = slotController.getAvailableFloors(space.getFloor());
             typeCombo.setSelectedItem(space.getType());
+        } else {
+            availableFloors = slotController.getAvailableFloors(-1);
+            if (availableFloors.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "All floors are full.");
+                return;
+            }
+        }
+
+        JComboBox<Integer> floorCombo = new JComboBox<>(availableFloors.toArray(new Integer[0]));
+        if (space != null) {
+            floorCombo.setSelectedItem(space.getFloor());
         }
 
         JLabel titleLabel = new JLabel(text.toUpperCase());
@@ -356,7 +299,7 @@ public class ManageSlotsPanel extends JPanel {
         dialog.setVisible(true);
     }
 
-    private void showRemoveStatusDialog() {
+    private void showRemoveSlotDialog() {
         JPanel formPanel = new JPanel();
         formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
         JTextField idField = new JTextField(15);
@@ -393,12 +336,13 @@ public class ManageSlotsPanel extends JPanel {
                 int confirm = JOptionPane.showConfirmDialog(dialog, "Delete slot " + spaceId + "?", "Confirm", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
                     switch (slotController.removeSpace(spaceId)) {
-                        case SUCCESS        -> {
+                        case SUCCESS -> {
                             JOptionPane.showMessageDialog(dialog, "Slot removed!");
                             dialog.dispose();
                             refreshTable();
                         }
-                        case NOT_FOUND      -> JOptionPane.showMessageDialog(dialog, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
+                        case CANNOT_REMOVE_OCCUPIED -> JOptionPane.showMessageDialog(dialog, "Slot is occupied and no alternative spaces are available.", "Cannot Remove", JOptionPane.WARNING_MESSAGE);
+                        case NOT_FOUND -> JOptionPane.showMessageDialog(dialog, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
                         case DATABASE_ERROR -> JOptionPane.showMessageDialog(dialog, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }

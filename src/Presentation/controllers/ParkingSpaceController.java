@@ -3,50 +3,74 @@ package Presentation.controllers;
 import Business.Entities.ParkingSpace;
 import Business.ParkingLotManager;
 import Business.DaoResult;
+import Business.ReservationManager;
 
 import java.util.List;
 
 public class ParkingSpaceController {
 
-    private final ParkingLotManager manager;
+    private final ParkingLotManager parkingLotManager;
+    private final ReservationManager reservationManager;
 
-    public ParkingSpaceController(ParkingLotManager manager) {
-        this.manager = manager;
+    public ParkingSpaceController(ParkingLotManager parkingLotManager, ReservationManager reservationManager) {
+        this.parkingLotManager = parkingLotManager;
+        this.reservationManager = reservationManager;
     }
 
     public DaoResult addSpace(int code, int floor, String vehicleType, boolean occStatus, boolean resStatus) {
         ParkingSpace space = new ParkingSpace(code, floor, occStatus, resStatus, vehicleType);
-        return manager.addSpace(space);
+        return parkingLotManager.addSpace(space);
     }
 
     public DaoResult editSpace(int code, int floor, String vehicleType, boolean resStatus) {
         boolean occupied = getSpaceDetails(code).isOccupied();
         ParkingSpace space = new ParkingSpace(code, floor, occupied, resStatus, vehicleType);
 
-        return manager.editSpace(space);
+        return parkingLotManager.editSpace(space);
     }
 
     public DaoResult removeSpace(int spaceId) {
-        return manager.deleteSpace(spaceId);
+        ParkingSpace space = parkingLotManager.getSpaceDetails(spaceId);
+        if (space == null) return DaoResult.NOT_FOUND;
+
+        if (space.isOccupied()) {
+            ParkingSpace alternative = parkingLotManager.findAlternativeSpace(space.getType(), spaceId);
+            if (alternative == null) return DaoResult.CANNOT_REMOVE_OCCUPIED;
+            parkingLotManager.moveVehicle(space, alternative);
+        }
+
+        if (space.isReserved()) {
+            ParkingSpace alternative = parkingLotManager.findAlternativeSpace(space.getType(), spaceId);
+            if (alternative != null) {
+                reservationManager.moveReservation(spaceId, alternative.getId());
+            } else {
+                reservationManager.cancelReservationBySlot(spaceId);
+            }
+        }
+
+        return parkingLotManager.deleteSpace(spaceId);
     }
 
     public ParkingSpace getSpaceDetails(int spaceId) {
         //TODO: Implement
-        return manager.getSpaceDetails(spaceId);
+        return parkingLotManager.getSpaceDetails(spaceId);
     }
 
+    //TODO: this should be in reservation controller
     public void cancelReservationFromAdmin(int spaceId) {
-        manager.cancelReservationByAdmin(spaceId);
+        parkingLotManager.cancelReservationByAdmin(spaceId);
     }
 
     // TODO: maybe not need this function
     public boolean slotExists(int id) {
-        return manager.slotExistsById(id);
+        return parkingLotManager.slotExistsById(id);
     }
 
     public List<ParkingSpace> getAllSpaces() {
-        return manager.getAllSpaces();
+        return parkingLotManager.getAllSpaces();
+    }
+
+    public List<Integer> getAvailableFloors(int currentFloor) {
+        return parkingLotManager.getAvailableFloors(currentFloor);
     }
 }
-
-//h

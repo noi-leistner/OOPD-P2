@@ -39,10 +39,11 @@ public class MainWindow extends JFrame {
         AuthManager authManager       = new AuthManager(userDAO);
         SessionManager sessionManager = SessionManager.getInstance();
         AuthController authController = new AuthController(authManager, sessionManager);
-        ParkingLotManager parkingLotManager = new ParkingLotManager(parkingSpaceDAO, reservationDAO);
-        ParkingSpaceController slotController = new ParkingSpaceController(parkingLotManager);
-        StatusController statusController = new StatusController(parkingLotManager);
+        ParkingLotManager parkingLotManager = new ParkingLotManager(parkingSpaceDAO);
         ReservationManager reservationManager = new ReservationManager(reservationDAO);
+        ParkingSpaceController slotController = new ParkingSpaceController(parkingLotManager, reservationManager);
+        //TODO: idk if we need a status controller (maybe slotController is enough)
+        StatusController statusController = new StatusController(parkingLotManager, reservationManager);
         ReservationController reservationController = new ReservationController(reservationManager);
 
 

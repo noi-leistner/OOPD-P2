@@ -6,17 +6,21 @@ import Business.Entities.Reservation;
 import Persistance.ParkingSpaceDAO;
 import Persistance.ReservationDAO;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ParkingLotManager {
 
     private ParkingSpaceDAO parkingSpaceDao;
-    private ReservationDAO reservationDao;
 
-    public ParkingLotManager (ParkingSpaceDAO parkingSpaceDao, ReservationDAO reservationDao) {
+
+    private static final int MAX_SLOTS_PER_FLOOR = 20;
+    private static final int NUM_FLOORS = 4;
+
+    public ParkingLotManager (ParkingSpaceDAO parkingSpaceDao) {
         this.parkingSpaceDao = parkingSpaceDao;
-        this.reservationDao = reservationDao;
     }
 
     public DaoResult addSpace(ParkingSpace space) {
@@ -35,10 +39,25 @@ public class ParkingLotManager {
     }
 
     public DaoResult deleteSpace(int spaceId) {
-        boolean deleted = parkingSpaceDao.deleteParkingSpace(spaceId);
-        return deleted ? DaoResult.SUCCESS : DaoResult.DATABASE_ERROR;
+        return parkingSpaceDao.deleteParkingSpace(spaceId) ? DaoResult.SUCCESS : DaoResult.DATABASE_ERROR;
     }
 
+    public ParkingSpace findAlternativeSpace(String type, int excludeId) {
+        return parkingSpaceDao.getAllParkingSpaces().stream()
+                .filter(s -> s.getId() != excludeId)
+                .filter(s -> s.getType().equalsIgnoreCase(type))
+                .filter(s -> !s.isOccupied())
+                .filter(s -> !s.isReserved())
+                .findFirst()
+                .orElse(null);
+    }
+
+    public void moveVehicle(ParkingSpace from, ParkingSpace to) {
+        to.setOccupied(true);
+        from.setOccupied(false);
+        parkingSpaceDao.updateParkingSpace(to);
+        parkingSpaceDao.updateParkingSpace(from);
+    }
 
     public ParkingSpace getSpaceDetails(int spaceId) {
         return parkingSpaceDao.getParkingSpaceById(spaceId);
@@ -80,48 +99,45 @@ public class ParkingLotManager {
         //TODO: Implement
     }
 
-    public void cancelReservationByAdmin(int spaceId) {
-        reservationDao.deleteReservation(spaceId);
+    public List<Integer> getAvailableFloors(int currentFloor) {
+        List<ParkingSpace> allSpaces = parkingSpaceDao.getAllParkingSpaces();
 
-        ParkingSpace space = parkingSpaceDao.getParkingSpaceById(spaceId);
-        if (space != null) {
-            ParkingSpace updated = new ParkingSpace(
-                    getSpaceDetails(spaceId).getId(),
-                    getSpaceDetails(spaceId).getFloor(),
-                    false,
-                    false,
-                    getSpaceDetails(spaceId).getType()
-            );
-            parkingSpaceDao.updateParkingSpace(updated);
+        Map<Integer, Long> slotsPerFloor = allSpaces.stream()
+                .collect(Collectors.groupingBy(ParkingSpace::getFloor, Collectors.counting()));
 
+        List<Integer> availableFloors = new ArrayList<>();
+        for (int floor = 0; floor <= NUM_FLOORS; floor++) {
+            long count = slotsPerFloor.getOrDefault(floor, 0L);
+
+            if (floor == currentFloor) {
+                availableFloors.add(floor);
+            } else if (count < MAX_SLOTS_PER_FLOOR) {
+                availableFloors.add(floor);
+            }
         }
+        return availableFloors;
     }
 
-    public List<Reservation> getUserReservations(int userId) {
-        //TODO: Implement
-        return null;
-    }
-
-    public Map<Integer,Integer> getOccupancyLastHour() {
-        return reservationDao.getOccupancyLastHour();
-    }
+    //TODO: should be in reservation manager
+//    public void cancelReservationByAdmin(int spaceId) {
+//        reservationDao.deleteReservation(spaceId);
+//
+//        ParkingSpace space = parkingSpaceDao.getParkingSpaceById(spaceId);
+//        if (space != null) {
+//            ParkingSpace updated = new ParkingSpace(
+//                    getSpaceDetails(spaceId).getId(),
+//                    getSpaceDetails(spaceId).getFloor(),
+//                    false,
+//                    false,
+//                    getSpaceDetails(spaceId).getType()
+//            );
+//            parkingSpaceDao.updateParkingSpace(updated);
+//
+//        }
+//    }
 
     // TODO: maybe not need this function
     public boolean slotExistsById(int id) {
         return parkingSpaceDao.existsById(id);
     }
-
-    public boolean hasCancelledReservations(int userId) {
-        List<Reservation> cancelled = reservationDao.getCancelledReservationsByUser(userId);
-        return !cancelled.isEmpty();
-    }
-
-    public void clearCancelledNotifications(int userId) {
-        List<Reservation> cancelled = reservationDao.getCancelledReservationsByUser(userId);
-        for (Reservation r : cancelled) {
-            reservationDao.deleteReservationBySpaceId(r.getParking_slot_id());
-        }
-    }
 }
-
-//h
