@@ -1,5 +1,6 @@
 package Persistance;
 
+import Business.DaoResult;
 import Business.Entities.Reservation;
 
 import java.util.Map;
@@ -25,7 +26,8 @@ public class ReservationDAOSql implements ReservationDAO {
                 rs.getInt("user_id"),
                 rs.getString("vehicle_license_plate"),
                 rs.getInt("parking_slot_id"),
-                rs.getDate("date")
+                rs.getDate("date"),
+                rs.getBoolean("is_cancelled")
         );
     }
 
@@ -46,7 +48,7 @@ public class ReservationDAOSql implements ReservationDAO {
     }
 
     public void deleteReservation(int spotId) {
-        String sql = "DELETE FROM reservations WHERE spot_id = ?";
+        String sql = "DELETE FROM reservations WHERE id = ?";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)){
 
@@ -58,9 +60,23 @@ public class ReservationDAOSql implements ReservationDAO {
         }
     }
 
+    public void cancelReservation(int reservationId) {
+        String sql = "UPDATE reservations SET is_cancelled = TRUE WHERE id = ?";
+
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, reservationId);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+    }
+
     public List<Reservation> getAllReservations() {
         List<Reservation> list = new ArrayList<>();
-        String sql = "SELECT * FROM reservations";
+        String sql = "SELECT * FROM reservations WHERE is_cancelled = FALSE";
 
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -97,25 +113,30 @@ public class ReservationDAOSql implements ReservationDAO {
         return result; // {1->8, 2->7, ..., 59->23}
     }
 
-    public Reservation getReservationBySpaceId(int spaceId) {
-        String sql = "SELECT * FROM reservations WHERE parking_slot_id = ? LIMIT 1";
+    public List<Reservation> getReservationsByUserId(int userId) {
+        List<Reservation> list = new ArrayList<>();
+        String sql = "SELECT * FROM reservations WHERE user_id = ?";
+
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, spaceId);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return mapRow(rs);
+            stmt.setInt(1, userId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
             }
 
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        return null;
+
+        return list;
     }
 
     public Reservation findReservationBySlotId(int slotId) {
-        String sql = "SELECT * FROM reservations WHERE parking_slot_id = ?";
+        String sql = "SELECT * FROM reservations WHERE parking_slot_id = ? AND is_cancelled = FALSE";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -132,47 +153,29 @@ public class ReservationDAOSql implements ReservationDAO {
         return null;
     }
 
-    public void markCancelledByAdmin(int reservationId) {
-        String sql = "UPDATE reservations SET cancelled_by_admin = TRUE WHERE id = ?";
+    public DaoResult editReservation(Reservation reservation) {
+        String sql = "UPDATE reservations " +
+                "SET parking_slot_id = ?, date = ? " +
+                "WHERE id = ?";
+
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, reservationId);
-            stmt.executeUpdate();
+            stmt.setInt(1, reservation.getParking_slot_id());
+            stmt.setDate(2, new java.sql.Date(reservation.getDate().getTime()));
+            stmt.setInt(3, reservation.getId());
 
-        } catch (SQLException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
-    }
+            int rowsAffected = stmt.executeUpdate();
 
-    public void deleteReservationBySpaceId(int spaceId) {
-        String sql = "DELETE FROM reservations WHERE parking_slot_id = ?";
-        try (Connection conn = ConfigDAO.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, spaceId);
-            stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
-    }
-
-    public List<Reservation> getCancelledReservationsByUser(int userId) {
-        List<Reservation> list = new ArrayList<>();
-        String sql = "SELECT * FROM reservations WHERE user_id = ? AND cancelled_by_admin = TRUE";
-        try (Connection conn = ConfigDAO.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, userId);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                list.add(mapRow(rs));
+            if (rowsAffected > 0) {
+                return DaoResult.SUCCESS;
+            } else {
+                return DaoResult.NOT_FOUND;
             }
 
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
+            return DaoResult.DATABASE_ERROR;
         }
-        return list;
     }
 }

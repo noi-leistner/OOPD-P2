@@ -22,9 +22,10 @@ public class ParkingSpaceController {
         return parkingLotManager.addSpace(space);
     }
 
-    public DaoResult editSpace(int code, int floor, String vehicleType, boolean resStatus) {
+    public DaoResult editSpace(int code, int floor, String vehicleType) {
         boolean occupied = getSpaceDetails(code).isOccupied();
-        ParkingSpace space = new ParkingSpace(code, floor, occupied, resStatus, vehicleType);
+        boolean reserved = getSpaceDetails(code).isReserved();
+        ParkingSpace space = new ParkingSpace(code, floor, occupied, reserved, vehicleType);
 
         return parkingLotManager.editSpace(space);
     }
@@ -57,9 +58,9 @@ public class ParkingSpaceController {
     }
 
     //TODO: this should be in reservation controller
-    public void cancelReservationFromAdmin(int spaceId) {
-        parkingLotManager.cancelReservationByAdmin(spaceId);
-    }
+//    public void cancelReservationFromAdmin(int spaceId) {
+//        parkingLotManager.cancelReservationByAdmin(spaceId);
+//    }
 
     // TODO: maybe not need this function
     public boolean slotExists(int id) {
@@ -72,5 +73,9 @@ public class ParkingSpaceController {
 
     public List<Integer> getAvailableFloors(int currentFloor) {
         return parkingLotManager.getAvailableFloors(currentFloor);
+    }
+
+    public List<ParkingSpace> getAvailableSpotsByType(String type) {
+        return parkingLotManager.getAvailableSpacesForType(type);
     }
 }

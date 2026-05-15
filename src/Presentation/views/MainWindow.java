@@ -46,9 +46,6 @@ public class MainWindow extends JFrame {
         StatusController statusController = new StatusController(parkingLotManager, reservationManager);
         ReservationController reservationController = new ReservationController(reservationManager);
 
-
-        authController.setParkingLotManager(parkingLotManager);
-
         AuthPanel authPanel = new AuthPanel(this, authController);
 
         dashboardPanel = new  DashboardPanel(this, authController, slotController, reservationController, statusController);
@@ -72,5 +69,3 @@ public class MainWindow extends JFrame {
         this.repaint();
     }
 }
-
-//h

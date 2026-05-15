@@ -189,8 +189,7 @@ public class ManageSlotsPanel extends JPanel {
             if (space != null) {
                 // Edit existing slot
                 //TODO: if spaceType changed check if still valid
-                boolean isOccupied = slotController.getSpaceDetails(code).isOccupied();
-                switch (slotController.editSpace(code, floor, vehicleType, isOccupied)) {
+                switch (slotController.editSpace(code, floor, vehicleType)) {
                     case SUCCESS -> {
                         JOptionPane.showMessageDialog(dialog, "Slot edited!");
                         dialog.dispose();
