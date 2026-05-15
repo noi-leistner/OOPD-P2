@@ -173,6 +173,7 @@ public class ManageBookingsPanel extends JPanel {
 
         ParkingSpace currentSpot = slotController.getSpaceDetails(reservation.getParking_slot_id());
 
+        //TODO: add time logic (not only date)
         SpinnerDateModel dateModel = new SpinnerDateModel();
         JSpinner dateSpinner = new JSpinner(dateModel);
         JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dateSpinner, "dd/MM/yyyy");
@@ -181,11 +182,17 @@ public class ManageBookingsPanel extends JPanel {
         dateSpinner.setValue(reservation.getDate());
 
         List<ParkingSpace> availableSpots = slotController.getAvailableSpotsByType(currentSpot.getType());
-        JComboBox<ParkingSpace> spotsCombo = new JComboBox<>(availableSpots.toArray(new ParkingSpace[0]));
+
+        if (availableSpots == null) {
+            availableSpots = new ArrayList<>();
+        }
 
         if (!availableSpots.contains(currentSpot)) {
-            availableSpots.addFirst(currentSpot);
+            availableSpots.add(0, currentSpot);
         }
+
+        JComboBox<ParkingSpace> spotsCombo = new JComboBox<>(availableSpots.toArray(new ParkingSpace[0]));
+
 
         spotsCombo.setSelectedItem(currentSpot);
 
