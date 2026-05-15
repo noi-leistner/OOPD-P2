@@ -24,7 +24,6 @@ public class ConfigDAO {
             Class.forName("com.mysql.cj.jdbc.Driver");
             // Connection try:
             connection = DriverManager.getConnection(URL, USER, PASS);
-            System.out.println("Connected to database successfully");
 
         } catch (ClassNotFoundException e) {
             System.err.println("Driver not found:" + e.getMessage());

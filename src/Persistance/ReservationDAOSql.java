@@ -13,7 +13,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.HashMap;
-
+import java.util.Map;
+import java.util.logging.Logger;
+import java.util.logging.Level;
+import java.util.List;
 
 public class ReservationDAOSql implements ReservationDAO {
 
@@ -78,9 +81,11 @@ public class ReservationDAOSql implements ReservationDAO {
 
     public Map<Integer, Integer> getOccupancyLastHour() {
         Map<Integer, Integer> result = new HashMap<>();
-        String sql = "SELECT TIMESTAMPDIFF(MINUTE, date, NOW()) as minutes_ago, Count(*) as total" +
-                "FROM reservations" + "WHERE date >= NOW() - INTERVAL 1 HOUR" +
-                "GROUPED BY TIMESTAMPDIFF(MINUTE, date, NOW())" + "ORDER BY minutes_ago DESC";
+        String sql = "SELECT TIMESTAMPDIFF(MINUTE, date, NOW()) as minutes_ago, COUNT(*) as total " +
+                "FROM reservations " +
+                "WHERE date >= NOW() - INTERVAL 1 HOUR " +
+                "GROUP BY TIMESTAMPDIFF(MINUTE, date, NOW()) " +
+                "ORDER BY minutes_ago DESC ";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -101,7 +106,6 @@ public class ReservationDAOSql implements ReservationDAO {
         String sql = "SELECT * FROM reservations WHERE parking_slot_id = ? LIMIT 1";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
             stmt.setInt(1, spaceId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {

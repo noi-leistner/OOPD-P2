@@ -6,6 +6,7 @@ import Presentation.controllers.AuthController;
 import Presentation.controllers.ParkingSpaceController;
 import Presentation.controllers.StatusController;
 import Presentation.controllers.ReservationController;
+import Presentation.controllers.StatusController;
 import Presentation.theme.AppColors;
 
 import javax.swing.*;
@@ -18,20 +19,20 @@ public class DashboardPanel extends JPanel {
 
     private MainWindow mainWindow;
     private AuthController authController;
+    private StatusController statusController;
 
     private final java.util.List<JButton> buttons = new java.util.ArrayList<>();
     private JButton initialButton;
 
     private ParkingSpaceController slotController;
-    private StatusController statusController;
     private ReservationController reservationController;
 
     public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController, ReservationController reservationController, StatusController statusController) {
         this.slotController = slotController;
         this.mainWindow = mainWindow;
         this.authController = authController;
-        this.reservationController = reservationController;
         this.statusController = statusController;
+        this.reservationController = reservationController;
 
         setLayout(new BorderLayout());
 
@@ -71,9 +72,12 @@ public class DashboardPanel extends JPanel {
 
             ManageSlotsPanel manageSlotsPanel = new ManageSlotsPanel(slotController, reservationController);
             manageSlotsPanel.refreshTable();
+
+            OccupancyPanel occupancyPanel = new OccupancyPanel(statusController);
+
             contentArea.add(manageSlotsPanel,   "SLOTS");
 //            contentArea.add(new ManageUsersPanel(),   "USERS");
-//            contentArea.add(new OccupancyPanel(),  "OCCUPANCY");
+            contentArea.add(new OccupancyPanel(statusController),  "OCCUPANCY");
             contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
             addButton(sidebar, "Log Out", "LOGOUT");
             contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");
