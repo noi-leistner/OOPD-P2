@@ -3,10 +3,8 @@ package Business;
 import Business.Entities.ParkingSpace;
 import Business.Entities.Reservation;
 
-import Persistance.ParkingSpaceDAO;
-import Persistance.ParkingSpaceDAOSql;
-import Persistance.ReservationDAO;
-import Persistance.VehicleDAO;
+import Business.Entities.Vehicle;
+import Persistance.*;
 
 import java.util.List;
 import java.util.Map;
@@ -16,11 +14,13 @@ public class ParkingLotManager {
     private ParkingSpaceDAO parkingSpaceDao;
     private ReservationDAO reservationDao;
     private VehicleDAO vehicleDao;
+    private ParkingLogDAO parkingLogDao;
 
-    public ParkingLotManager (ParkingSpaceDAO parkingSpaceDao, ReservationDAO reservationDao, VehicleDAO vehicleDao) {
+    public ParkingLotManager (ParkingSpaceDAO parkingSpaceDao, ReservationDAO reservationDao, VehicleDAO vehicleDao, ParkingLogDAO parkingLogDao) {
         this.parkingSpaceDao = parkingSpaceDao;
         this.reservationDao = reservationDao;
         this.vehicleDao = vehicleDao;
+        this.parkingLogDao = parkingLogDao;
     }
 
     public Reservation getReservationForSpace(int spaceId) {
@@ -29,6 +29,15 @@ public class ParkingLotManager {
 
     public boolean vehiclePlateExists(String licensePlate) {
         return vehicleDao.findByPlate(licensePlate) != null;
+    }
+
+    public boolean vehicleBelongsToUser(String licensePlate, int userId) {
+        Vehicle v = vehicleDao.findByPlate(licensePlate);
+        return v != null && v.getUserId() == userId;
+    }
+
+    public void logParkingAction(int spaceId, String licensePlate, int userId, String action) {
+        parkingLogDao.insertLog(spaceId, licensePlate, userId, action);
     }
 
     public DaoResult addSpace(ParkingSpace space) {
@@ -68,35 +77,44 @@ public class ParkingLotManager {
         return parkingSpaceDao.getAvailableSpacesForType(vehicleType);
     }
 
-    public ParkingSpace enterWithReservation(String licensePlate) {
+    public ParkingSpace enterWithReservation(String licensePlate, int userId) {
         ParkingSpace space = parkingSpaceDao.getReservedSpaceByPlate(licensePlate);
         if (space == null) return null;
         ParkingSpace fresh = parkingSpaceDao.getParkingSpaceById(space.getId());
         if (fresh == null || fresh.isOccupied()) return null;
         boolean ok = ((ParkingSpaceDAOSql) parkingSpaceDao).occupySpace(space.getId(), licensePlate);
-        return ok ? parkingSpaceDao.getParkingSpaceById(space.getId()) : null;
+        if (ok) {
+            parkingLogDao.insertLog(space.getId(), licensePlate, userId, "ENTRY");
+            return parkingSpaceDao.getParkingSpaceById(space.getId());
+        }
+        return null;
     }
 
-    public ParkingSpace enterWithoutReservation(String licensePlate, int spaceId) {
+    public ParkingSpace enterWithoutReservation(String licensePlate, int spaceId, int userId) {
         ParkingSpace fresh = parkingSpaceDao.getParkingSpaceById(spaceId);
-        System.out.println("=== enterWithoutReservation ===");
-        System.out.println("Space ID: " + spaceId);
-        System.out.println("Fresh space null? " + (fresh == null));
-        if (fresh != null) {
-            System.out.println("Is occupied: " + fresh.isOccupied());
-            System.out.println("Is reserved: " + fresh.isReserved());
-        }
         if (fresh == null || fresh.isOccupied()) return null;
         boolean ok = ((ParkingSpaceDAOSql) parkingSpaceDao).occupySpace(spaceId, licensePlate);
-        System.out.println("occupySpace result: " + ok);
-        return ok ? parkingSpaceDao.getParkingSpaceById(spaceId) : null;
+        if (ok) {
+            parkingLogDao.insertLog(spaceId, licensePlate, userId, "ENTRY");
+            return parkingSpaceDao.getParkingSpaceById(spaceId);
+        }
+        return null;
     }
 
-    public ParkingSpace exit(String licensePlate){
+    public ParkingSpace exit(String licensePlate, int userId) {
         ParkingSpace space = parkingSpaceDao.getOccupiedSpaceByPlate(licensePlate);
         if (space == null) return null;
         boolean ok = ((ParkingSpaceDAOSql) parkingSpaceDao).vacateSpace(space.getId());
-        return ok ? parkingSpaceDao.getParkingSpaceById(space.getId()) : null;
+        if (ok) {
+            parkingLogDao.insertLog(space.getId(), licensePlate, userId, "EXIT");
+            return parkingSpaceDao.getParkingSpaceById(space.getId());
+        }
+        return null;
+    }
+
+    public String getVehicleType(String licensePlate) {
+        Vehicle v = vehicleDao.findByPlate(licensePlate);
+        return v != null ? v.getType() : null;
     }
 
     public boolean reservationExistsForPlate(String licensePlate) {

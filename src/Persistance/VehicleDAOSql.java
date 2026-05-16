@@ -11,7 +11,7 @@ public class VehicleDAOSql implements VehicleDAO {
 
     @Override
     public Vehicle findByPlate(String licensePlate) {
-        String sql = "SELECT license_plate, vehicle_type FROM vehicles WHERE license_plate = ?";
+        String sql = "SELECT license_plate, user_id, vehicle_type FROM vehicles WHERE UPPER(license_plate) = UPPER(?)";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -20,6 +20,7 @@ public class VehicleDAOSql implements VehicleDAO {
                 if (rs.next()) {
                     return new Vehicle(
                             rs.getString("license_plate"),
+                            rs.getInt("user_id"),
                             rs.getString("vehicle_type")
                     );
                 }

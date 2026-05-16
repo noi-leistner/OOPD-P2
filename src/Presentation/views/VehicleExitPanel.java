@@ -1,6 +1,7 @@
 package Presentation.views;
 
 import Business.Entities.ParkingSpace;
+import Business.SessionManager;
 import Presentation.controllers.EntryExitController;
 import Presentation.theme.AppColors;
 
@@ -74,24 +75,36 @@ public class VehicleExitPanel extends JPanel {
             return;
         }
 
-        int confirm = JOptionPane.showConfirmDialog(
-                this,
-                "<html>Mark vehicle <b>" + plate + "</b> as exited?<br>" +
-                        "The parking space will be freed.</html>",
-                "Confirm Exit",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE
-        );
+        try {
+            int userId = SessionManager.getInstance().getCurrentUser().getId();
 
-        if (confirm != JOptionPane.YES_OPTION) return;
+            if (!controller.vehicleBelongsToUser(plate, userId)) {
+                showError("This vehicle is not registered to your account.");
+                return;
+            }
 
-        ParkingSpace freed = controller.exitParking(plate);
+            int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "<html>Mark vehicle <b>" + plate + "</b> as exited?<br>" +
+                            "The parking space will be freed.</html>",
+                    "Confirm Exit",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
+            );
 
-        if (freed != null) {
-            showSuccess("✓  Vehicle " + plate + " has exited. Space #" + freed.getId() + " is now free.");
-            plateField.setText("");
-        } else {
-            showError("No vehicle with plate \"" + plate + "\" is currently parked.");
+            if (confirm != JOptionPane.YES_OPTION) return;
+
+            ParkingSpace freed = controller.exitParking(plate, userId);
+
+            if (freed != null) {
+                showSuccess("✓  Vehicle " + plate + " has exited. Space #" + freed.getId() + " is now free.");
+                plateField.setText("");
+            } else {
+                showError("No vehicle with plate \"" + plate + "\" is currently parked.");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showError("Error: " + ex.getMessage());
         }
     }
 

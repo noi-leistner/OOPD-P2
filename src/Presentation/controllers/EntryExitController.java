@@ -18,27 +18,29 @@ public class EntryExitController {
         return manager.reservationExistsForPlate(plate);
     }
 
-    public ParkingSpace enterWithReservation(String plate) {
-        return manager.enterWithReservation(plate);
+    public boolean vehicleBelongsToUser(String licensePlate, int userId) {
+        return manager.vehicleBelongsToUser(licensePlate, userId);
     }
 
-    public ParkingSpace enterWithoutReservation(String plate, int spaceId) {
-        return manager.enterWithoutReservation(plate, spaceId);
+    public String getVehicleType(String licensePlate) {
+        return manager.getVehicleType(licensePlate);
     }
 
-    public ParkingSpace exitParking(String plate) {
-        return manager.exit(plate);
+    public ParkingSpace enterWithReservation(String plate, int userId) {
+        return manager.enterWithReservation(plate, userId);
+    }
+
+    public ParkingSpace enterWithoutReservation(String plate, int spaceId, int userId) {
+        return manager.enterWithoutReservation(plate, spaceId, userId);
+    }
+
+    public ParkingSpace exitParking(String plate, int userId) {
+        return manager.exit(plate, userId);
     }
 
     public Reservation getReservationForSpace(int spaceId) {
         return manager.getReservationForSpace(spaceId);
     }
-
-    public boolean vehiclePlateExists(String licensePlate) {
-        return manager.vehiclePlateExists(licensePlate);
-    }
-
-
 
     public List<ParkingSpace> getAvailableSpacesForType(String vehicleType) {
         return manager.getAvailableSpacesForType(vehicleType);

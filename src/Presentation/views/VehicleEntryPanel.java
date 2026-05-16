@@ -2,6 +2,7 @@ package Presentation.views;
 
 import Business.Entities.ParkingSpace;
 import Business.Entities.Reservation;
+import Business.SessionManager;
 import Presentation.controllers.EntryExitController;
 import Presentation.theme.AppColors;
 
@@ -13,23 +14,22 @@ import java.util.List;
 
 public class VehicleEntryPanel extends JPanel {
 
-    private static final String[] VEHICLE_TYPES = {"Car", "Motorcycle", "Large Vehicle"};
-
     private final EntryExitController controller;
 
     // Step 1 — plate input
-    private JPanel stepOnPanel;
+    private JPanel stepOnePanel;
     private JTextField plateField;
 
     // Step 2 — space selection
     private JPanel stepTwoPanel;
     private JComboBox<SpaceItem> spaceCombo;
-    private JComboBox<String> typeCombo;
+    private JLabel vehicleTypeLabel;
     private JLabel noSpacesLabel;
 
     // Shared
     private JLabel statusLabel;
     private String currentPlate;
+    private String currentVehicleType;
 
     public VehicleEntryPanel(EntryExitController controller) {
         this.controller = controller;
@@ -39,7 +39,7 @@ public class VehicleEntryPanel extends JPanel {
         JPanel wrapper = new JPanel();
         wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
 
-        stepOnPanel = buildStepOne();
+        stepOnePanel = buildStepOne();
         stepTwoPanel = buildStepTwo();
         stepTwoPanel.setVisible(false);
 
@@ -47,7 +47,7 @@ public class VehicleEntryPanel extends JPanel {
         statusLabel.setFont(new Font("Arial", Font.ITALIC, 13));
         statusLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        wrapper.add(stepOnPanel);
+        wrapper.add(stepOnePanel);
         wrapper.add(stepTwoPanel);
         wrapper.add(Box.createVerticalStrut(20));
         wrapper.add(statusLabel);
@@ -100,7 +100,7 @@ public class VehicleEntryPanel extends JPanel {
     }
 
     // -------------------------------------------------------------------------
-    // Step 2 — vehicle type + space selection
+    // Step 2 — space selection (vehicle type is auto-detected, not chosen)
     // -------------------------------------------------------------------------
 
     private JPanel buildStepTwo() {
@@ -108,7 +108,6 @@ public class VehicleEntryPanel extends JPanel {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Separator
         JSeparator sep = new JSeparator();
         sep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
         sep.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -118,21 +117,15 @@ public class VehicleEntryPanel extends JPanel {
         subtitle.setForeground(Color.GRAY);
         subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Vehicle type row
+        // Vehicle type — display only, not selectable
         JPanel typeRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         typeRow.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel typeLabel = new JLabel("Vehicle type: ");
-        typeLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        vehicleTypeLabel = new JLabel("Vehicle type: ");
+        vehicleTypeLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        typeRow.add(vehicleTypeLabel);
 
-        typeCombo = new JComboBox<>(VEHICLE_TYPES);
-        typeCombo.setFont(new Font("Arial", Font.PLAIN, 13));
-        typeCombo.addActionListener(e -> refreshSpaceCombo());
-
-        typeRow.add(typeLabel);
-        typeRow.add(typeCombo);
-
-        // Space selection row
+        // Space selection
         JPanel spaceRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         spaceRow.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -152,7 +145,7 @@ public class VehicleEntryPanel extends JPanel {
         noSpacesLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         noSpacesLabel.setVisible(false);
 
-        // Buttons row
+        // Buttons
         JPanel btnRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         btnRow.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -192,27 +185,49 @@ public class VehicleEntryPanel extends JPanel {
             return;
         }
 
-        if (!controller.vehiclePlateExists(plate)) {
-            showError("No vehicle with that plate is registered in the system.");
-            return;
-        }
+        try {
+            int userId = SessionManager.getInstance().getCurrentUser().getId();
 
-        currentPlate = plate;
-        clearStatus();
-
-
-        if (controller.hasReservation(plate)) {
-            // Has a reservation — occupy it directly
-            ParkingSpace space = controller.enterWithReservation(plate);
-            if (space != null) {
-                showSuccess("✓  Parked at reserved space #" + space.getId() + "  (Floor " + space.getFloor() + ")");
-                plateField.setText("");
-            } else {
-                showError("Your reserved space is currently occupied. Please contact an administrator.");
+            if (!controller.vehicleBelongsToUser(plate, userId)) {
+                showError("This vehicle is not registered to your account.");
+                return;
             }
-        } else {
-            // No reservation — show step two
-            showStepTwo();
+
+            currentPlate = plate;
+            clearStatus();
+
+            if (controller.hasReservation(plate)) {
+                // Has a reservation — ask for confirmation first
+                int confirm = JOptionPane.showConfirmDialog(
+                        this,
+                        "<html><b>Reservation found</b> for plate <b>" + plate + "</b>.<br>" +
+                                "You will be assigned your reserved parking space.<br><br>" +
+                                "Proceed?</html>",
+                        "Reservation Found",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+                if (confirm != JOptionPane.YES_OPTION) return;
+
+                ParkingSpace space = controller.enterWithReservation(plate, userId);
+                if (space != null) {
+                    showSuccess("✓  Parked at reserved space #" + space.getId() + "  (Floor " + space.getFloor() + ")");
+                    plateField.setText("");
+                } else {
+                    showError("Your reserved space is currently occupied. Please contact an administrator.");
+                }
+            } else {
+                // No reservation — auto-detect type and show space selection
+                String vehicleType = controller.getVehicleType(plate);
+                if (vehicleType == null) {
+                    showError("Could not determine vehicle type.");
+                    return;
+                }
+                showStepTwo(vehicleType);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showError("Error: " + ex.getMessage());
         }
     }
 
@@ -223,11 +238,11 @@ public class VehicleEntryPanel extends JPanel {
             return;
         }
 
-        // Check if this space has a reservation from another user
+        int userId = SessionManager.getInstance().getCurrentUser().getId();
+
         Reservation reservation = controller.getReservationForSpace(selected.id);
 
         if (reservation != null) {
-            // Space is reserved — warn the user
             String dateStr = new SimpleDateFormat("dd/MM/yyyy").format(reservation.getDate());
             int choice = JOptionPane.showConfirmDialog(
                     this,
@@ -239,13 +254,11 @@ public class VehicleEntryPanel extends JPanel {
                     JOptionPane.WARNING_MESSAGE,
                     null
             );
-            // YES = continue anyway, NO = go back and pick another
             if (choice != JOptionPane.YES_OPTION) return;
         } else {
-            // No reservation on this space — simple confirmation
             int choice = JOptionPane.showConfirmDialog(
                     this,
-                    "<html>Space <b>#" + selected.id + "</b> (Floor " + selected.floor + ") is not reserved.<br>" +
+                    "<html>Space <b>#" + selected.id + "</b> (Floor " + selected.floor + ") has no reservation.<br>" +
                             "Confirm entry?</html>",
                     "Confirm Entry",
                     JOptionPane.YES_NO_OPTION,
@@ -254,29 +267,28 @@ public class VehicleEntryPanel extends JPanel {
             if (choice != JOptionPane.YES_OPTION) return;
         }
 
-        ParkingSpace space = controller.enterWithoutReservation(currentPlate, selected.id);
+        ParkingSpace space = controller.enterWithoutReservation(currentPlate, selected.id, userId);
 
         if (space != null) {
             showSuccess("✓  Parked at space #" + space.getId() + "  (Floor " + space.getFloor() + ")");
             resetToStepOne();
         } else {
             showError("Space #" + selected.id + " was just taken. Please choose another.");
-            refreshSpaceCombo(); // reload available spaces
+            refreshSpaceCombo(currentVehicleType);
         }
     }
 
-    private void showStepTwo() {
+    private void showStepTwo(String vehicleType) {
+        currentVehicleType = vehicleType;
+        vehicleTypeLabel.setText("Vehicle type: " + vehicleType);
         stepTwoPanel.setVisible(true);
-        typeCombo.setSelectedIndex(0);
-        refreshSpaceCombo();
+        refreshSpaceCombo(vehicleType);
         revalidate();
         repaint();
     }
 
-    private void refreshSpaceCombo() {
-        String vehicleType = (String) typeCombo.getSelectedItem();
+    private void refreshSpaceCombo(String vehicleType) {
         List<ParkingSpace> spaces = controller.getAvailableSpacesForType(vehicleType);
-
         spaceCombo.removeAllItems();
 
         if (spaces == null || spaces.isEmpty()) {
@@ -295,6 +307,7 @@ public class VehicleEntryPanel extends JPanel {
         stepTwoPanel.setVisible(false);
         plateField.setText("");
         currentPlate = null;
+        currentVehicleType = null;
         clearStatus();
         revalidate();
         repaint();
