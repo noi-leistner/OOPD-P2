@@ -15,6 +15,8 @@ public interface ReservationDAO {
     void markCancelledByAdmin(int reservationId);
     void deleteReservationBySpaceId(int spaceId);
     List<Reservation> getCancelledReservationsByUser(int userId);
+    Reservation findReservationByPlate(String licensePlate);
+
 }
 
 //h

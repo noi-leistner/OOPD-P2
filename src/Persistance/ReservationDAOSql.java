@@ -48,10 +48,41 @@ public class ReservationDAOSql implements ReservationDAO {
         }
     }
 
+    public Reservation findReservationByPlate(String licensePlate) {
+        String sql = "SELECT * FROM reservations WHERE vehicle_license_plate = ?";
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, licensePlate);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return null;
+    }
+
+    public Reservation findReservationBySlotId(int slotId) {
+        String sql = "SELECT * FROM reservations WHERE parking_slot_id = ?";
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, slotId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapRow(rs);
+                }
+            }
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return null;
+    }
+
     public void deleteReservation(int spotId) {
         String sql = "DELETE FROM reservations WHERE spot_id = ?";
         try (Connection conn = ConfigDAO.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)){
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, spotId);
             stmt.executeUpdate();
@@ -69,7 +100,7 @@ public class ReservationDAOSql implements ReservationDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             ResultSet rs = stmt.executeQuery();
 
-            while(rs.next()) {
+            while (rs.next()) {
                 list.add(mapRow(rs));
             }
 
@@ -90,7 +121,7 @@ public class ReservationDAOSql implements ReservationDAO {
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
-            while(rs.next()) {
+            while (rs.next()) {
                 int minutes = rs.getInt("minutes_ago");
                 int count = rs.getInt("total");
                 result.put(minutes, count);
@@ -99,7 +130,7 @@ public class ReservationDAOSql implements ReservationDAO {
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        return result; // {1->8, 2->7, ..., 59->23}
+        return result;
     }
 
     public Reservation getReservationBySpaceId(int spaceId) {
@@ -178,5 +209,15 @@ public class ReservationDAOSql implements ReservationDAO {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         return list;
+    }
+}
+    private Reservation mapRow(ResultSet rs) throws SQLException {
+        return new Reservation(
+                rs.getInt("id"),
+                rs.getInt("user_id"),
+                rs.getString("vehicle_license_plate"),
+                rs.getInt("parking_slot_id"),
+                rs.getDate("date")
+        );
     }
 }

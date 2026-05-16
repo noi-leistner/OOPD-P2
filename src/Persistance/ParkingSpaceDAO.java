@@ -16,4 +16,9 @@ public interface ParkingSpaceDAO {
     boolean existsById(int id);
 
     ParkingSpace getParkingSpaceById(int id);
+
+    List<ParkingSpace> getAvailableSpacesForType(String vehicleType);
+    ParkingSpace getFirstAvailableSpaceForType(String vehicleType);
+    ParkingSpace getReservedSpaceByPlate(String licensePlate);
+    ParkingSpace getOccupiedSpaceByPlate(String licensePlate);
 }

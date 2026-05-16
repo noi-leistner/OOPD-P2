@@ -1,4 +1,7 @@
 package Persistance;
 
-public class VehicleDAO {
+import Business.Entities.Vehicle;
+
+public interface VehicleDAO {
+    Vehicle findByPlate(String licensePlate);
 }
