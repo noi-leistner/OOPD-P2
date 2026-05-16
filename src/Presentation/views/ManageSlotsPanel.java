@@ -54,9 +54,13 @@ public class ManageSlotsPanel extends JPanel {
         JButton removeBtn = buildButton("Remove Slot");
         removeBtn.addActionListener(e -> showRemoveStatusDialog());
 
+        JButton cancelResBtn = buildButton("Cancel Reservation");
+        cancelResBtn.addActionListener(e -> showCancelReservationDialog());
+
         threeButtons.add(addBtn);
         threeButtons.add(editBtn);
         threeButtons.add(removeBtn);
+        threeButtons.add(cancelResBtn);
         wrapper.add(threeButtons);
 
         wrapper.add(Box.createVerticalStrut(15));
@@ -125,6 +129,66 @@ public class ManageSlotsPanel extends JPanel {
         btn.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
 
         btn.setHorizontalAlignment(SwingConstants.CENTER);
+    }
+
+    private void showCancelReservationDialog() {
+        JPanel formPanel = new JPanel(new GridLayout(0, 1, 5, 5));
+        JTextField idField = new JTextField(15);
+        JButton cancelResBtn = new JButton("Cancel Reservation");
+        JButton closeBtn = new JButton("Close");
+
+        styleButton(cancelResBtn, true);
+        styleButton(closeBtn, false);
+
+        JDialog dialog = createBaseDialog("Cancel Reservation", new Dimension(350, 160), formPanel, cancelResBtn, closeBtn);
+
+        JLabel titleLabel = new JLabel("CANCEL RESERVATION ON SLOT");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        formPanel.add(titleLabel);
+        addField(formPanel, "Enter Slot Identifier:", idField);
+
+        cancelResBtn.addActionListener(e -> {
+            String input = idField.getText().trim();
+            if (input.isBlank()) {
+                JOptionPane.showMessageDialog(dialog, "Please enter a slot ID.");
+                return;
+            }
+            try {
+                int spaceId = Integer.parseInt(input);
+
+                if (!slotController.slotExists(spaceId)) {
+                    JOptionPane.showMessageDialog(dialog, "There is no parking space with this ID.");
+                    return;
+                }
+
+                ParkingSpace space = slotController.getSpaceDetails(spaceId);
+                if (space == null || !space.isReserved()) {
+                    JOptionPane.showMessageDialog(dialog, "This slot has no active reservation.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+
+                int confirm = JOptionPane.showConfirmDialog(
+                        dialog,
+                        "Cancel the reservation on slot " + spaceId + "?\nThe user will be notified on next login.",
+                        "Confirm",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+                if (confirm == JOptionPane.YES_OPTION) {
+                    slotController.cancelReservationFromAdmin(spaceId);
+                    JOptionPane.showMessageDialog(dialog, "Reservation cancelled. The slot is now free.");
+                    dialog.dispose();
+                    refreshTable();
+                }
+
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(dialog, "Slot ID must be a number.", "Invalid input", JOptionPane.WARNING_MESSAGE);
+            }
+        });
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
     }
 
     private void showSlotInfoDialog(String text, ParkingSpace space) {
@@ -401,3 +465,5 @@ public class ManageSlotsPanel extends JPanel {
         panel.add(Box.createVerticalStrut(15));
     }
 }
+
+//h

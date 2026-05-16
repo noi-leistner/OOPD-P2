@@ -56,10 +56,10 @@ INSERT INTO vehicles (license_plate, user_id, vehicle_type) VALUES
                                                                 ('5678DEF', '2', 'motorcycle');
 
 INSERT INTO parking_slots (identifier, vehicle_type, occupation_status, reservation_status, floor) VALUES
-                                                                                                       (1, 'car', FALSE, FALSE, 0),
-                                                                                                       (2, 'car', FALSE, FALSE, 1),
-                                                                                                       (3, 'motorcycle', FALSE, FALSE, 0),
-                                                                                                       (4, 'motorcycle', FALSE, FALSE, 1);
+(1, 'car', FALSE, FALSE, 0),
+(2, 'car', FALSE, FALSE, 1),
+(3, 'motorcycle', FALSE, FALSE, 0),
+(4, 'motorcycle', FALSE, FALSE, 1);
 
 -- Add ADMIN CANCELLATION flag to RESERVATION table
 ALTER TABLE reservations

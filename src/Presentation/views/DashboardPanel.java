@@ -5,7 +5,9 @@ import Business.SessionManager;
 import Presentation.controllers.AuthController;
 import Presentation.controllers.EntryExitController;
 import Presentation.controllers.ParkingSpaceController;
+import Presentation.controllers.StatusController;
 import Presentation.controllers.ReservationController;
+import Presentation.controllers.StatusController;
 import Presentation.theme.AppColors;
 
 import javax.swing.*;
@@ -20,6 +22,7 @@ public class DashboardPanel extends JPanel {
 
     private MainWindow mainWindow;
     private AuthController authController;
+    private StatusController statusController;
 
     private final java.util.List<JButton> buttons = new java.util.ArrayList<>();
     private JButton initialButton;
@@ -27,10 +30,12 @@ public class DashboardPanel extends JPanel {
     private ParkingSpaceController slotController;
     private ReservationController reservationController;
 
-    public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController, ReservationController reservationController, EntryExitController entryExitController) {
+    
+    public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController, ReservationController reservationController, StatusController statusController, EntryExitController entryExitController) {
         this.slotController = slotController;
         this.mainWindow = mainWindow;
         this.authController = authController;
+        this.statusController = statusController;
         this.reservationController = reservationController;
         this.entryExitController = entryExitController;
 
@@ -72,10 +77,13 @@ public class DashboardPanel extends JPanel {
 
             ManageSlotsPanel manageSlotsPanel = new ManageSlotsPanel(slotController, reservationController);
             manageSlotsPanel.refreshTable();
+
+            OccupancyPanel occupancyPanel = new OccupancyPanel(statusController);
+
             contentArea.add(manageSlotsPanel,   "SLOTS");
 //            contentArea.add(new ManageUsersPanel(),   "USERS");
-//            contentArea.add(new OccupancyPanel(),  "OCCUPANCY");
-//            contentArea.add(new CurrentStatusPanel(),  "STATUS");
+            contentArea.add(new OccupancyPanel(statusController),  "OCCUPANCY");
+            contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
             addButton(sidebar, "Log Out", "LOGOUT");
             contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");
 
@@ -94,6 +102,8 @@ public class DashboardPanel extends JPanel {
             contentArea.add(new VehicleEntryPanel(entryExitController), "VEHICLE_ENTRY");
             contentArea.add(new VehicleExitPanel(entryExitController), "VEHICLE_EXIT");
 //            contentArea.add(new OccupancyPanel(), "OCCUPANCY");
+            contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
+            addButton(sidebar, "Log Out", "LOGOUT");
 //            contentArea.add(new CurrentStatusPanel(),  "STATUS");
             contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");
 

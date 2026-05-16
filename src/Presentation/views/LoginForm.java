@@ -26,6 +26,7 @@ public class LoginForm extends JPanel {
                 case AuthResult.SUCCESS -> {
                     mainWindow.getDashboard().refresh();
                     mainWindow.switchTo(MainWindow.DASHBOARD_SCREEN);
+                    auth.checkAndShowCancelledNotification();
                 }
                 case AuthResult.EMPTY_FIELDS -> JOptionPane.showMessageDialog(LoginForm.this, "Please fill all the fields!");
                 case AuthResult.INVALID_CREDENTIALS -> JOptionPane.showMessageDialog(LoginForm.this, "Invalid credentials!");
@@ -47,3 +48,5 @@ public class LoginForm extends JPanel {
         add(inner);
     }
 }
+
+//h
