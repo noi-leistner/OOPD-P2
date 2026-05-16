@@ -103,7 +103,7 @@ public class DashboardPanel extends JPanel {
             contentArea.add(new VehicleExitPanel(entryExitController), "VEHICLE_EXIT");
 //            contentArea.add(new OccupancyPanel(), "OCCUPANCY");
             contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
-            addButton(sidebar, "Log Out", "LOGOUT");
+//            addButton(sidebar, "Log Out", "LOGOUT");
 //            contentArea.add(new CurrentStatusPanel(),  "STATUS");
             contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");
 
