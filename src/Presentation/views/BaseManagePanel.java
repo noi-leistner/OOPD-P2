@@ -73,26 +73,4 @@ public abstract class BaseManagePanel extends JPanel {
         panel.add(field);
         panel.add(Box.createVerticalStrut(15));
     }
-
-    protected JPanel buildTitleArea(String title) {
-        JPanel wrapper = new JPanel();
-        wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
-        wrapper.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
-
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        wrapper.add(titleLabel);
-        wrapper.add(Box.createVerticalStrut(15));
-
-        return wrapper;
-    }
-
-    protected JScrollPane buildTable(DefaultTableModel tableModel, JTable table) {
-        table.setRowHeight(30);
-        table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 13));
-        table.setFont(new Font("Arial", Font.PLAIN, 13));
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        return new JScrollPane(table);
-    }
 }
