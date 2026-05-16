@@ -2,21 +2,13 @@ package Persistance;
 
 import Business.Entities.Reservation;
 
-import java.util.Map;
-import java.util.List;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ReservationDAOSql implements ReservationDAO {
 
@@ -32,6 +24,7 @@ public class ReservationDAOSql implements ReservationDAO {
         );
     }
 
+    @Override
     public void addReservation(Reservation reservation) {
         String sql = "INSERT INTO reservations (user_id, vehicle_license_plate, parking_slot_id, date) " +
                 "VALUES (?, ?, ?, ?)";
@@ -42,45 +35,15 @@ public class ReservationDAOSql implements ReservationDAO {
             stmt.setString(2, reservation.getVehiclePlate());
             stmt.setInt(3, reservation.getParking_slot_id());
             stmt.setDate(4, new java.sql.Date(reservation.getDate().getTime()));
-            stmt.executeQuery();
+            stmt.executeUpdate();
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
-    public Reservation findReservationByPlate(String licensePlate) {
-        String sql = "SELECT * FROM reservations WHERE vehicle_license_plate = ?";
-        try (Connection conn = ConfigDAO.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, licensePlate);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) return mapRow(rs);
-            }
-        } catch (SQLException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return null;
-    }
-
-    public Reservation findReservationBySlotId(int slotId) {
-        String sql = "SELECT * FROM reservations WHERE parking_slot_id = ?";
-        try (Connection conn = ConfigDAO.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, slotId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return mapRow(rs);
-                }
-            }
-        } catch (SQLException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return null;
-    }
-
+    @Override
     public void deleteReservation(int spotId) {
-        String sql = "DELETE FROM reservations WHERE spot_id = ?";
+        String sql = "DELETE FROM reservations WHERE id = ?";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -92,6 +55,7 @@ public class ReservationDAOSql implements ReservationDAO {
         }
     }
 
+    @Override
     public List<Reservation> getAllReservations() {
         List<Reservation> list = new ArrayList<>();
         String sql = "SELECT * FROM reservations";
@@ -99,24 +63,23 @@ public class ReservationDAOSql implements ReservationDAO {
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             ResultSet rs = stmt.executeQuery();
-
             while (rs.next()) {
                 list.add(mapRow(rs));
             }
-
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         return list;
     }
 
+    @Override
     public Map<Integer, Integer> getOccupancyLastHour() {
         Map<Integer, Integer> result = new HashMap<>();
         String sql = "SELECT TIMESTAMPDIFF(MINUTE, date, NOW()) as minutes_ago, COUNT(*) as total " +
                 "FROM reservations " +
                 "WHERE date >= NOW() - INTERVAL 1 HOUR " +
                 "GROUP BY TIMESTAMPDIFF(MINUTE, date, NOW()) " +
-                "ORDER BY minutes_ago DESC ";
+                "ORDER BY minutes_ago DESC";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -126,41 +89,38 @@ public class ReservationDAOSql implements ReservationDAO {
                 int count = rs.getInt("total");
                 result.put(minutes, count);
             }
-
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         return result;
     }
 
-    public Reservation getReservationBySpaceId(int spaceId) {
+    @Override
+    public Reservation findReservationBySlotId(int slotId) {
         String sql = "SELECT * FROM reservations WHERE parking_slot_id = ? LIMIT 1";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, spaceId);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return mapRow(rs);
-            }
 
+            stmt.setInt(1, slotId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         return null;
     }
 
-    public Reservation findReservationBySlotId(int slotId) {
-        String sql = "SELECT * FROM reservations WHERE parking_slot_id = ?";
+    @Override
+    public Reservation findReservationByPlate(String licensePlate) {
+        String sql = "SELECT * FROM reservations WHERE vehicle_license_plate = ?";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, slotId);
+            stmt.setString(1, licensePlate);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return mapRow(rs);
-                }
+                if (rs.next()) return mapRow(rs);
             }
-
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -174,7 +134,6 @@ public class ReservationDAOSql implements ReservationDAO {
 
             stmt.setInt(1, reservationId);
             stmt.executeUpdate();
-
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -187,7 +146,6 @@ public class ReservationDAOSql implements ReservationDAO {
 
             stmt.setInt(1, spaceId);
             stmt.executeUpdate();
-
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -204,20 +162,9 @@ public class ReservationDAOSql implements ReservationDAO {
             while (rs.next()) {
                 list.add(mapRow(rs));
             }
-
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         return list;
-    }
-}
-    private Reservation mapRow(ResultSet rs) throws SQLException {
-        return new Reservation(
-                rs.getInt("id"),
-                rs.getInt("user_id"),
-                rs.getString("vehicle_license_plate"),
-                rs.getInt("parking_slot_id"),
-                rs.getDate("date")
-        );
     }
 }
