@@ -4,14 +4,13 @@ import Business.Entities.ParkingSpace;
 import Business.Entities.Reservation;
 import Presentation.controllers.ParkingSpaceController;
 import Presentation.controllers.ReservationController;
-import Presentation.theme.AppColors;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
-public class ManageSlotsPanel extends JPanel {
+public class ManageSlotsPanel extends BaseManagePanel {
 
     private DefaultTableModel tableModel;
     private JTable table;
@@ -60,22 +59,8 @@ public class ManageSlotsPanel extends JPanel {
         return wrapper;
     }
 
-    private JButton buildButton(String text) {
-        JButton btn = new JButton(text);
-
-        btn.setContentAreaFilled(false);
-        btn.setOpaque(true);
-        btn.setBorderPainted(false);
-        btn.setFocusPainted(false);
-        btn.setBackground(AppColors.LIGHT_BLUE);
-        btn.setForeground(Color.WHITE);
-        btn.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
-
-        return btn;
-    }
-
     private JScrollPane buildTable() {
-        String[] columns = { "Code", "Floor", "Current Status", "Reservation Status", "Type" };
+        String[] columns = {"Code", "Floor", "Current Status", "Reservation Status", "Type"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -108,20 +93,6 @@ public class ManageSlotsPanel extends JPanel {
                     space.getType()
             });
         }
-    }
-
-    private void styleButton(JButton btn, boolean cancel) {
-        btn.setBackground(cancel ? AppColors.RED : AppColors.LIGHT_BLUE);
-        btn.setForeground(Color.WHITE);
-
-        btn.setOpaque(true);
-        btn.setContentAreaFilled(true);
-        btn.setBorderPainted(false);
-        btn.setFocusPainted(false);
-
-        btn.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
-
-        btn.setHorizontalAlignment(SwingConstants.CENTER);
     }
 
     private void showSlotInfoDialog(String text, ParkingSpace space) {
@@ -182,21 +153,27 @@ public class ManageSlotsPanel extends JPanel {
             }
 
 
-            int code  = Integer.parseInt(idField.getText());
+            int code = Integer.parseInt(idField.getText());
             int floor = (Integer) floorCombo.getSelectedItem();
             String vehicleType = (String) typeCombo.getSelectedItem();
 
             if (space != null) {
                 // Edit existing slot
-                //TODO: if spaceType changed check if still valid
+                if ((!space.getType().equals(vehicleType)) && (space.isOccupied() || space.isReserved())) {
+                    JOptionPane.showMessageDialog(dialog, "The slot type of a reserved or occupied space can't be changed!");
+                    return;
+                }
+
                 switch (slotController.editSpace(code, floor, vehicleType)) {
                     case SUCCESS -> {
                         JOptionPane.showMessageDialog(dialog, "Slot edited!");
                         dialog.dispose();
                         refreshTable();
                     }
-                    case NOT_FOUND -> JOptionPane.showMessageDialog(dialog, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
-                    case DATABASE_ERROR -> JOptionPane.showMessageDialog(dialog, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
+                    case NOT_FOUND ->
+                            JOptionPane.showMessageDialog(dialog, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
+                    case DATABASE_ERROR ->
+                            JOptionPane.showMessageDialog(dialog, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } else {
                 // Add new slot
@@ -206,8 +183,10 @@ public class ManageSlotsPanel extends JPanel {
                         dialog.dispose();
                         refreshTable();
                     }
-                    case ALREADY_EXISTS -> JOptionPane.showMessageDialog(dialog, "A slot with this ID already exists.", "Duplicate", JOptionPane.WARNING_MESSAGE);
-                    case DATABASE_ERROR -> JOptionPane.showMessageDialog(dialog, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
+                    case ALREADY_EXISTS ->
+                            JOptionPane.showMessageDialog(dialog, "A slot with this ID already exists.", "Duplicate", JOptionPane.WARNING_MESSAGE);
+                    case DATABASE_ERROR ->
+                            JOptionPane.showMessageDialog(dialog, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -242,7 +221,7 @@ public class ManageSlotsPanel extends JPanel {
         }
 
         panel.add(new JLabel("      Vehicle Plate: " + reservation.getVehiclePlate()));
-        panel.add(new JLabel("      Date: "    + reservation.getDate()));
+        panel.add(new JLabel("      Date: " + reservation.getDate()));
         panel.add(Box.createVerticalStrut(10));
         panel.add(new JLabel("To edit or cancel the reservation go to Manage Bookings!"));
 
@@ -340,9 +319,12 @@ public class ManageSlotsPanel extends JPanel {
                             dialog.dispose();
                             refreshTable();
                         }
-                        case CANNOT_REMOVE_OCCUPIED -> JOptionPane.showMessageDialog(dialog, "Slot is occupied and no alternative spaces are available.", "Cannot Remove", JOptionPane.WARNING_MESSAGE);
-                        case NOT_FOUND -> JOptionPane.showMessageDialog(dialog, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
-                        case DATABASE_ERROR -> JOptionPane.showMessageDialog(dialog, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
+                        case CANNOT_REMOVE_OCCUPIED ->
+                                JOptionPane.showMessageDialog(dialog, "Slot is occupied and no alternative spaces are available.", "Cannot Remove", JOptionPane.WARNING_MESSAGE);
+                        case NOT_FOUND ->
+                                JOptionPane.showMessageDialog(dialog, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
+                        case DATABASE_ERROR ->
+                                JOptionPane.showMessageDialog(dialog, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
 
@@ -355,58 +337,4 @@ public class ManageSlotsPanel extends JPanel {
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }
-
-    private JDialog createBaseDialog(String title, Dimension size, JPanel formPanel, JButton actionBtn, JButton cancelBtn) {
-        JDialog dialog = new JDialog((Frame) null, title, true);
-
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
-
-        Dimension btnSize = new Dimension(100, 35);
-
-        actionBtn.setPreferredSize(btnSize);
-        cancelBtn.setPreferredSize(btnSize);
-
-        cancelBtn.addActionListener(e -> dialog.dispose());
-
-        buttonPanel.add(actionBtn);
-        buttonPanel.add(cancelBtn);
-
-        formPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        mainPanel.add(formPanel);
-
-        mainPanel.add(Box.createVerticalStrut(10)); // small spacing
-
-        mainPanel.add(buttonPanel);
-
-        dialog.setContentPane(mainPanel);
-
-        return dialog;
-    }
-
-    private void addField(JPanel panel, String label, JComponent field) {
-        JLabel jLabel = new JLabel(label);
-
-        jLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        field.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        Dimension fieldSize = new Dimension(450, field.getPreferredSize().height);
-
-        field.setPreferredSize(fieldSize);
-        field.setMaximumSize(fieldSize);
-
-        panel.add(jLabel);
-        panel.add(Box.createVerticalStrut(5));
-
-        panel.add(field);
-
-        panel.add(Box.createVerticalStrut(15));
-    }
 }
-
-//h

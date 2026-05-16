@@ -2,10 +2,8 @@ package Presentation.views;
 
 import Business.Entities.ParkingSpace;
 import Business.Entities.Reservation;
-import Business.Entities.User;
 import Presentation.controllers.ParkingSpaceController;
 import Presentation.controllers.ReservationController;
-import Presentation.theme.AppColors;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -14,8 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-//TODO: has functions in common with ManageSlotsPanel
-public class ManageBookingsPanel extends JPanel {
+public class ManageBookingsPanel extends BaseManagePanel {
     private ReservationController reservationController;
     private ParkingSpaceController slotController;
 
@@ -32,7 +29,6 @@ public class ManageBookingsPanel extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         add(buildButtonArea(), BorderLayout.NORTH);
-        //TODO: make table
         add(buildTable(), BorderLayout.CENTER);
     }
 
@@ -83,34 +79,6 @@ public class ManageBookingsPanel extends JPanel {
 
         wrapper.add(Box.createVerticalStrut(15));
         return wrapper;
-    }
-
-    private JButton buildButton(String text) {
-        JButton btn = new JButton(text);
-
-        btn.setContentAreaFilled(false);
-        btn.setOpaque(true);
-        btn.setBorderPainted(false);
-        btn.setFocusPainted(false);
-        btn.setBackground(AppColors.LIGHT_BLUE);
-        btn.setForeground(Color.WHITE);
-        btn.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
-
-        return btn;
-    }
-
-    private void styleButton(JButton btn, boolean cancel) {
-        btn.setBackground(cancel ? AppColors.RED : AppColors.LIGHT_BLUE);
-        btn.setForeground(Color.WHITE);
-
-        btn.setOpaque(true);
-        btn.setContentAreaFilled(true);
-        btn.setBorderPainted(false);
-        btn.setFocusPainted(false);
-
-        btn.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
-
-        btn.setHorizontalAlignment(SwingConstants.CENTER);
     }
 
     private JScrollPane buildTable() {
@@ -223,58 +191,5 @@ public class ManageBookingsPanel extends JPanel {
         dialog.pack();
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
-    }
-
-
-    private JDialog createBaseDialog(String title, Dimension size, JPanel formPanel, JButton actionBtn, JButton cancelBtn) {
-        JDialog dialog = new JDialog((Frame) null, title, true);
-
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
-
-        Dimension btnSize = new Dimension(100, 35);
-
-        actionBtn.setPreferredSize(btnSize);
-        cancelBtn.setPreferredSize(btnSize);
-
-        cancelBtn.addActionListener(e -> dialog.dispose());
-
-        buttonPanel.add(actionBtn);
-        buttonPanel.add(cancelBtn);
-
-        formPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        mainPanel.add(formPanel);
-
-        mainPanel.add(Box.createVerticalStrut(10));
-
-        mainPanel.add(buttonPanel);
-
-        dialog.setContentPane(mainPanel);
-
-        return dialog;
-    }
-
-    private void addField(JPanel panel, String label, JComponent field) {
-        JLabel jLabel = new JLabel(label);
-
-        jLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        field.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        Dimension fieldSize = new Dimension(450, field.getPreferredSize().height);
-
-        field.setPreferredSize(fieldSize);
-        field.setMaximumSize(fieldSize);
-
-        panel.add(jLabel);
-        panel.add(Box.createVerticalStrut(5));
-
-        panel.add(field);
-
-        panel.add(Box.createVerticalStrut(15));
     }
 }
