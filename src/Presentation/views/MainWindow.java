@@ -42,7 +42,7 @@ public class MainWindow extends JFrame {
         AuthManager authManager       = new AuthManager(userDAO);
         SessionManager sessionManager = SessionManager.getInstance();
         AuthController authController = new AuthController(authManager, sessionManager);
-        ParkingLotManager parkingLotManager = new ParkingLotManager(parkingSpaceDAO, reservationDAO, vehicleDAO, parkingLogDAO);
+        ParkingLotManager parkingLotManager = new ParkingLotManager(parkingSpaceDAO, vehicleDAO, parkingLogDAO);
         ReservationManager reservationManager = new ReservationManager(reservationDAO);
         ReservationController reservationController = new ReservationController(reservationManager);
         EntryExitController entryExitController = new EntryExitController(parkingLotManager, reservationController);

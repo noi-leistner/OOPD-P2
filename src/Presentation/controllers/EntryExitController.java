@@ -42,7 +42,7 @@ public class EntryExitController {
     }
 
     public Reservation getReservationForSpace(int spaceId) {
-        return parkingLotManager.getReservationForSpace(spaceId);
+        return reservationController.getReservationBySlotId(spaceId);
     }
 
     public List<ParkingSpace> getAvailableSpacesForType(String vehicleType) {

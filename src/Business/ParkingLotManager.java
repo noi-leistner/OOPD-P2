@@ -13,25 +13,17 @@ import java.util.stream.Collectors;
 
 public class ParkingLotManager {
 
-    private ParkingSpaceDAO parkingSpaceDao;
-
-
-    private static final int MAX_SLOTS_PER_FLOOR = 20;
     private static final int NUM_FLOORS = 4;
-  
-    private ReservationDAO reservationDao;
+    private static final int MAX_SLOTS_PER_FLOOR = 20;
+
+    private ParkingSpaceDAO parkingSpaceDao;
     private VehicleDAO vehicleDao;
     private ParkingLogDAO parkingLogDao;
 
-    public ParkingLotManager (ParkingSpaceDAO parkingSpaceDao, ReservationDAO reservationDao, VehicleDAO vehicleDao, ParkingLogDAO parkingLogDao) {
+    public ParkingLotManager (ParkingSpaceDAO parkingSpaceDao, VehicleDAO vehicleDao, ParkingLogDAO parkingLogDao) {
         this.parkingSpaceDao = parkingSpaceDao;
-        this.reservationDao = reservationDao;
         this.vehicleDao = vehicleDao;
         this.parkingLogDao = parkingLogDao;
-    }
-
-    public Reservation getReservationForSpace(int spaceId) {
-        return reservationDao.findReservationBySlotId(spaceId);
     }
 
     public boolean vehiclePlateExists(String licensePlate) {
