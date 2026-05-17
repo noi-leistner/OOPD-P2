@@ -29,6 +29,8 @@ public class StatusController {
     public Map<Integer, Integer> getOccupancyChartData(){
         return reservationManager.getOccupancyLastHour();
     }
+
+
 }
 /*
 / To check if the map works:

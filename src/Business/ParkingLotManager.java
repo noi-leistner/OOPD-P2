@@ -3,8 +3,8 @@ package Business;
 import Business.Entities.ParkingSpace;
 import Business.Entities.Reservation;
 
-import Persistance.ParkingSpaceDAO;
-import Persistance.ReservationDAO;
+import Business.Entities.Vehicle;
+import Persistance.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +18,33 @@ public class ParkingLotManager {
 
     private static final int MAX_SLOTS_PER_FLOOR = 20;
     private static final int NUM_FLOORS = 4;
+  
+    private ReservationDAO reservationDao;
+    private VehicleDAO vehicleDao;
+    private ParkingLogDAO parkingLogDao;
 
-    public ParkingLotManager (ParkingSpaceDAO parkingSpaceDao) {
+    public ParkingLotManager (ParkingSpaceDAO parkingSpaceDao, ReservationDAO reservationDao, VehicleDAO vehicleDao, ParkingLogDAO parkingLogDao) {
         this.parkingSpaceDao = parkingSpaceDao;
+        this.reservationDao = reservationDao;
+        this.vehicleDao = vehicleDao;
+        this.parkingLogDao = parkingLogDao;
+    }
+
+    public Reservation getReservationForSpace(int spaceId) {
+        return reservationDao.findReservationBySlotId(spaceId);
+    }
+
+    public boolean vehiclePlateExists(String licensePlate) {
+        return vehicleDao.findByPlate(licensePlate) != null;
+    }
+
+    public boolean vehicleBelongsToUser(String licensePlate, int userId) {
+        Vehicle v = vehicleDao.findByPlate(licensePlate);
+        return v != null && v.getUserId() == userId;
+    }
+
+    public void logParkingAction(int spaceId, String licensePlate, int userId, String action) {
+        parkingLogDao.insertLog(spaceId, licensePlate, userId, action);
     }
 
     public DaoResult addSpace(ParkingSpace space) {
@@ -72,22 +96,51 @@ public class ParkingLotManager {
     }
 
     public List<ParkingSpace> getAvailableSpacesForType(String vehicleType) {
-        //TODO: Implement
+        return parkingSpaceDao.getAvailableSpacesForType(vehicleType);
+    }
+
+    public ParkingSpace enterWithReservation(String licensePlate, int userId) {
+        ParkingSpace space = parkingSpaceDao.getReservedSpaceByPlate(licensePlate);
+        if (space == null) return null;
+        ParkingSpace fresh = parkingSpaceDao.getParkingSpaceById(space.getId());
+        if (fresh == null || fresh.isOccupied()) return null;
+        boolean ok = ((ParkingSpaceDAOSql) parkingSpaceDao).occupySpace(space.getId(), licensePlate);
+        if (ok) {
+            parkingLogDao.insertLog(space.getId(), licensePlate, userId, "ENTRY");
+            return parkingSpaceDao.getParkingSpaceById(space.getId());
+        }
         return null;
     }
 
-    public ParkingSpace enterWithReservation(String licensePlate) {
-        //TODO: Implement
+    public ParkingSpace enterWithoutReservation(String licensePlate, int spaceId, int userId) {
+        ParkingSpace fresh = parkingSpaceDao.getParkingSpaceById(spaceId);
+        if (fresh == null || fresh.isOccupied()) return null;
+        boolean ok = ((ParkingSpaceDAOSql) parkingSpaceDao).occupySpace(spaceId, licensePlate);
+        if (ok) {
+            parkingLogDao.insertLog(spaceId, licensePlate, userId, "ENTRY");
+            return parkingSpaceDao.getParkingSpaceById(spaceId);
+        }
         return null;
     }
 
-    public ParkingSpace enterWithoutReservation(String licensePlate, String vehicleType) {
-        //TODO: Implement
+    public ParkingSpace exit(String licensePlate, int userId) {
+        ParkingSpace space = parkingSpaceDao.getOccupiedSpaceByPlate(licensePlate);
+        if (space == null) return null;
+        boolean ok = ((ParkingSpaceDAOSql) parkingSpaceDao).vacateSpace(space.getId());
+        if (ok) {
+            parkingLogDao.insertLog(space.getId(), licensePlate, userId, "EXIT");
+            return parkingSpaceDao.getParkingSpaceById(space.getId());
+        }
         return null;
     }
 
-    public void exit(String licensePlate){
-        //TODO: Implement
+    public String getVehicleType(String licensePlate) {
+        Vehicle v = vehicleDao.findByPlate(licensePlate);
+        return v != null ? v.getType() : null;
+    }
+
+    public boolean reservationExistsForPlate(String licensePlate) {
+        return reservationDao.findReservationByPlate(licensePlate) != null;
     }
 
     public Reservation reserve(String licensePlate, String vehicleType, int spaceId) {
@@ -117,24 +170,6 @@ public class ParkingLotManager {
         }
         return availableFloors;
     }
-
-    //TODO: should be in reservation manager
-//    public void cancelReservationByAdmin(int spaceId) {
-//        reservationDao.deleteReservation(spaceId);
-//
-//        ParkingSpace space = parkingSpaceDao.getParkingSpaceById(spaceId);
-//        if (space != null) {
-//            ParkingSpace updated = new ParkingSpace(
-//                    getSpaceDetails(spaceId).getId(),
-//                    getSpaceDetails(spaceId).getFloor(),
-//                    false,
-//                    false,
-//                    getSpaceDetails(spaceId).getType()
-//            );
-//            parkingSpaceDao.updateParkingSpace(updated);
-//
-//        }
-//    }
 
     // TODO: maybe not need this function
     public boolean slotExistsById(int id) {

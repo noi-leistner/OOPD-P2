@@ -6,6 +6,7 @@ import Business.ReservationManager;
 import Business.SessionManager;
 import Persistance.*;
 import Presentation.controllers.AuthController;
+import Presentation.controllers.EntryExitController;
 import Presentation.controllers.ParkingSpaceController;
 import Presentation.controllers.StatusController;
 import Presentation.controllers.ReservationController;
@@ -35,11 +36,16 @@ public class MainWindow extends JFrame {
         UserDAO userDAO = new UserDAOSql();
         ParkingSpaceDAO parkingSpaceDAO = new ParkingSpaceDAOSql();
         ReservationDAO reservationDAO = new ReservationDAOSql();
+        VehicleDAO vehicleDAO = new VehicleDAOSql();
+        ParkingLogDAO parkingLogDAO = new ParkingLogDAOSql();
 
         AuthManager authManager       = new AuthManager(userDAO);
         SessionManager sessionManager = SessionManager.getInstance();
         AuthController authController = new AuthController(authManager, sessionManager);
-        ParkingLotManager parkingLotManager = new ParkingLotManager(parkingSpaceDAO);
+        ParkingLotManager parkingLotManager = new ParkingLotManager(parkingSpaceDAO, reservationDAO, vehicleDAO, parkingLogDAO);
+        ParkingSpaceController slotController = new ParkingSpaceController(parkingLotManager);
+        StatusController statusController = new StatusController(parkingLotManager);
+        EntryExitController entryExitController = new EntryExitController(parkingLotManager);
         ReservationManager reservationManager = new ReservationManager(reservationDAO);
         ParkingSpaceController slotController = new ParkingSpaceController(parkingLotManager, reservationManager);
         //TODO: idk if we need a status controller (maybe slotController is enough)
@@ -48,8 +54,7 @@ public class MainWindow extends JFrame {
 
         AuthPanel authPanel = new AuthPanel(this, authController);
 
-        dashboardPanel = new  DashboardPanel(this, authController, slotController, reservationController, statusController);
-
+        dashboardPanel = new  DashboardPanel(this, authController, slotController, reservationController, statusController, entryExitController);
 
         mainPanel.add(AUTH_SCREEN, authPanel);
         mainPanel.add(DASHBOARD_SCREEN, dashboardPanel);

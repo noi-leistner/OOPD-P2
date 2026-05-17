@@ -16,4 +16,5 @@ public interface ReservationDAO {
     Reservation findReservationBySlotId(int id);
     DaoResult editReservation(Reservation reservation);
     List<Reservation> getReservationsByUserId(int userId);
+    Reservation findReservationByPlate(String licensePlate);
 }
