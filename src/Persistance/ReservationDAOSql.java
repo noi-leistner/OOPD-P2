@@ -5,7 +5,7 @@ import Business.Entities.Reservation;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -129,21 +129,6 @@ public class ReservationDAOSql implements ReservationDAO {
         }
         return null;
     }
-    @Override
-    public Reservation findReservationByPlate(String plate) {
-        String sql = "SELECT * FROM reservations WHERE parking_slot_id = ? AND is_cancelled = FALSE";
-        try (Connection conn = ConfigDAO.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, plate);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) return mapRow(rs);
-            }
-        } catch (SQLException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return null;
-    }
 
     @Override
     public DaoResult editReservation(Reservation reservation) {
@@ -169,5 +154,21 @@ public class ReservationDAOSql implements ReservationDAO {
             log.log(Level.SEVERE, e.getMessage(), e);
             return DaoResult.DATABASE_ERROR;
         }
+    }
+
+    @Override
+    public Reservation findReservationByPlate(String licensePlate) {
+        String sql = "SELECT * FROM reservations WHERE vehicle_license_plate = ? AND is_cancelled = FALSE";
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, licensePlate);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return null;
     }
 }

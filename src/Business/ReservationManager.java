@@ -78,4 +78,8 @@ public class ReservationManager {
     public DaoResult editReservation(Reservation reservation) {
         return reservationDao.editReservation(reservation);
     }
+
+    public boolean reservationExistsForPlate(String licensePlate) {
+        return reservationDao.findReservationByPlate(licensePlate) != null;
+    }
 }

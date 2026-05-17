@@ -42,13 +42,13 @@ public class MainWindow extends JFrame {
         AuthManager authManager       = new AuthManager(userDAO);
         SessionManager sessionManager = SessionManager.getInstance();
         AuthController authController = new AuthController(authManager, sessionManager);
-        ParkingLotManager parkingLotManager = new ParkingLotManager(parkingSpaceDAO, reservationDAO, vehicleDAO, parkingLogDAO);
-        EntryExitController entryExitController = new EntryExitController(parkingLotManager);
+        ParkingLotManager parkingLotManager = new ParkingLotManager(parkingSpaceDAO, vehicleDAO, parkingLogDAO);
         ReservationManager reservationManager = new ReservationManager(reservationDAO);
-        ParkingSpaceController slotController = new ParkingSpaceController(parkingLotManager, reservationManager);
+        ReservationController reservationController = new ReservationController(reservationManager);
+        EntryExitController entryExitController = new EntryExitController(parkingLotManager, reservationController);
+        ParkingSpaceController slotController = new ParkingSpaceController(parkingLotManager, reservationController);
         //TODO: idk if we need a status controller (maybe slotController is enough)
         StatusController statusController = new StatusController(parkingLotManager, reservationManager);
-        ReservationController reservationController = new ReservationController(reservationManager);
 
         AuthPanel authPanel = new AuthPanel(this, authController);
 
