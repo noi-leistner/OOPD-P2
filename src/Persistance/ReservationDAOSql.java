@@ -140,7 +140,7 @@ public class ReservationDAOSql implements ReservationDAO {
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, licensePlate);
+            stmt.setInt(1, slotId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) return mapRow(rs);
             }
@@ -174,5 +174,20 @@ public class ReservationDAOSql implements ReservationDAO {
             log.log(Level.SEVERE, e.getMessage(), e);
             return DaoResult.DATABASE_ERROR;
         }
+    }
+
+    public Reservation findReservationByPlate(String licensePlate) {
+        String sql = "SELECT * FROM reservations WHERE vehicle_license_plate = ? AND is_cancelled = FALSE";
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, licensePlate);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return null;
     }
 }

@@ -139,10 +139,6 @@ public class ParkingLotManager {
         return v != null ? v.getType() : null;
     }
 
-    public boolean reservationExistsForPlate(String licensePlate) {
-        return reservationDao.findReservationByPlate(licensePlate) != null;
-    }
-
     public Reservation reserve(String licensePlate, String vehicleType, int spaceId) {
         //TODO: Implement
         return null;
