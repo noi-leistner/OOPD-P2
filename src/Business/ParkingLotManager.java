@@ -104,7 +104,7 @@ public class ParkingLotManager {
         if (space == null) return null;
         ParkingSpace fresh = parkingSpaceDao.getParkingSpaceById(space.getId());
         if (fresh == null || fresh.isOccupied()) return null;
-        boolean ok = ((ParkingSpaceDAOSql) parkingSpaceDao).occupySpace(space.getId(), licensePlate);
+        boolean ok = parkingSpaceDao.occupySpace(space.getId(), licensePlate);
         if (ok) {
             parkingLogDao.insertLog(space.getId(), licensePlate, userId, "ENTRY");
             return parkingSpaceDao.getParkingSpaceById(space.getId());
@@ -115,8 +115,8 @@ public class ParkingLotManager {
     public ParkingSpace enterWithoutReservation(String licensePlate, int spaceId, int userId) {
         ParkingSpace fresh = parkingSpaceDao.getParkingSpaceById(spaceId);
         if (fresh == null || fresh.isOccupied()) return null;
-        boolean ok = ((ParkingSpaceDAOSql) parkingSpaceDao).occupySpace(spaceId, licensePlate);
-        if (ok) {
+
+        if (parkingSpaceDao.occupySpace(spaceId, licensePlate)) {
             parkingLogDao.insertLog(spaceId, licensePlate, userId, "ENTRY");
             return parkingSpaceDao.getParkingSpaceById(spaceId);
         }
@@ -126,8 +126,8 @@ public class ParkingLotManager {
     public ParkingSpace exit(String licensePlate, int userId) {
         ParkingSpace space = parkingSpaceDao.getOccupiedSpaceByPlate(licensePlate);
         if (space == null) return null;
-        boolean ok = ((ParkingSpaceDAOSql) parkingSpaceDao).vacateSpace(space.getId());
-        if (ok) {
+
+        if (parkingSpaceDao.vacateSpace(space.getId())) {
             parkingLogDao.insertLog(space.getId(), licensePlate, userId, "EXIT");
             return parkingSpaceDao.getParkingSpaceById(space.getId());
         }

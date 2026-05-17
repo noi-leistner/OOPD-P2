@@ -176,6 +176,7 @@ public class ReservationDAOSql implements ReservationDAO {
         }
     }
 
+    @Override
     public Reservation findReservationByPlate(String licensePlate) {
         String sql = "SELECT * FROM reservations WHERE vehicle_license_plate = ? AND is_cancelled = FALSE";
         try (Connection conn = ConfigDAO.getConnection();

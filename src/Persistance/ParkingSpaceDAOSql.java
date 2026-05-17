@@ -242,6 +242,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
         return null;
     }
 
+    @Override
     public boolean occupySpace(int spaceId, String licensePlate) {
         String sql = "UPDATE parking_slots SET occupation_status = TRUE, parked_license_plate = ? WHERE identifier = ?";
         try (Connection conn = ConfigDAO.getConnection();
@@ -257,6 +258,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
         }
     }
 
+    @Override
     public boolean vacateSpace(int spaceId) {
         String sql = "UPDATE parking_slots SET occupation_status = FALSE, parked_license_plate = NULL WHERE identifier = ?";
         try (Connection conn = ConfigDAO.getConnection();
