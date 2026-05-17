@@ -42,6 +42,9 @@ public class ParkingSpace {
         public void setReserved(boolean reserved) {
             this.reservation_status = reserved;
         }
-}
 
-//h
+        @Override
+        public String toString() {
+                return "Slot " + id + " - Floor " + floor + " (" + type + ")";
+        }
+}

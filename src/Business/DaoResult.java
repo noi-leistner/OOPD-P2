@@ -5,5 +5,6 @@ public enum DaoResult {
     ALREADY_EXISTS,
     NOT_FOUND,
     DATABASE_ERROR,
-    EMPTY_SPACE
+    EMPTY_SPACE,
+    CANNOT_REMOVE_OCCUPIED
 }

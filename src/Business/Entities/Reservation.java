@@ -8,13 +8,15 @@ public class Reservation {
     String vehicle_license_plate;
     int parking_slot_id;
     Date date;
+    boolean isCancelled;
 
-    public Reservation (int id, int user_id, String vehicle_license_plate, int parking_slot_id, Date date) {
+    public Reservation (int id, int user_id, String vehicle_license_plate, int parking_slot_id, Date date, boolean isCancelled) {
         this.id = id;
         this.user_id = user_id;
         this.vehicle_license_plate = vehicle_license_plate;
         this.parking_slot_id = parking_slot_id;
         this.date = date;
+        this.isCancelled = isCancelled;
     }
 
     public int getId() {return id;}
@@ -36,4 +38,8 @@ public class Reservation {
     public void setParking_slot_id(int parking_slot_id) {this.parking_slot_id = parking_slot_id;}
 
     public void setDate(Date date) {this.date = date;}
+
+    public boolean isCancelled() {
+        return isCancelled;
+    }
 }

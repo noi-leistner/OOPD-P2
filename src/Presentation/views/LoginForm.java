@@ -95,7 +95,6 @@ public class LoginForm extends JPanel {
                 case SUCCESS -> {
                     mainWindow.getDashboard().refresh();
                     mainWindow.switchTo(MainWindow.DASHBOARD_SCREEN);
-                    auth.checkAndShowCancelledNotification();
                     passField.setText("");
 
                 }

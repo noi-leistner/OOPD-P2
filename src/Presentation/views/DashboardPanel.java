@@ -1,8 +1,10 @@
 package Presentation.views;
 
+import Business.Entities.Reservation;
 import Business.Entities.User;
 import Business.SessionManager;
 import Presentation.controllers.AuthController;
+import Presentation.controllers.EntryExitController;
 import Presentation.controllers.ParkingSpaceController;
 import Presentation.controllers.StatusController;
 import Presentation.controllers.ReservationController;
@@ -11,11 +13,14 @@ import Presentation.theme.AppColors;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class DashboardPanel extends JPanel {
 
     private final CardLayout cardLayout;
     private final JPanel contentArea;
+
+    private EntryExitController entryExitController;
 
     private MainWindow mainWindow;
     private AuthController authController;
@@ -27,12 +32,14 @@ public class DashboardPanel extends JPanel {
     private ParkingSpaceController slotController;
     private ReservationController reservationController;
 
-    public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController, ReservationController reservationController, StatusController statusController) {
+
+    public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController, ReservationController reservationController, StatusController statusController, EntryExitController entryExitController) {
         this.slotController = slotController;
         this.mainWindow = mainWindow;
         this.authController = authController;
         this.statusController = statusController;
         this.reservationController = reservationController;
+        this.entryExitController = entryExitController;
 
         setLayout(new BorderLayout());
 
@@ -49,6 +56,7 @@ public class DashboardPanel extends JPanel {
 
         add(buildSidebar(), BorderLayout.WEST);
         add(contentArea, BorderLayout.CENTER);
+        showCancelledReservationNotification();
         revalidate();
         repaint();
     }
@@ -76,7 +84,10 @@ public class DashboardPanel extends JPanel {
             OccupancyPanel occupancyPanel = new OccupancyPanel(statusController);
 
             contentArea.add(manageSlotsPanel,   "SLOTS");
-//            contentArea.add(new ManageUsersPanel(),   "USERS");
+
+            ManageBookingsPanel manageBookingsPanel = new ManageBookingsPanel(reservationController, slotController);
+            manageBookingsPanel.refreshTable();
+            contentArea.add(manageBookingsPanel,   "BOOKINGS");
             contentArea.add(new OccupancyPanel(statusController),  "OCCUPANCY");
             contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
             addButton(sidebar, "Log Out", "LOGOUT");
@@ -92,12 +103,15 @@ public class DashboardPanel extends JPanel {
             addButton(sidebar, "Vehicle Exit",     "VEHICLE_EXIT");
             addButton(sidebar, "Last Hour Occupancy",  "OCCUPANCY");
             addButton(sidebar, "Current Parking status", "STATUS");
+            addButton(sidebar, "Log Out", "LOGOUT");
 
-//            contentArea.add(new VehicleEntryPanel(), "VEHICLE_ENTRY");
-//            contentArea.add(new VehicleExitPanel(), "VEHICLE_EXIT");
+            contentArea.add(new VehicleEntryPanel(entryExitController), "VEHICLE_ENTRY");
+            contentArea.add(new VehicleExitPanel(entryExitController), "VEHICLE_EXIT");
             contentArea.add(new OccupancyPanel(statusController), "OCCUPANCY");
             contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
-            addButton(sidebar, "Log Out", "LOGOUT");
+            contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
+            contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");
+
 
             showContent("VEHICLE_ENTRY");
             highlightButton(initialButton);
@@ -163,5 +177,42 @@ public class DashboardPanel extends JPanel {
 
     public void showContent(String name) {
         cardLayout.show(contentArea, name);
+    }
+
+    private void showCancelledReservationNotification() {
+
+        User user = SessionManager.getInstance().getCurrentUser();
+
+        if (user == null || user.isAdmin()) {
+            return;
+        }
+
+        List<Reservation> cancelled = reservationController.getCancelledReservations(user.getId());
+        if (!cancelled.isEmpty()) {
+            StringBuilder message = new StringBuilder();
+            message.append("The following reservations have been cancelled:\n\n");
+
+            for (Reservation r : cancelled) {
+                message.append("• Plate: ")
+                        .append(r.getVehiclePlate())
+                        .append(" | Spot: ")
+                        .append(r.getParking_slot_id())
+                        .append(" | Date: ")
+                        .append(r.getDate())
+                        .append("\n");
+            }
+
+            message.append("\nPlease make a new reservation if needed.");
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    message.toString(),
+                    "Reservation Cancelled",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+
+            reservationController.deleteCancelledReservations(user.getId());
+        }
     }
 }
