@@ -175,4 +175,8 @@ public class ParkingLotManager {
     public boolean slotExistsById(int id) {
         return parkingSpaceDao.existsById(id);
     }
+
+    public Map<Integer,Integer> getOccupancyLastHour() {
+        return parkingLogDao.getOccupancyLastHour();
+    }
 }

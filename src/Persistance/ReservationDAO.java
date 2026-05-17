@@ -12,7 +12,6 @@ public interface ReservationDAO {
     void deleteReservation(int reservationId);
     void cancelReservation(int reservationId);
     List<Reservation> getAllReservations();
-    Map<Integer, Integer> getOccupancyLastHour();
     Reservation findReservationBySlotId(int id);
     DaoResult editReservation(Reservation reservation);
     List<Reservation> getReservationsByUserId(int userId);
