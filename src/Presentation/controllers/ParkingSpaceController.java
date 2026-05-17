@@ -10,11 +10,11 @@ import java.util.List;
 public class ParkingSpaceController {
 
     private final ParkingLotManager parkingLotManager;
-    private final ReservationManager reservationManager;
+    private final ReservationController reservationController;
 
-    public ParkingSpaceController(ParkingLotManager parkingLotManager, ReservationManager reservationManager) {
+    public ParkingSpaceController(ParkingLotManager parkingLotManager, ReservationController reservationController) {
         this.parkingLotManager = parkingLotManager;
-        this.reservationManager = reservationManager;
+        this.reservationController = reservationController;
     }
 
     public DaoResult addSpace(int code, int floor, String vehicleType, boolean occStatus, boolean resStatus) {
@@ -43,9 +43,9 @@ public class ParkingSpaceController {
         if (space.isReserved()) {
             ParkingSpace alternative = parkingLotManager.findAlternativeSpace(space.getType(), spaceId);
             if (alternative != null) {
-                reservationManager.moveReservation(spaceId, alternative.getId());
+                reservationController.moveReservation(spaceId, alternative.getId());
             } else {
-                reservationManager.cancelReservationBySlot(spaceId);
+                reservationController.cancelReservationBySlot(spaceId);
             }
         }
 

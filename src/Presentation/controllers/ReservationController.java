@@ -51,4 +51,16 @@ public class ReservationController {
     public void deleteCancelledReservations(int id) {
         manager.deleteCancelledReservations(id);
     }
+
+    public void moveReservation(int fromSlotId, int toSlotId) {
+        manager.moveReservation(fromSlotId, toSlotId);
+    }
+
+    public void cancelReservationBySlot(int slotId) {
+        manager.cancelReservationBySlot(slotId);
+    }
+
+    public boolean reservationExistsForPlate(String plate) {
+        return manager.reservationExistsForPlate(plate);
+    }
 }

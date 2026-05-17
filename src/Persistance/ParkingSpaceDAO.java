@@ -6,19 +6,15 @@ import java.util.List;
 
 public interface ParkingSpaceDAO {
     boolean addParkingSpace(ParkingSpace space);
-
     boolean updateParkingSpace(ParkingSpace space);
-
     boolean deleteParkingSpace(int id);
-
     List<ParkingSpace> getAllParkingSpaces();
-
     boolean existsById(int id);
-
     ParkingSpace getParkingSpaceById(int id);
-
     List<ParkingSpace> getAvailableSpacesForType(String vehicleType);
     ParkingSpace getFirstAvailableSpaceForType(String vehicleType);
     ParkingSpace getReservedSpaceByPlate(String licensePlate);
     ParkingSpace getOccupiedSpaceByPlate(String licensePlate);
+    boolean occupySpace(int spaceId, String licensePlate);
+    boolean vacateSpace(int spaceId);
 }
