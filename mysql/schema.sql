@@ -51,9 +51,9 @@ INSERT INTO users (name, surname, email, password, role) VALUES
 ('Admin', 'User', 'admin@lsparking.com', 'admin123', 'admin'),
 ('Test', 'User', 'test@lsparking.com', 'test123', 'user');
 
-INSERT INTO vehicles (license_plate, vehicle_type) VALUES
-('1234ABC', 'car'),
-('5678DEF', 'motorcycle');
+INSERT INTO vehicles (license_plate, user_id, vehicle_type) VALUES
+('1234ABC', 1, 'car'),
+('5678DEF', 2, 'motorcycle');
 
 INSERT INTO parking_slots (identifier, vehicle_type, occupation_status, reservation_status, floor) VALUES
 (1, 'car', FALSE, FALSE, 0),
