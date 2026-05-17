@@ -97,6 +97,7 @@ public class LoginForm extends JPanel {
                     mainWindow.switchTo(MainWindow.DASHBOARD_SCREEN);
                     auth.checkAndShowCancelledNotification();
                     passField.setText("");
+
                 }
                 case EMPTY_FIELDS        -> JOptionPane.showMessageDialog(this, "Please fill all the fields!");
                 case INVALID_CREDENTIALS -> {
