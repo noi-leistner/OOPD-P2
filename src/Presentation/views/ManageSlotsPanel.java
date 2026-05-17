@@ -8,6 +8,7 @@ import Presentation.controllers.ReservationController;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ManageSlotsPanel extends BaseManagePanel {
@@ -16,6 +17,9 @@ public class ManageSlotsPanel extends BaseManagePanel {
     private JTable table;
     private ParkingSpaceController slotController;
     private ReservationController reservationController;
+
+    private ParkingSpace selectedSpace;
+    private List<ParkingSpace> currentSpaces = new ArrayList<>();
 
     public ManageSlotsPanel(ParkingSpaceController slotController, ReservationController reservationController) {
         this.slotController = slotController;
@@ -28,53 +32,41 @@ public class ManageSlotsPanel extends BaseManagePanel {
     }
 
     private JPanel buildButtonArea() {
-        JPanel wrapper = new JPanel();
-        wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
-        wrapper.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
-
-        JLabel title = new JLabel("Parking Slots");
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
-        title.setFont(new Font("Arial", Font.BOLD, 16));
-
-        wrapper.add(title);
-        wrapper.add(Box.createVerticalStrut(15));
-
-        JPanel threeButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
-
         JButton addBtn = buildButton("Add Slot");
         addBtn.addActionListener(e -> showSlotInfoDialog("Add slot", null));
 
         JButton editBtn = buildButton("Edit Slot");
-        editBtn.addActionListener(e -> showEditSlotDialog());
+        editBtn.addActionListener(e -> {
+            if (selectedSpace == null) {
+                JOptionPane.showMessageDialog(this, "Please select a slot first.");
+                return;
+            }
+            showSlotInfoDialog("Edit slot", selectedSpace);
+        });
 
         JButton removeBtn = buildButton("Remove Slot");
-        removeBtn.addActionListener(e -> showRemoveSlotDialog());
+        removeBtn.addActionListener(e -> {
+            if (selectedSpace == null) {
+                JOptionPane.showMessageDialog(this, "Please select a slot first.");
+                return;
+            }
+            showRemoveSlotDialog(selectedSpace.getId());
+        });
 
-        threeButtons.add(addBtn);
-        threeButtons.add(editBtn);
-        threeButtons.add(removeBtn);
-        wrapper.add(threeButtons);
-
-        wrapper.add(Box.createVerticalStrut(15));
-        return wrapper;
+        return buildButtonArea("Parking Slots", addBtn, editBtn, removeBtn);
     }
 
     private JScrollPane buildTable() {
         String[] columns = {"Code", "Floor", "Current Status", "Reservation Status", "Type"};
-        tableModel = new DefaultTableModel(columns, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; // make table read-only
-            }
-        };
-
+        tableModel = buildTableModel(columns);
         table = new JTable(tableModel);
-        table.setRowHeight(30);
-        table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 13));
-        table.setFont(new Font("Arial", Font.PLAIN, 13));
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        return new JScrollPane(table);
+        return buildTable(columns, tableModel, table, () -> {
+            int row = table.getSelectedRow();
+            if (row >= 0 && row < currentSpaces.size()) {
+                selectedSpace = currentSpaces.get(row);
+            }
+        });
     }
 
     public void refreshTable() {
@@ -83,6 +75,7 @@ public class ManageSlotsPanel extends BaseManagePanel {
     }
 
     public void loadData(List<ParkingSpace> spaces) {
+        currentSpaces = spaces;
         tableModel.setRowCount(0);
         for (ParkingSpace space : spaces) {
             tableModel.addRow(new Object[]{
@@ -228,113 +221,22 @@ public class ManageSlotsPanel extends BaseManagePanel {
         return panel;
     }
 
-    private void showEditSlotDialog() {
-        JPanel formPanel = new JPanel();
-        formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
-        JTextField idField = new JTextField(10);
-        JButton nextBtn = new JButton("Next");
-        JButton cancelBtn = new JButton("Cancel");
+    private void showRemoveSlotDialog(int spaceId) {
+        int confirm = JOptionPane.showConfirmDialog(this, "Delete slot " + spaceId + "?", "Confirm", JOptionPane.YES_NO_OPTION);
 
-        styleButton(nextBtn, false);
-        styleButton(cancelBtn, true);
-
-        JDialog dialog = createBaseDialog("Edit Slot", new Dimension(350, 160), formPanel, nextBtn, cancelBtn);
-
-        JLabel title = new JLabel("EDIT PARKING SLOT");
-        title.setFont(new Font("Arial", Font.BOLD, 14));
-        title.setAlignmentX(Component.LEFT_ALIGNMENT);
-        formPanel.add(title);
-        formPanel.add(Box.createVerticalStrut(20));
-        addField(formPanel, "Enter Slot Identifier:", idField);
-
-        nextBtn.addActionListener(e -> {
-            String input = idField.getText().trim();
-
-            if (input.isBlank()) {
-                JOptionPane.showMessageDialog(dialog, "Please enter a slot ID.");
-                return;
-            }
-
-            try {
-                int spaceId = Integer.parseInt(input);
-
-                dialog.dispose();
-
-                ParkingSpace space = slotController.getSpaceDetails(spaceId);
-                if (space != null) {
-                    showSlotInfoDialog("Edit slot", space);
-                } else {
-                    JOptionPane.showMessageDialog(null, "There is no parking space with this ID.");
+        if (confirm == JOptionPane.YES_OPTION) {
+            switch (slotController.removeSpace(spaceId)) {
+                case SUCCESS -> {
+                    JOptionPane.showMessageDialog(this, "Slot removed!");
+                    refreshTable();
                 }
-
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(dialog, "Slot ID must be a number.", "Invalid input", JOptionPane.WARNING_MESSAGE);
+                case CANNOT_REMOVE_OCCUPIED ->
+                        JOptionPane.showMessageDialog(this, "Slot is occupied and no alternative spaces are available.", "Cannot Remove", JOptionPane.WARNING_MESSAGE);
+                case NOT_FOUND ->
+                        JOptionPane.showMessageDialog(this, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
+                case DATABASE_ERROR ->
+                        JOptionPane.showMessageDialog(this, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-        });
-
-        dialog.pack();
-        dialog.setLocationRelativeTo(this);
-        dialog.setVisible(true);
-    }
-
-    private void showRemoveSlotDialog() {
-        JPanel formPanel = new JPanel();
-        formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
-        JTextField idField = new JTextField(15);
-        JButton removeBtn = new JButton("Remove");
-        JButton cancelBtn = new JButton("Cancel");
-
-        styleButton(removeBtn, true);
-        styleButton(cancelBtn, false);
-
-        JDialog dialog = createBaseDialog("Remove Slot", new Dimension(350, 160), formPanel, removeBtn, cancelBtn);
-
-        JLabel title = new JLabel("REMOVE PARKING SLOT");
-        title.setFont(new Font("Arial", Font.BOLD, 14));
-        title.setAlignmentX(Component.LEFT_ALIGNMENT);
-        formPanel.add(title);
-        formPanel.add(Box.createVerticalStrut(20));
-        addField(formPanel, "Enter Slot Identifier to remove:", idField);
-
-        removeBtn.addActionListener(e -> {
-            String input = idField.getText().trim();
-            if (input.isBlank()) {
-                JOptionPane.showMessageDialog(dialog, "Please enter a slot ID.");
-                return;
-            }
-
-            try {
-                int spaceId = Integer.parseInt(input);
-
-                if (!slotController.slotExists(spaceId)) {
-                    JOptionPane.showMessageDialog(dialog, "There is no parking space with this ID.");
-                    return;
-                }
-
-                int confirm = JOptionPane.showConfirmDialog(dialog, "Delete slot " + spaceId + "?", "Confirm", JOptionPane.YES_NO_OPTION);
-                if (confirm == JOptionPane.YES_OPTION) {
-                    switch (slotController.removeSpace(spaceId)) {
-                        case SUCCESS -> {
-                            JOptionPane.showMessageDialog(dialog, "Slot removed!");
-                            dialog.dispose();
-                            refreshTable();
-                        }
-                        case CANNOT_REMOVE_OCCUPIED ->
-                                JOptionPane.showMessageDialog(dialog, "Slot is occupied and no alternative spaces are available.", "Cannot Remove", JOptionPane.WARNING_MESSAGE);
-                        case NOT_FOUND ->
-                                JOptionPane.showMessageDialog(dialog, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
-                        case DATABASE_ERROR ->
-                                JOptionPane.showMessageDialog(dialog, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(dialog, "Slot ID must be a number.", "Invalid input", JOptionPane.WARNING_MESSAGE);
-            }
-        });
-
-        dialog.pack();
-        dialog.setLocationRelativeTo(this);
-        dialog.setVisible(true);
+        }
     }
 }

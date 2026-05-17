@@ -33,19 +33,6 @@ public class ManageBookingsPanel extends BaseManagePanel {
     }
 
     private JPanel buildButtonArea() {
-        JPanel wrapper = new JPanel();
-        wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
-        wrapper.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
-
-        JLabel title = new JLabel("Parking Slots");
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
-        title.setFont(new Font("Arial", Font.BOLD, 16));
-
-        wrapper.add(title);
-        wrapper.add(Box.createVerticalStrut(15));
-
-        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
-
         JButton editResBtn = buildButton("Edit Reservation");
         editResBtn.addActionListener(e -> {
             if (selectedReservation == null) {
@@ -61,51 +48,29 @@ public class ManageBookingsPanel extends BaseManagePanel {
                 JOptionPane.showMessageDialog(this, "Please select a reservation first.");
                 return;
             }
-            int confirm = JOptionPane.showConfirmDialog(
-                    this,
+            int confirm = JOptionPane.showConfirmDialog(this,
                     "Cancel reservation " + selectedReservation.getId() + "?",
-                    "Confirm",
-                    JOptionPane.YES_NO_OPTION
-            );
+                    "Confirm", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 reservationController.cancelReservationFromAdmin(selectedReservation.getId());
                 refreshTable();
             }
         });
 
-        buttons.add(editResBtn);
-        buttons.add(cancelResBtn);
-        wrapper.add(buttons);
-
-        wrapper.add(Box.createVerticalStrut(15));
-        return wrapper;
+        return buildButtonArea("Manage Bookings", editResBtn, cancelResBtn);
     }
 
     private JScrollPane buildTable() {
-        String[] columns = { "User Id", "Plate", "Slot", "Type", "Date" };
-        tableModel = new DefaultTableModel(columns, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; // make table read-only
-            }
-        };
-
+        String[] columns = {"User Id", "Plate", "Slot", "Type", "Date"};
+        tableModel = buildTableModel(columns);
         table = new JTable(tableModel);
-        table.setRowHeight(30);
-        table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 13));
-        table.setFont(new Font("Arial", Font.PLAIN, 13));
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        table.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                int row = table.getSelectedRow();
-                if (row >= 0 && row < currentReservations.size()) {
-                    selectedReservation = currentReservations.get(row);
-                }
+        return buildTable(columns, tableModel, table, () -> {
+            int row = table.getSelectedRow();
+            if (row >= 0 && row < currentReservations.size()) {
+                selectedReservation = currentReservations.get(row);
             }
         });
-
-        return new JScrollPane(table);
     }
 
     public void refreshTable() {
