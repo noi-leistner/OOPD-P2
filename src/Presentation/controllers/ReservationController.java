@@ -1,9 +1,10 @@
 package Presentation.controllers;
 
 import Business.DaoResult;
-import Business.Entities.ParkingSpace;
 import Business.Entities.Reservation;
 import Business.ReservationManager;
+
+import java.util.List;
 
 public class ReservationController {
 
@@ -17,9 +18,14 @@ public class ReservationController {
         //TODO: Implement
     }
 
+    //normal user cancel
     public DaoResult cancelReservation(int reservation_id) {
         //TODO: Implement
         return DaoResult.SUCCESS;
+    }
+
+    public List<Reservation> getAllReservations() {
+        return manager.getAllReservations();
     }
 
     public void getUserReservations() {
@@ -30,4 +36,19 @@ public class ReservationController {
         return manager.getReservationBySlot(id);
     }
 
+    public void cancelReservationFromAdmin(int reservationId) {
+        manager.cancelReservationByAdmin(reservationId);
+    }
+
+    public DaoResult editReservation(Reservation reservation) {
+        return manager.editReservation(reservation);
+    }
+
+    public List<Reservation> getCancelledReservations(int id) {
+        return manager.getCancelledReservations(id);
+    }
+
+    public void deleteCancelledReservations(int id) {
+        manager.deleteCancelledReservations(id);
+    }
 }

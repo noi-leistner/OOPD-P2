@@ -1,5 +1,6 @@
 package Presentation.views;
 
+import Business.Entities.Reservation;
 import Business.Entities.User;
 import Business.SessionManager;
 import Presentation.controllers.AuthController;
@@ -12,6 +13,7 @@ import Presentation.theme.AppColors;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class DashboardPanel extends JPanel {
 
@@ -54,6 +56,9 @@ public class DashboardPanel extends JPanel {
 
         add(buildSidebar(), BorderLayout.WEST);
         add(contentArea, BorderLayout.CENTER);
+
+        showCancelledReservationNotification();
+
         revalidate();
         repaint();
     }
@@ -81,8 +86,11 @@ public class DashboardPanel extends JPanel {
             OccupancyPanel occupancyPanel = new OccupancyPanel(statusController);
 
             contentArea.add(manageSlotsPanel,   "SLOTS");
-//            contentArea.add(new ManageUsersPanel(),   "USERS");
-            contentArea.add(new OccupancyPanel(statusController),  "OCCUPANCY");
+
+            ManageBookingsPanel manageBookingsPanel = new ManageBookingsPanel(reservationController, slotController);
+            manageBookingsPanel.refreshTable();
+            contentArea.add(manageBookingsPanel,   "BOOKINGS");
+//            contentArea.add(new OccupancyPanel(),  "OCCUPANCY");
             contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
             addButton(sidebar, "Log Out", "LOGOUT");
             contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");
@@ -172,5 +180,42 @@ public class DashboardPanel extends JPanel {
 
     public void showContent(String name) {
         cardLayout.show(contentArea, name);
+    }
+
+    private void showCancelledReservationNotification() {
+
+        User user = SessionManager.getInstance().getCurrentUser();
+
+        if (user == null || user.isAdmin()) {
+            return;
+        }
+
+        List<Reservation> cancelled = reservationController.getCancelledReservations(user.getId());
+        if (!cancelled.isEmpty()) {
+            StringBuilder message = new StringBuilder();
+            message.append("The following reservations have been cancelled:\n\n");
+
+            for (Reservation r : cancelled) {
+                message.append("• Plate: ")
+                        .append(r.getVehiclePlate())
+                        .append(" | Spot: ")
+                        .append(r.getParking_slot_id())
+                        .append(" | Date: ")
+                        .append(r.getDate())
+                        .append("\n");
+            }
+
+            message.append("\nPlease make a new reservation if needed.");
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    message.toString(),
+                    "Reservation Cancelled",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+
+            reservationController.deleteCancelledReservations(user.getId());
+        }
     }
 }

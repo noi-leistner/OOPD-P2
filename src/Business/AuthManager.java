@@ -12,21 +12,20 @@ public class AuthManager {
         this.userDAO = userDAO;
     }
 
-    public AuthResult login(String email, String password) {
+    public User login(String email, String password) {
         if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
-            return AuthResult.EMPTY_FIELDS;
+            return null;
         }
         User user = userDAO.getUserByEmail(email.trim());
 
         if (user == null) {
-            return AuthResult.INVALID_CREDENTIALS;
+            return null;
         }
 
         if (BCrypt.checkpw(password, user.getPassword())) {
-            SessionManager.getInstance().login(user);
-            return AuthResult.SUCCESS;
+            return user;
         }
-        return AuthResult.INVALID_CREDENTIALS;
+        return null;
     }
 
     public AuthResult signUp(User user) {
