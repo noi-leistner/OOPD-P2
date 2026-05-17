@@ -48,6 +48,9 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
         }
     }
     */
+    /*
+    // Gives a map with cars / minutes each minute, and displays it in statusController.
+     */
     @Override
     public Map<Integer, Integer> getOccupancyLastHour() {
         Map<Integer, Integer> netByMinute = new LinkedHashMap<>();
@@ -58,7 +61,7 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
         WHERE timestamp >= NOW() - INTERVAL 1 HOUR
         GROUP BY minutes_ago
         ORDER BY minutes_ago DESC
-    """;
+        """;
         try (Connection c = ConfigDAO.getConnection();
              PreparedStatement ps = c.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
