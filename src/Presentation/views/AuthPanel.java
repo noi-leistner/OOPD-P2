@@ -11,9 +11,9 @@ public class AuthPanel extends JPanel {
     public AuthPanel(MainWindow app, AuthController authController) {
         setLayout(new BorderLayout());
 
-        add(createHeader(), BorderLayout.NORTH);
+        // add(createHeader(), BorderLayout.NORTH); -> Removed top bar
 
-        contentArea = new JPanel();
+        contentArea = new JPanel(new BorderLayout());
         add(contentArea, BorderLayout.CENTER);
 
         showLogin(app, authController);
@@ -33,7 +33,7 @@ public class AuthPanel extends JPanel {
         contentArea.repaint();
     }
 
-    private JLabel createHeader() {
+    /*private JLabel createHeader() {
         JLabel header = new JLabel("Parking");
         header.setOpaque(true);
         header.setBackground(Color.BLUE);
@@ -41,5 +41,5 @@ public class AuthPanel extends JPanel {
         header.setHorizontalAlignment(SwingConstants.CENTER);
         header.setPreferredSize(new Dimension(0, 50));
         return header;
-    }
+    }*/
 }
