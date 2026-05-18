@@ -203,19 +203,23 @@ public class ManageSlotsPanel extends BaseManagePanel {
         panel.setMaximumSize(new Dimension(450, 120));
 
         if (!space.isReserved()) {
-            panel.add(new JLabel("  No reservation for this spot."));
+            panel.add(new JLabel("  No reservations for this spot."));
             return panel;
         }
 
-        Reservation reservation = reservationController.getReservationBySlotId(space.getId());
-        if (reservation == null) {
-            panel.add(new JLabel("      No reservation found."));
+        List<Reservation> reservations = reservationController.getReservationsBySlotId(space.getId());
+        if (reservations.isEmpty()) {
+            panel.add(new JLabel("      No reservations found."));
             return panel;
         }
 
-        panel.add(new JLabel("      Vehicle Plate: " + reservation.getVehiclePlate()));
-        panel.add(new JLabel("      Date: " + reservation.getDate()));
-        panel.add(Box.createVerticalStrut(10));
+        //TODO: make this pretty
+        for (Reservation reservation : reservations) {
+            panel.add(new JLabel("      Vehicle Plate: " + reservation.getVehiclePlate()));
+            panel.add(new JLabel("      Start Date: " + reservation.getStartDateTime()));
+            panel.add(new JLabel("      End Date: " + reservation.getEndDateTime()));
+            panel.add(Box.createVerticalStrut(10));
+        }
         panel.add(new JLabel("To edit or cancel the reservation go to Manage Bookings!"));
 
         return panel;

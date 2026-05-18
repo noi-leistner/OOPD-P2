@@ -3,6 +3,10 @@ package Presentation.views;
 import Business.DaoResult;
 import Business.Entities.ParkingSpace;
 import Business.Entities.Reservation;
+import Business.Entities.User;
+import Business.Entities.Vehicle;
+import Business.SessionManager;
+import Presentation.controllers.EntryExitController;
 import Presentation.controllers.ParkingSpaceController;
 import Presentation.controllers.ReservationController;
 
@@ -13,18 +17,20 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ManageBookingsPanel extends BaseManagePanel {
+public class ManageReservationsPanel extends BaseManagePanel {
     private final ReservationController reservationController;
     private final ParkingSpaceController slotController;
+    private final EntryExitController entryExitController;
 
     private DefaultTableModel tableModel;
     private JTable table;
     private Reservation selectedReservation;
     private List<Reservation> currentReservations = new ArrayList<>();
 
-    public ManageBookingsPanel(ReservationController reservationController, ParkingSpaceController slotController) {
+    public ManageReservationsPanel(ReservationController reservationController, ParkingSpaceController slotController, EntryExitController entryExitController) {
         this.reservationController = reservationController;
         this.slotController = slotController;
+        this.entryExitController = entryExitController;
 
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -34,6 +40,9 @@ public class ManageBookingsPanel extends BaseManagePanel {
     }
 
     private JPanel buildButtonArea() {
+        JButton addResBtn = buildButton("Make Reservation");
+        addResBtn.addActionListener(e -> showAddReservationDialog());
+
         JButton editResBtn = buildButton("Edit Reservation");
         editResBtn.addActionListener(e -> {
             if (selectedReservation == null) {
@@ -52,8 +61,9 @@ public class ManageBookingsPanel extends BaseManagePanel {
             int confirm = JOptionPane.showConfirmDialog(this,
                     "Cancel reservation " + selectedReservation.getId() + "?",
                     "Confirm", JOptionPane.YES_NO_OPTION);
+
             if (confirm == JOptionPane.YES_OPTION) {
-                DaoResult cancelResult = reservationController.cancelReservationFromAdmin(selectedReservation.getId());
+                DaoResult cancelResult = reservationController.cancelReservation(selectedReservation.getId());
                 if (cancelResult != DaoResult.SUCCESS) {
                     JOptionPane.showMessageDialog(this, "Failed to cancel reservation.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
@@ -71,7 +81,7 @@ public class ManageBookingsPanel extends BaseManagePanel {
             }
         });
 
-        return buildButtonArea("Manage Bookings", editResBtn, cancelResBtn);
+        return buildButtonArea("Manage Bookings", addResBtn, editResBtn, cancelResBtn);
     }
 
     private JScrollPane buildTable() {
@@ -88,7 +98,8 @@ public class ManageBookingsPanel extends BaseManagePanel {
     }
 
     public void refreshTable() {
-        List<Reservation> reservations = reservationController.getAllReservations();
+        User currentUser = SessionManager.getInstance().getCurrentUser();
+        java.util.List<Reservation> reservations = reservationController.getReservationsByUserId(currentUser.getId());
         loadData(reservations);
     }
 
@@ -102,10 +113,147 @@ public class ManageBookingsPanel extends BaseManagePanel {
                     reservation.getVehiclePlate(),
                     space != null ? space.getId() : "N/A",
                     space != null ? space.getType() : "N/A",
-                    reservation.getStartDateTime(),
+                    reservation.getEndDateTime(),
                     reservation.getEndDateTime()
             });
         }
+    }
+
+    private void showAddReservationDialog() {
+        JPanel formPanel = new JPanel();
+        formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
+        JButton okBtn = new JButton("OK");
+        JButton cancelBtn = new JButton("Cancel");
+
+        styleButton(okBtn, false);
+        styleButton(cancelBtn, true);
+
+        JDialog dialog = createBaseDialog("Make Reservation", new Dimension(400, 500), formPanel, okBtn, cancelBtn);
+
+        JLabel titleLabel = new JLabel("Edit Reservation");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        formPanel.add(titleLabel);
+        formPanel.add(Box.createVerticalStrut(20));
+
+        //Get car id
+        JTextField licenseField = new JTextField(15);
+        addField(formPanel, "Vehicle license plate:", licenseField);
+
+        //Get vehicle type
+        JComboBox<String> typeCombo = new JComboBox<>(new String[]{"Car", "Motorcycle", "Truck"});
+        addField(formPanel, "Vehicle type:", typeCombo);
+
+        //combobox with available spots for type
+        JComboBox<ParkingSpace> spotsCombo = new JComboBox<>();
+        addField(formPanel, "Available Spots:", spotsCombo);
+
+        updateSpotsCombo(spotsCombo, (String) typeCombo.getSelectedItem(), dialog);
+
+        typeCombo.addActionListener(e ->
+                updateSpotsCombo(spotsCombo, (String) typeCombo.getSelectedItem(), dialog)
+        );
+
+        // start date
+        SpinnerDateModel startDateModel = new SpinnerDateModel();
+        JSpinner startDateSpinner = new JSpinner(startDateModel);
+        startDateSpinner.setEditor(new JSpinner.DateEditor(startDateSpinner, "dd/MM/yyyy"));
+        addField(formPanel, "Start date:", startDateSpinner);
+
+        // start time
+        SpinnerDateModel startTimeModel = new SpinnerDateModel();
+        JSpinner startTimeSpinner = new JSpinner(startTimeModel);
+        startTimeSpinner.setEditor(new JSpinner.DateEditor(startTimeSpinner, "HH:mm"));
+        addField(formPanel, "Start time:", startTimeSpinner);
+
+        // end date
+        SpinnerDateModel endDateModel = new SpinnerDateModel();
+        JSpinner endDateSpinner = new JSpinner(endDateModel);
+        endDateSpinner.setEditor(new JSpinner.DateEditor(endDateSpinner, "dd/MM/yyyy"));
+        addField(formPanel, "End date:", endDateSpinner);
+
+        // end time
+        SpinnerDateModel endTimeModel = new SpinnerDateModel();
+        JSpinner endTimeSpinner = new JSpinner(endTimeModel);
+        endTimeSpinner.setEditor(new JSpinner.DateEditor(endTimeSpinner, "HH:mm"));
+        addField(formPanel, "End time:", endTimeSpinner);
+
+        okBtn.addActionListener(e -> {
+            User currentUser = SessionManager.getInstance().getCurrentUser();
+            String plate = licenseField.getText().trim();
+            String type = (String) typeCombo.getSelectedItem();
+
+            if (plate.isBlank()) {
+                JOptionPane.showMessageDialog(dialog, "Please enter a license plate.");
+                return;
+            }
+
+            if (entryExitController.vehicleExistsForOtherUser(plate, currentUser.getId())) {
+                JOptionPane.showMessageDialog(dialog,
+                        "This vehicle is registered to another user.",
+                        "Vehicle conflict",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            Vehicle existing = entryExitController.ensureVehicleExists(plate, type, currentUser.getId());
+
+            if (existing == null) {
+                JOptionPane.showMessageDialog(dialog, "Something went wrong registering the vehicle.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!existing.getType().equalsIgnoreCase(type)) {
+                JOptionPane.showMessageDialog(dialog,
+                        "This vehicle is already registered as type: " + existing.getType() + ". Type cannot be changed.",
+                        "Vehicle conflict",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            Date start = combineDateAndTime(startDateSpinner, startTimeSpinner);
+            Date end   = combineDateAndTime(endDateSpinner, endTimeSpinner);
+
+            if (!end.after(start)) {
+                JOptionPane.showMessageDialog(dialog,
+                        "End date and time must be after start date and time.",
+                        "Invalid dates",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            if (start.before(new Date())) {
+                JOptionPane.showMessageDialog(dialog,
+                        "Start date and time cannot be in the past.",
+                        "Invalid dates",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            Reservation newReservation = new Reservation(
+                    currentUser.getId(),
+                    licenseField.getText(),
+                    ((ParkingSpace) spotsCombo.getSelectedItem()).getId(),
+                    start,
+                    end,
+                    false
+            );
+
+            //TODO: set spot as reserved
+            switch (reservationController.makeReservation(newReservation)) {
+                case SUCCESS -> {
+                    JOptionPane.showMessageDialog(dialog, "Reservation added!");
+                    dialog.dispose();
+                    refreshTable();
+                }
+                case ALREADY_EXISTS -> JOptionPane.showMessageDialog(dialog, "This reservation would overlap with another!.", "Error", JOptionPane.ERROR_MESSAGE);
+                case DATABASE_ERROR -> JOptionPane.showMessageDialog(dialog, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
     }
 
     private void showEditReservationDialog(Reservation reservation) {
@@ -125,28 +273,24 @@ public class ManageBookingsPanel extends BaseManagePanel {
         SpinnerDateModel startDateModel = new SpinnerDateModel();
         JSpinner startDateSpinner = new JSpinner(startDateModel);
         startDateSpinner.setEditor(new JSpinner.DateEditor(startDateSpinner, "dd/MM/yyyy"));
-        addField(formPanel, "Start date:", startDateSpinner);
         startDateSpinner.setValue(reservation.getStartDateTime());
 
         // start time
         SpinnerDateModel startTimeModel = new SpinnerDateModel();
         JSpinner startTimeSpinner = new JSpinner(startTimeModel);
         startTimeSpinner.setEditor(new JSpinner.DateEditor(startTimeSpinner, "HH:mm"));
-        addField(formPanel, "Start time:", startTimeSpinner);
         startTimeSpinner.setValue(reservation.getStartDateTime());
 
         // end date
         SpinnerDateModel endDateModel = new SpinnerDateModel();
         JSpinner endDateSpinner = new JSpinner(endDateModel);
         endDateSpinner.setEditor(new JSpinner.DateEditor(endDateSpinner, "dd/MM/yyyy"));
-        addField(formPanel, "End date:", endDateSpinner);
         endDateSpinner.setValue(reservation.getEndDateTime());
 
         // end time
         SpinnerDateModel endTimeModel = new SpinnerDateModel();
         JSpinner endTimeSpinner = new JSpinner(endTimeModel);
         endTimeSpinner.setEditor(new JSpinner.DateEditor(endTimeSpinner, "HH:mm"));
-        addField(formPanel, "End time:", endTimeSpinner);
         endTimeSpinner.setValue(reservation.getEndDateTime());
 
         List<ParkingSpace> availableSpots = slotController.getAvailableSpotsByType(currentSpot.getType());
@@ -155,6 +299,7 @@ public class ManageBookingsPanel extends BaseManagePanel {
             availableSpots = new ArrayList<>();
         }
 
+        //TODO: current spot appearing twice
         if (!availableSpots.contains(currentSpot)) {
             availableSpots.add(0, currentSpot);
         }
@@ -214,5 +359,20 @@ public class ManageBookingsPanel extends BaseManagePanel {
         dialog.pack();
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
+    }
+
+    private void updateSpotsCombo(JComboBox<ParkingSpace> spotsCombo, String type, JDialog dialog) {
+        List<ParkingSpace> availableSpots = slotController.getAvailableSpotsByType(type);
+
+        spotsCombo.removeAllItems();
+
+        if (availableSpots == null || availableSpots.isEmpty()) {
+            JOptionPane.showMessageDialog(dialog, "There are no parking spots available for this type!");
+            return;
+        }
+
+        for (ParkingSpace space : availableSpots) {
+            spotsCombo.addItem(space);
+        }
     }
 }

@@ -53,14 +53,8 @@ public class ParkingSpaceController {
     }
 
     public ParkingSpace getSpaceDetails(int spaceId) {
-        //TODO: Implement
         return parkingLotManager.getSpaceDetails(spaceId);
     }
-
-    //TODO: this should be in reservation controller
-//    public void cancelReservationFromAdmin(int spaceId) {
-//        parkingLotManager.cancelReservationByAdmin(spaceId);
-//    }
 
     // TODO: maybe not need this function
     public boolean slotExists(int id) {
@@ -77,5 +71,13 @@ public class ParkingSpaceController {
 
     public List<ParkingSpace> getAvailableSpotsByType(String type) {
         return parkingLotManager.getAvailableSpacesForType(type);
+    }
+
+    public DaoResult removeReservationFromSlot(int slotId) {
+        ParkingSpace space = getSpaceDetails(slotId);
+        if (space == null) return DaoResult.NOT_FOUND;
+
+        space.setReserved(false);
+        return parkingLotManager.editSpace(space);
     }
 }

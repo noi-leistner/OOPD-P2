@@ -6,8 +6,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class VehicleDAOSql implements VehicleDAO {
+
+    private static final Logger log = Logger.getLogger(VehicleDAOSql.class.getName());
 
     @Override
     public Vehicle findByPlate(String licensePlate) {
@@ -29,5 +33,21 @@ public class VehicleDAOSql implements VehicleDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public void addVehicle(Vehicle vehicle) {
+        String sql = "INSERT INTO vehicles (license_plate, user_id, vehicle_type) VALUES (?, ?, ?)";
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, vehicle.getLicense_plate());
+            stmt.setInt(2, vehicle.getUserId());
+            stmt.setString(3, vehicle.getType());
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
     }
 }

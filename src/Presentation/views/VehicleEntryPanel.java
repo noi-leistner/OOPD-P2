@@ -240,10 +240,10 @@ public class VehicleEntryPanel extends JPanel {
 
         int userId = SessionManager.getInstance().getCurrentUser().getId();
 
-        Reservation reservation = controller.getReservationForSpace(selected.id);
+        Reservation reservation = controller.getFirstReservationForSpace(selected.id);
 
         if (reservation != null) {
-            String dateStr = new SimpleDateFormat("dd/MM/yyyy").format(reservation.getDate());
+            String dateStr = new SimpleDateFormat("dd/MM/yyyy").format(reservation.getStartDateTime());
             int choice = JOptionPane.showConfirmDialog(
                     this,
                     "<html>Space <b>#" + selected.id + "</b> is reserved by another user.<br>" +

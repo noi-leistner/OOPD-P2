@@ -13,30 +13,42 @@ public class ReservationManager {
         this.reservationDao = reservationDao;
     }
 
-    public Reservation getReservationBySlot(int id) {
-        return reservationDao.findReservationBySlotId(id);
+    public List<Reservation> getReservationsBySlot(int id) {
+        return reservationDao.findReservationsBySlotId(id);
+    }
+
+    public DaoResult makeReservation(Reservation reservation) {
+        return reservationDao.createReservation(reservation);
+    }
+
+    public DaoResult deleteReservation(int reservationId) {
+        return reservationDao.deleteReservation(reservationId);
     }
 
     public void cancelReservationBySlot(int slotId) {
-        Reservation reservation = reservationDao.findReservationBySlotId(slotId);
-        if (reservation != null) {
+        List<Reservation> reservations = reservationDao.findReservationsBySlotId(slotId);
+        for (Reservation reservation : reservations) {
             reservationDao.deleteReservation(reservation.getId());
         }
     }
 
     public void moveReservation(int fromSlotId, int toSlotId) {
-        Reservation reservation = reservationDao.findReservationBySlotId(fromSlotId);
-        if (reservation == null) return;
+        List<Reservation> reservations = reservationDao.findReservationsBySlotId(fromSlotId);
+        if (reservations.isEmpty()) return;
 
-        reservation.setParking_slot_id(toSlotId);
-        //TODO: make this in reservationDAO
-        //reservationDao.updateReservation(reservation);
+        for (Reservation reservation : reservations) {
+            reservation.setParking_slot_id(toSlotId);
+            reservationDao.editReservation(reservation);
+        }
     }
 
     public List<Reservation> getAllReservations() {
         return reservationDao.getAllReservations();
     }
 
+    public List<Reservation> getReservationsByUserId(int userId) {
+        return reservationDao.getReservationsByUserId(userId);
+    }
 
     public List<Reservation> getUserReservations(int userId, boolean cancelled) {
         List<Reservation> reservations = reservationDao.getReservationsByUserId(userId);
@@ -71,8 +83,9 @@ public class ReservationManager {
         }
     }
 
-    public void cancelReservationByAdmin(int reservationId) {
+    public DaoResult cancelReservationByAdmin(int reservationId) {
         reservationDao.cancelReservation(reservationId);
+        return DaoResult.SUCCESS;
     }
 
     public DaoResult editReservation(Reservation reservation) {
