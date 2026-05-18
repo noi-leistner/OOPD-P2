@@ -57,15 +57,8 @@ public class ManageBookingsPanel extends BaseManagePanel {
                 if (cancelResult != DaoResult.SUCCESS) {
                     JOptionPane.showMessageDialog(this, "Failed to cancel reservation.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
-                }
-
-                switch (slotController.removeReservationFromSlot(selectedReservation.getParking_slot_id())) {
-                    case SUCCESS -> {
-                        JOptionPane.showMessageDialog(this, "Reservation cancelled successfully.");
-                        refreshTable();
-                    }
-                    case NOT_FOUND      -> JOptionPane.showMessageDialog(this, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
-                    case DATABASE_ERROR -> JOptionPane.showMessageDialog(this, "Something went wrong updating the slot.", "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Reservation cancelled successfully.");
                 }
                 refreshTable();
             }
@@ -96,7 +89,7 @@ public class ManageBookingsPanel extends BaseManagePanel {
         currentReservations = reservations;
         tableModel.setRowCount(0);
         for (Reservation reservation : reservations) {
-            ParkingSpace space = slotController.getSpaceDetails(reservation.getParking_slot_id());
+            ParkingSpace space = slotController.getSpaceDetails(reservation.getParkingSlotId());
             tableModel.addRow(new Object[]{
                     reservation.getUser_id(),
                     reservation.getVehiclePlate(),
@@ -119,7 +112,7 @@ public class ManageBookingsPanel extends BaseManagePanel {
 
         JDialog dialog = createBaseDialog("Edit Reservation", new Dimension(400, 500), formPanel, okBtn, cancelBtn);
 
-        ParkingSpace currentSpot = slotController.getSpaceDetails(reservation.getParking_slot_id());
+        ParkingSpace currentSpot = slotController.getSpaceDetails(reservation.getParkingSlotId());
 
         // start date
         SpinnerDateModel startDateModel = new SpinnerDateModel();

@@ -1,10 +1,13 @@
 package Presentation.views;
 
 import Business.Entities.ParkingSpace;
+import Business.Entities.Reservation;
+import Presentation.controllers.ReservationController;
 import Presentation.controllers.StatusController;
 import Presentation.theme.AppColors;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -17,11 +20,14 @@ public class CurrentStatusPanel extends JPanel {
     private DefaultTableModel tableModel;
     private JTable table;
     private final StatusController statusController;
+    private final ReservationController reservationController;
     private Timer timer;
     private List<ParkingSpace> spaces = new ArrayList<>(); //TODO: Change once functions have been made, this isn't good architecture
 
-    public CurrentStatusPanel(StatusController statusController) {
+    public CurrentStatusPanel(StatusController statusController, ReservationController reservationController) {
         this.statusController = statusController;
+        this.reservationController = reservationController;
+
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
@@ -137,11 +143,15 @@ public class CurrentStatusPanel extends JPanel {
         content.add(makeField("Floor:", String.valueOf(space.getFloor())));
         content.add(makeField("Vehicle Type:", space.getType()));
         content.add(makeField("Occupation Status:", space.isOccupied() ? "Occupied" : "Free"));
-        content.add(makeField("Reservation Status:", space.isReserved() ? "Reserved" : "Unreserved"));
+
+        boolean hasReservation = reservationController.getReservationsBySlotId(space.getId())
+                .stream().anyMatch(r -> r.getStartDateTime().before(new Date()) && r.getEndDateTime().after(new Date()));
+
+        content.add(makeField("Reservation Status:", hasReservation ? "Reserved" : "Unreserved"));
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 15));
 
-        if (space.isReserved()) {
+        if (hasReservation) {
             content.add(new JSeparator());
 
             JLabel reservationTitle = new JLabel("Reservation Information");
@@ -203,12 +213,16 @@ public class CurrentStatusPanel extends JPanel {
         tableModel.setRowCount(0);
         spaces = statusController.getParkingTableData();
         for (ParkingSpace space : spaces) {
+            List<Reservation> reservations = reservationController.getReservationsBySlotId(space.getId());
+            boolean isReserved = !reservations.isEmpty();
+            boolean isOccupied = reservations.stream().anyMatch(r -> r.getStartDateTime().before(new Date()) && r.getEndDateTime().after(new Date()));
+
             tableModel.addRow(new Object[]{
                     space.getId(),
                     space.getFloor(),
                     space.getType(),
-                    space.isOccupied() ? "Occupied" : "Free",
-                    space.isReserved() ? "Reserved" : "Unreserved",
+                    isOccupied ? "Occupied" : "Free",
+                    isReserved ? "Reserved" : "Unreserved",
                     "-" // TODO: get licence plate
             });
         }

@@ -17,20 +17,19 @@ public class ParkingSpaceController {
         this.reservationController = reservationController;
     }
 
-    public DaoResult addSpace(int code, int floor, String vehicleType, boolean occStatus, boolean resStatus) {
-        ParkingSpace space = new ParkingSpace(code, floor, occStatus, resStatus, vehicleType);
+    public DaoResult addSpace(int code, int floor, String vehicleType, boolean occStatus) {
+        ParkingSpace space = new ParkingSpace(code, floor, occStatus, vehicleType);
         return parkingLotManager.addSpace(space);
     }
 
     public DaoResult editSpace(int code, int floor, String vehicleType) {
         boolean occupied = getSpaceDetails(code).isOccupied();
-        boolean reserved = getSpaceDetails(code).isReserved();
-        ParkingSpace space = new ParkingSpace(code, floor, occupied, reserved, vehicleType);
+        ParkingSpace space = new ParkingSpace(code, floor, occupied, vehicleType);
 
         return parkingLotManager.editSpace(space);
     }
 
-    public DaoResult removeSpace(int spaceId) {
+    public DaoResult removeSpace(int spaceId, boolean hasReservation) {
         ParkingSpace space = parkingLotManager.getSpaceDetails(spaceId);
         if (space == null) return DaoResult.NOT_FOUND;
 
@@ -40,7 +39,7 @@ public class ParkingSpaceController {
             parkingLotManager.moveVehicle(space, alternative);
         }
 
-        if (space.isReserved()) {
+        if (hasReservation) {
             ParkingSpace alternative = parkingLotManager.findAlternativeSpace(space.getType(), spaceId);
             if (alternative != null) {
                 reservationController.moveReservation(spaceId, alternative.getId());
@@ -71,13 +70,5 @@ public class ParkingSpaceController {
 
     public List<ParkingSpace> getAvailableSpotsByType(String type) {
         return parkingLotManager.getAvailableSpacesForType(type);
-    }
-
-    public DaoResult removeReservationFromSlot(int slotId) {
-        ParkingSpace space = getSpaceDetails(slotId);
-        if (space == null) return DaoResult.NOT_FOUND;
-
-        space.setReserved(false);
-        return parkingLotManager.editSpace(space);
     }
 }

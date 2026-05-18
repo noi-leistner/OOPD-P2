@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ManageSlotsPanel extends BaseManagePanel {
@@ -77,12 +78,17 @@ public class ManageSlotsPanel extends BaseManagePanel {
     public void loadData(List<ParkingSpace> spaces) {
         currentSpaces = spaces;
         tableModel.setRowCount(0);
+
         for (ParkingSpace space : spaces) {
+            List<Reservation> reservations = reservationController.getReservationsBySlotId(space.getId());
+            boolean isReserved = !reservations.isEmpty();
+            boolean isOccupied = reservations.stream().anyMatch(r -> r.getStartDateTime().before(new Date()) && r.getEndDateTime().after(new Date()));
+
             tableModel.addRow(new Object[]{
                     space.getId(),
                     space.getFloor(),
-                    space.isOccupied() ? "Occupied" : "Free",
-                    space.isReserved() ? "Reserved" : "Unreserved",
+                    isOccupied ? "Occupied" : "Free",
+                    isReserved ? "Reserved" : "Unreserved",
                     space.getType()
             });
         }
@@ -91,6 +97,7 @@ public class ManageSlotsPanel extends BaseManagePanel {
     private void showSlotInfoDialog(String text, ParkingSpace space) {
         JPanel formPanel = new JPanel();
         formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
+        formPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         JButton okBtn = new JButton("OK");
         JButton cancelBtn = new JButton("Cancel");
 
@@ -152,7 +159,7 @@ public class ManageSlotsPanel extends BaseManagePanel {
 
             if (space != null) {
                 // Edit existing slot
-                if ((!space.getType().equals(vehicleType)) && (space.isOccupied() || space.isReserved())) {
+                if ((!space.getType().equals(vehicleType) || !reservationController.getReservationsBySlotId(space.getId()).isEmpty())) {
                     JOptionPane.showMessageDialog(dialog, "The slot type of a reserved or occupied space can't be changed!");
                     return;
                 }
@@ -170,7 +177,7 @@ public class ManageSlotsPanel extends BaseManagePanel {
                 }
             } else {
                 // Add new slot
-                switch (slotController.addSpace(code, floor, vehicleType, false, true)) {
+                switch (slotController.addSpace(code, floor, vehicleType, false)) {
                     case SUCCESS -> {
                         JOptionPane.showMessageDialog(dialog, "Slot added!");
                         dialog.dispose();
@@ -189,10 +196,9 @@ public class ManageSlotsPanel extends BaseManagePanel {
         dialog.setVisible(true);
     }
 
-    private JPanel buildReservationInfo(ParkingSpace space) {
+    private JComponent buildReservationInfo(ParkingSpace space) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         panel.setBorder(BorderFactory.createCompoundBorder(
@@ -200,36 +206,41 @@ public class ManageSlotsPanel extends BaseManagePanel {
                 BorderFactory.createEmptyBorder(8, 8, 8, 8)
         ));
 
-        panel.setMaximumSize(new Dimension(450, 120));
-
-        if (!space.isReserved()) {
-            panel.add(new JLabel("  No reservations for this spot."));
-            return panel;
-        }
-
         List<Reservation> reservations = reservationController.getReservationsBySlotId(space.getId());
         if (reservations.isEmpty()) {
             panel.add(new JLabel("      No reservations found."));
-            return panel;
+        } else {
+            for (Reservation reservation : reservations) {
+                panel.add(new JLabel("      Vehicle Plate: " + reservation.getVehiclePlate()));
+                panel.add(new JLabel("      Start Date: " + reservation.getStartDateTime()));
+                panel.add(new JLabel("      End Date: " + reservation.getEndDateTime()));
+                panel.add(Box.createVerticalStrut(10));
+            }
+            panel.add(new JLabel("To edit or cancel the reservation go to Manage Bookings!"));
         }
 
-        //TODO: make this pretty
-        for (Reservation reservation : reservations) {
-            panel.add(new JLabel("      Vehicle Plate: " + reservation.getVehiclePlate()));
-            panel.add(new JLabel("      Start Date: " + reservation.getStartDateTime()));
-            panel.add(new JLabel("      End Date: " + reservation.getEndDateTime()));
-            panel.add(Box.createVerticalStrut(10));
-        }
-        panel.add(new JLabel("To edit or cancel the reservation go to Manage Bookings!"));
+        JScrollPane scrollPane = new JScrollPane(panel);
 
-        return panel;
+        Dimension fixedSize = new Dimension(300, 120);
+
+        scrollPane.setPreferredSize(fixedSize);
+        scrollPane.setMinimumSize(fixedSize);
+        scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
+
+        scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        return scrollPane;
     }
 
     private void showRemoveSlotDialog(int spaceId) {
         int confirm = JOptionPane.showConfirmDialog(this, "Delete slot " + spaceId + "?", "Confirm", JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
-            switch (slotController.removeSpace(spaceId)) {
+            boolean hasReservation = reservationController.getReservationsBySlotId(spaceId)
+                    .stream().anyMatch(r -> r.getStartDateTime().before(new Date()) && r.getEndDateTime().after(new Date()));
+            switch (slotController.removeSpace(spaceId, hasReservation)) {
                 case SUCCESS -> {
                     JOptionPane.showMessageDialog(this, "Slot removed!");
                     refreshTable();

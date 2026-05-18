@@ -31,10 +31,6 @@ public class ReservationController {
         return manager.getReservationsByUserId(userId);
     }
 
-    public void getUserReservations() {
-        //TODO: Implement
-    }
-
     public List<Reservation> getReservationsBySlotId(int id) {
         return manager.getReservationsBySlot(id);
     }
@@ -65,5 +61,9 @@ public class ReservationController {
 
     public boolean reservationExistsForPlate(String plate) {
         return manager.reservationExistsForPlate(plate);
+    }
+
+    public void deleteExpiredReservations() {
+        manager.deleteExpiredReservations();
     }
 }

@@ -49,6 +49,8 @@ public class DashboardPanel extends JPanel {
     }
 
     public void refresh() {
+        reservationController.deleteExpiredReservations();
+
         removeAll();
         buttons.clear();
         contentArea.removeAll();
@@ -88,7 +90,7 @@ public class DashboardPanel extends JPanel {
             manageBookingsPanel.refreshTable();
             contentArea.add(manageBookingsPanel,   "BOOKINGS");
             contentArea.add(new OccupancyPanel(statusController),  "OCCUPANCY");
-            contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
+            contentArea.add(new CurrentStatusPanel(statusController, reservationController),  "STATUS");
             addButton(sidebar, "Log Out", "LOGOUT");
             contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");
 
@@ -111,8 +113,7 @@ public class DashboardPanel extends JPanel {
             manageReservationsPanel.refreshTable();
             contentArea.add(manageReservationsPanel, "RESERVE");
             contentArea.add(new OccupancyPanel(statusController), "OCCUPANCY");
-            contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
-            contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
+            contentArea.add(new CurrentStatusPanel(statusController, reservationController),  "STATUS");
             contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");
 
 
@@ -199,7 +200,7 @@ public class DashboardPanel extends JPanel {
                 message.append("• Plate: ")
                         .append(r.getVehiclePlate())
                         .append(" | Spot: ")
-                        .append(r.getParking_slot_id())
+                        .append(r.getParkingSlotId())
                         .append(" | Start Date: ")
                         .append(r.getStartDateTime())
                         .append(" | End Date: ")

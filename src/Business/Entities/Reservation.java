@@ -36,7 +36,7 @@ public class Reservation {
 
     public String getVehiclePlate() {return vehicle_license_plate;}
 
-    public int getParking_slot_id() {return parking_slot_id;}
+    public int getParkingSlotId() {return parking_slot_id;}
 
     public Date getStartDateTime() { return startDateTime; }
 

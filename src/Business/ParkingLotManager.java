@@ -45,7 +45,6 @@ public class ParkingLotManager {
                 .filter(s -> s.getId() != excludeId)
                 .filter(s -> s.getType().equalsIgnoreCase(type))
                 .filter(s -> !s.isOccupied())
-                .filter(s -> !s.isReserved())
                 .findFirst()
                 .orElse(null);
     }

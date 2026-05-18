@@ -67,15 +67,8 @@ public class ManageReservationsPanel extends BaseManagePanel {
                 if (cancelResult != DaoResult.SUCCESS) {
                     JOptionPane.showMessageDialog(this, "Failed to cancel reservation.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
-                }
-
-                switch (slotController.removeReservationFromSlot(selectedReservation.getParking_slot_id())) {
-                    case SUCCESS -> {
-                        JOptionPane.showMessageDialog(this, "Reservation cancelled successfully.");
-                        refreshTable();
-                    }
-                    case NOT_FOUND      -> JOptionPane.showMessageDialog(this, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
-                    case DATABASE_ERROR -> JOptionPane.showMessageDialog(this, "Something went wrong updating the slot.", "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Reservation cancelled successfully.");
                 }
                 refreshTable();
             }
@@ -107,7 +100,7 @@ public class ManageReservationsPanel extends BaseManagePanel {
         currentReservations = reservations;
         tableModel.setRowCount(0);
         for (Reservation reservation : reservations) {
-            ParkingSpace space = slotController.getSpaceDetails(reservation.getParking_slot_id());
+            ParkingSpace space = slotController.getSpaceDetails(reservation.getParkingSlotId());
             tableModel.addRow(new Object[]{
                     reservation.getUser_id(),
                     reservation.getVehiclePlate(),
@@ -239,7 +232,6 @@ public class ManageReservationsPanel extends BaseManagePanel {
                     false
             );
 
-            //TODO: set spot as reserved
             switch (reservationController.makeReservation(newReservation)) {
                 case SUCCESS -> {
                     JOptionPane.showMessageDialog(dialog, "Reservation added!");
@@ -267,7 +259,7 @@ public class ManageReservationsPanel extends BaseManagePanel {
 
         JDialog dialog = createBaseDialog("Edit Reservation", new Dimension(400, 500), formPanel, okBtn, cancelBtn);
 
-        ParkingSpace currentSpot = slotController.getSpaceDetails(reservation.getParking_slot_id());
+        ParkingSpace currentSpot = slotController.getSpaceDetails(reservation.getParkingSlotId());
 
         // start date
         SpinnerDateModel startDateModel = new SpinnerDateModel();
@@ -297,11 +289,6 @@ public class ManageReservationsPanel extends BaseManagePanel {
 
         if (availableSpots == null) {
             availableSpots = new ArrayList<>();
-        }
-
-        //TODO: current spot appearing twice
-        if (!availableSpots.contains(currentSpot)) {
-            availableSpots.add(0, currentSpot);
         }
 
         JComboBox<ParkingSpace> spotsCombo = new JComboBox<>(availableSpots.toArray(new ParkingSpace[0]));
