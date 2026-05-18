@@ -1,9 +1,9 @@
 package Presentation.controllers;
 
 import Business.Entities.ParkingSpace;
-import Business.Entities.Reservation;
 import Business.ParkingLotManager;
 import Business.ReservationManager;
+import Persistance.ParkingLogDAO;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,7 @@ public class StatusController {
     }
 
     public Map<Integer, Integer> getOccupancyChartData(){
-        return reservationManager.getOccupancyLastHour();
+        return parkingLotManager.getOccupancyLastHour();
     }
 
 

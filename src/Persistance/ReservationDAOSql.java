@@ -89,28 +89,8 @@ public class ReservationDAOSql implements ReservationDAO {
         return list;
     }
 
-    @Override
-    public Map<Integer, Integer> getOccupancyLastHour() {
-        Map<Integer, Integer> result = new HashMap<>();
-        String sql = "SELECT TIMESTAMPDIFF(MINUTE, date, NOW()) as minutes_ago, COUNT(*) as total " +
-                "FROM reservations " +
-                "WHERE date >= NOW() - INTERVAL 1 HOUR " +
-                "GROUP BY TIMESTAMPDIFF(MINUTE, date, NOW()) " +
-                "ORDER BY minutes_ago DESC";
-        try (Connection conn = ConfigDAO.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
 
-            while (rs.next()) {
-                int minutes = rs.getInt("minutes_ago");
-                int count = rs.getInt("total");
-                result.put(minutes, count);
-            }
-        } catch (SQLException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return result;
-    }
+
 
     @Override
     public List<Reservation> getReservationsByUserId(int userId) {

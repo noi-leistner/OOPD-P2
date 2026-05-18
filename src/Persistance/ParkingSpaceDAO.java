@@ -3,6 +3,7 @@ package Persistance;
 import Business.Entities.ParkingSpace;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ParkingSpaceDAO {
     boolean addParkingSpace(ParkingSpace space);

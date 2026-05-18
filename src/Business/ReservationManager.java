@@ -5,7 +5,6 @@ import Persistance.ReservationDAO;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ReservationManager {
     private final ReservationDAO reservationDao;
@@ -38,9 +37,6 @@ public class ReservationManager {
         return reservationDao.getAllReservations();
     }
 
-    public Map<Integer,Integer> getOccupancyLastHour() {
-        return reservationDao.getOccupancyLastHour();
-    }
 
     public List<Reservation> getUserReservations(int userId, boolean cancelled) {
         List<Reservation> reservations = reservationDao.getReservationsByUserId(userId);

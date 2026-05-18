@@ -32,7 +32,7 @@ public class DashboardPanel extends JPanel {
     private ParkingSpaceController slotController;
     private ReservationController reservationController;
 
-    
+
     public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController, ReservationController reservationController, StatusController statusController, EntryExitController entryExitController) {
         this.slotController = slotController;
         this.mainWindow = mainWindow;
@@ -56,9 +56,7 @@ public class DashboardPanel extends JPanel {
 
         add(buildSidebar(), BorderLayout.WEST);
         add(contentArea, BorderLayout.CENTER);
-
         showCancelledReservationNotification();
-
         revalidate();
         repaint();
     }
@@ -90,7 +88,7 @@ public class DashboardPanel extends JPanel {
             ManageBookingsPanel manageBookingsPanel = new ManageBookingsPanel(reservationController, slotController);
             manageBookingsPanel.refreshTable();
             contentArea.add(manageBookingsPanel,   "BOOKINGS");
-//            contentArea.add(new OccupancyPanel(),  "OCCUPANCY");
+            contentArea.add(new OccupancyPanel(statusController),  "OCCUPANCY");
             contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
             addButton(sidebar, "Log Out", "LOGOUT");
             contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");
@@ -109,10 +107,9 @@ public class DashboardPanel extends JPanel {
 
             contentArea.add(new VehicleEntryPanel(entryExitController), "VEHICLE_ENTRY");
             contentArea.add(new VehicleExitPanel(entryExitController), "VEHICLE_EXIT");
-//            contentArea.add(new OccupancyPanel(), "OCCUPANCY");
+            contentArea.add(new OccupancyPanel(statusController), "OCCUPANCY");
             contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
-//            addButton(sidebar, "Log Out", "LOGOUT");
-//            contentArea.add(new CurrentStatusPanel(),  "STATUS");
+            contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
             contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");
 
 
