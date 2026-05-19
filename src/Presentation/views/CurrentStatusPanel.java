@@ -7,6 +7,7 @@ import Presentation.controllers.StatusController;
 import Presentation.theme.AppColors;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import javax.swing.*;
@@ -217,13 +218,15 @@ public class CurrentStatusPanel extends JPanel {
             boolean isReserved = !reservations.isEmpty();
             boolean isOccupied = reservations.stream().anyMatch(r -> r.getStartDateTime().before(new Date()) && r.getEndDateTime().after(new Date()));
 
+            String plate = space.isOccupied() ? space.getParkedLicensePlate() : "-";
+
             tableModel.addRow(new Object[]{
                     space.getId(),
                     space.getFloor(),
                     space.getType(),
                     isOccupied ? "Occupied" : "Free",
                     isReserved ? "Reserved" : "Unreserved",
-                    "-" // TODO: get licence plate
+                    plate
             });
         }
     }
