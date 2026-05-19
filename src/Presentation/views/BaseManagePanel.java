@@ -5,6 +5,8 @@ import Presentation.theme.AppColors;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.Calendar;
+import java.util.Date;
 
 public abstract class BaseManagePanel extends JPanel {
 
@@ -119,5 +121,20 @@ public abstract class BaseManagePanel extends JPanel {
         panel.add(Box.createVerticalStrut(5));
         panel.add(field);
         panel.add(Box.createVerticalStrut(15));
+    }
+
+    protected Date combineDateAndTime(JSpinner dateSpinner, JSpinner timeSpinner) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime((Date) dateSpinner.getValue());
+
+        Calendar timeCal = Calendar.getInstance();
+        timeCal.setTime((Date) timeSpinner.getValue());
+
+        cal.set(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY));
+        cal.set(Calendar.MINUTE,      timeCal.get(Calendar.MINUTE));
+        cal.set(Calendar.SECOND,      0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+        return cal.getTime();
     }
 }

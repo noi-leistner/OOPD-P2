@@ -8,7 +8,6 @@ import Presentation.controllers.EntryExitController;
 import Presentation.controllers.ParkingSpaceController;
 import Presentation.controllers.StatusController;
 import Presentation.controllers.ReservationController;
-import Presentation.controllers.StatusController;
 import Presentation.theme.AppColors;
 
 import javax.swing.*;
@@ -50,6 +49,8 @@ public class DashboardPanel extends JPanel {
     }
 
     public void refresh() {
+        reservationController.deleteExpiredReservations();
+
         removeAll();
         buttons.clear();
         contentArea.removeAll();
@@ -98,7 +99,7 @@ public class DashboardPanel extends JPanel {
             contentArea.add(manageSlotsPanel,   "SLOTS");
             contentArea.add(manageBookingsPanel,   "BOOKINGS");
             contentArea.add(new OccupancyPanel(statusController),  "OCCUPANCY");
-            contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
+            contentArea.add(new CurrentStatusPanel(statusController, reservationController),  "STATUS");
             contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");
 
             sidebar.add(Box.createVerticalGlue());
@@ -115,14 +116,17 @@ public class DashboardPanel extends JPanel {
 
             addButton(sidebar, "Vehicle Entry", "VEHICLE_ENTRY");
             addButton(sidebar, "Vehicle Exit",     "VEHICLE_EXIT");
+            addButton(sidebar, "Manage Reservations", "RESERVE");
             addButton(sidebar, "Last Hour Occupancy",  "OCCUPANCY");
             addButton(sidebar, "Current Parking status", "STATUS");
 
             contentArea.add(new VehicleEntryPanel(entryExitController), "VEHICLE_ENTRY");
             contentArea.add(new VehicleExitPanel(entryExitController), "VEHICLE_EXIT");
+            ManageReservationsPanel manageReservationsPanel = new ManageReservationsPanel(reservationController, slotController, entryExitController);
+            manageReservationsPanel.refreshTable();
+            contentArea.add(manageReservationsPanel, "RESERVE");
             contentArea.add(new OccupancyPanel(statusController), "OCCUPANCY");
-            contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
-            contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
+            contentArea.add(new CurrentStatusPanel(statusController, reservationController),  "STATUS");
             contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");
             sidebar.add(Box.createVerticalGlue());
             sidebar.add(buildDivider());
@@ -217,9 +221,11 @@ public class DashboardPanel extends JPanel {
                 message.append("• Plate: ")
                         .append(r.getVehiclePlate())
                         .append(" | Spot: ")
-                        .append(r.getParking_slot_id())
-                        .append(" | Date: ")
-                        .append(r.getDate())
+                        .append(r.getParkingSlotId())
+                        .append(" | Start Date: ")
+                        .append(r.getStartDateTime())
+                        .append(" | End Date: ")
+                        .append(r.getEndDateTime())
                         .append("\n");
             }
 

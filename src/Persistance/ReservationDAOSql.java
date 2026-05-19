@@ -5,9 +5,7 @@ import Business.Entities.Reservation;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,7 +19,8 @@ public class ReservationDAOSql implements ReservationDAO {
                 rs.getInt("user_id"),
                 rs.getString("vehicle_license_plate"),
                 rs.getInt("parking_slot_id"),
-                rs.getDate("date"),
+                rs.getTimestamp("start_datetime"),
+                rs.getTimestamp("end_datetime"),
                 rs.getBoolean("is_cancelled")
         );
     }
@@ -35,8 +34,9 @@ public class ReservationDAOSql implements ReservationDAO {
 
             stmt.setInt(1, reservation.getUser_id());
             stmt.setString(2, reservation.getVehiclePlate());
-            stmt.setInt(3, reservation.getParking_slot_id());
-            stmt.setDate(4, new java.sql.Date(reservation.getDate().getTime()));
+            stmt.setInt(3, reservation.getParkingSlotId());
+            stmt.setTimestamp(4, new java.sql.Timestamp(reservation.getStartDateTime().getTime()));
+            stmt.setTimestamp(5, new java.sql.Timestamp(reservation.getEndDateTime().getTime()));
             stmt.executeUpdate();
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
@@ -44,7 +44,7 @@ public class ReservationDAOSql implements ReservationDAO {
     }
 
     @Override
-    public void deleteReservation(int spotId) {
+    public DaoResult deleteReservation(int spotId) {
         String sql = "DELETE FROM reservations WHERE id = ?";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -54,6 +54,52 @@ public class ReservationDAOSql implements ReservationDAO {
 
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
+            return DaoResult.DATABASE_ERROR;
+        }
+        return DaoResult.SUCCESS;
+    }
+
+    @Override
+    public DaoResult createReservation(Reservation reservation) {
+        String checkSql = "SELECT 1 FROM reservations " +
+                "WHERE parking_slot_id = ? " +
+                "AND is_cancelled = FALSE " +
+                "AND start_datetime < ? " +
+                "AND end_datetime > ?";
+
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+
+            checkStmt.setInt(1, reservation.getParkingSlotId());
+            checkStmt.setTimestamp(2, new java.sql.Timestamp(reservation.getEndDateTime().getTime()));
+            checkStmt.setTimestamp(3, new java.sql.Timestamp(reservation.getStartDateTime().getTime()));
+
+            try (ResultSet rs = checkStmt.executeQuery()) {
+                if (rs.next()) return DaoResult.ALREADY_EXISTS;
+            }
+
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            return DaoResult.DATABASE_ERROR;
+        }
+
+        String sql = "INSERT INTO reservations (user_id, vehicle_license_plate, parking_slot_id, start_datetime, end_datetime) " +
+                "VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, reservation.getUser_id());
+            stmt.setString(2, reservation.getVehiclePlate());
+            stmt.setInt(3, reservation.getParkingSlotId());
+            stmt.setTimestamp(4, new java.sql.Timestamp(reservation.getStartDateTime().getTime()));
+            stmt.setTimestamp(5, new java.sql.Timestamp(reservation.getEndDateTime().getTime()));
+            stmt.executeUpdate();
+            return DaoResult.SUCCESS;
+
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            return DaoResult.DATABASE_ERROR;
         }
     }
 
@@ -89,9 +135,6 @@ public class ReservationDAOSql implements ReservationDAO {
         return list;
     }
 
-
-
-
     @Override
     public List<Reservation> getReservationsByUserId(int userId) {
         List<Reservation> list = new ArrayList<>();
@@ -115,41 +158,66 @@ public class ReservationDAOSql implements ReservationDAO {
     }
 
     @Override
-    public Reservation findReservationBySlotId(int slotId) {
+    public List<Reservation> findReservationsBySlotId(int slotId) {
         String sql = "SELECT * FROM reservations WHERE parking_slot_id = ? AND is_cancelled = FALSE";
+        List<Reservation> reservations = new ArrayList<>();
+
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, slotId);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) return mapRow(rs);
+                while (rs.next()) {
+                    reservations.add(mapRow(rs));
+                }
             }
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        return null;
+        return reservations;
     }
 
     @Override
     public DaoResult editReservation(Reservation reservation) {
+        String checkSql = "SELECT 1 FROM reservations " +
+                "WHERE parking_slot_id = ? " +
+                "AND is_cancelled = FALSE " +
+                "AND id != ? " +
+                "AND start_datetime < ? " +
+                "AND end_datetime > ?";
+
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+
+            checkStmt.setInt(1, reservation.getParkingSlotId());
+            checkStmt.setInt(2, reservation.getId());
+            checkStmt.setTimestamp(3, new java.sql.Timestamp(reservation.getEndDateTime().getTime()));
+            checkStmt.setTimestamp(4, new java.sql.Timestamp(reservation.getStartDateTime().getTime()));
+
+            try (ResultSet rs = checkStmt.executeQuery()) {
+                if (rs.next()) return DaoResult.ALREADY_EXISTS;
+            }
+
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            return DaoResult.DATABASE_ERROR;
+        }
+
         String sql = "UPDATE reservations " +
-                "SET parking_slot_id = ?, date = ? " +
+                "SET parking_slot_id = ?, start_datetime = ?, end_datetime = ? " +
                 "WHERE id = ?";
 
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, reservation.getParking_slot_id());
-            stmt.setDate(2, new java.sql.Date(reservation.getDate().getTime()));
-            stmt.setInt(3, reservation.getId());
+            stmt.setInt(1, reservation.getParkingSlotId());
+            stmt.setTimestamp(2, new java.sql.Timestamp(reservation.getStartDateTime().getTime()));
+            stmt.setTimestamp(3, new java.sql.Timestamp(reservation.getEndDateTime().getTime()));
+            stmt.setInt(4, reservation.getId());
 
             int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0 ? DaoResult.SUCCESS : DaoResult.NOT_FOUND;
 
-            if (rowsAffected > 0) {
-                return DaoResult.SUCCESS;
-            } else {
-                return DaoResult.NOT_FOUND;
-            }
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
             return DaoResult.DATABASE_ERROR;
@@ -170,5 +238,19 @@ public class ReservationDAOSql implements ReservationDAO {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         return null;
+    }
+
+    @Override
+    public void deleteExpiredReservations() {
+        String sql = "DELETE FROM reservations WHERE end_datetime < NOW() AND is_cancelled = FALSE";
+
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
     }
 }

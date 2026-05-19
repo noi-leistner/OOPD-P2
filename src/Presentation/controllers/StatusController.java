@@ -1,6 +1,7 @@
 package Presentation.controllers;
 
 import Business.Entities.ParkingSpace;
+import Business.ParkingLogManager;
 import Business.ParkingLotManager;
 import Business.ReservationManager;
 import Persistance.ParkingLogDAO;
@@ -12,11 +13,11 @@ import java.util.HashMap;
 public class StatusController {
 
     private final ParkingLotManager parkingLotManager;
-    private final ReservationManager reservationManager;
+    private final ParkingLogManager parkingLogManager;
 
-    public StatusController(ParkingLotManager parkingLotManager, ReservationManager reservationManager) {
+    public StatusController(ParkingLotManager parkingLotManager, ParkingLogManager parkingLogManager) {
         this.parkingLotManager = parkingLotManager;
-        this.reservationManager = reservationManager;
+        this.parkingLogManager = parkingLogManager;
     }
 
     // Returns all parking spaces with the current state. Each space already contains:
@@ -27,7 +28,7 @@ public class StatusController {
     }
 
     public Map<Integer, Integer> getOccupancyChartData(){
-        return parkingLotManager.getOccupancyLastHour();
+        return parkingLogManager.getOccupancyLastHour();
     }
 
 

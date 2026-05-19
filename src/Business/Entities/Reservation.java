@@ -7,15 +7,26 @@ public class Reservation {
     int user_id;
     String vehicle_license_plate;
     int parking_slot_id;
-    Date date;
+    Date startDateTime;
+    Date endDateTime;
     boolean isCancelled;
 
-    public Reservation (int id, int user_id, String vehicle_license_plate, int parking_slot_id, Date date, boolean isCancelled) {
+    public Reservation (int id, int user_id, String vehicle_license_plate, int parking_slot_id, Date startDateTime, Date endDateTime, boolean isCancelled) {
         this.id = id;
         this.user_id = user_id;
         this.vehicle_license_plate = vehicle_license_plate;
         this.parking_slot_id = parking_slot_id;
-        this.date = date;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+        this.isCancelled = isCancelled;
+    }
+
+    public Reservation (int user_id, String vehicle_license_plate, int parking_slot_id, Date startDateTime, Date endDateTime, boolean isCancelled) {
+        this.user_id = user_id;
+        this.vehicle_license_plate = vehicle_license_plate;
+        this.parking_slot_id = parking_slot_id;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
         this.isCancelled = isCancelled;
     }
 
@@ -25,9 +36,11 @@ public class Reservation {
 
     public String getVehiclePlate() {return vehicle_license_plate;}
 
-    public int getParking_slot_id() {return parking_slot_id;}
+    public int getParkingSlotId() {return parking_slot_id;}
 
-    public Date getDate() {return date;}
+    public Date getStartDateTime() { return startDateTime; }
+
+    public Date getEndDateTime()   { return endDateTime; }
 
     public void setId(int id) {this.id = id;}
 
@@ -36,8 +49,6 @@ public class Reservation {
     public void setVehicle_license_plate(String vehicle_license_plate) {this.vehicle_license_plate = vehicle_license_plate;}
 
     public void setParking_slot_id(int parking_slot_id) {this.parking_slot_id = parking_slot_id;}
-
-    public void setDate(Date date) {this.date = date;}
 
     public boolean isCancelled() {
         return isCancelled;
