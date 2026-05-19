@@ -32,6 +32,8 @@ public class ReservationController {
         //TODO: Implement
     }
 
+    public void deleteReservationByUserId(int id) {manager.deleteReservationByUserId(id);}
+
     public Reservation getReservationBySlotId(int id) {
         return manager.getReservationBySlot(id);
     }

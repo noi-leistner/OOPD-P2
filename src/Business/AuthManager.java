@@ -54,9 +54,6 @@ public class AuthManager {
 
 
     public boolean deleteAccount(int userId) {
-        reservationDAO.deleteReservationsByUserId(userId);
-        parkingSpaceDAO.vacateSpacesByUserId(userId);
-        vehicleDAO.deleteByUserId(userId);
         return userDAO.deleteUser(userId);
     }
 

@@ -1,6 +1,9 @@
 package Presentation.views;
 
 import Presentation.controllers.AuthController;
+import Presentation.controllers.EntryExitController;
+import Presentation.controllers.ParkingSpaceController;
+import Presentation.controllers.ReservationController;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -8,7 +11,7 @@ import java.awt.*;
 
 public class LogOutPanel extends JPanel {
 
-    public LogOutPanel(MainWindow mainWindow, AuthController authController) {
+    public LogOutPanel(MainWindow mainWindow, AuthController authController, ReservationController reservationController, ParkingSpaceController parkingSpaceController, EntryExitController entryExitController) {
         setLayout(new GridBagLayout());
         setBackground(Color.WHITE);
 
@@ -41,6 +44,10 @@ public class LogOutPanel extends JPanel {
             DeleteAccountDialog dialog = new DeleteAccountDialog(
                     (Frame) SwingUtilities.getWindowAncestor(this), true);
             if (dialog.isConfirmed()) {
+                int userId = authController.getUserID();
+                reservationController.deleteReservationByUserId(userId);
+                parkingSpaceController.vacateSpacesByUserId(userId);
+                entryExitController.deleteByUserId(userId);
                 authController.deleteAccount();
                 mainWindow.switchTo(MainWindow.AUTH_SCREEN);
             }

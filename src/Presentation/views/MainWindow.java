@@ -45,7 +45,7 @@ public class MainWindow extends JFrame {
         ParkingLotManager parkingLotManager = new ParkingLotManager(parkingSpaceDAO, vehicleDAO, parkingLogDAO);
         ReservationManager reservationManager = new ReservationManager(reservationDAO);
         ReservationController reservationController = new ReservationController(reservationManager);
-        EntryExitController entryExitController = new EntryExitController(parkingLotManager, reservationController);
+        EntryExitController entryExitController = new EntryExitController(parkingLotManager, reservationController, vehicleDAO);
         ParkingSpaceController slotController = new ParkingSpaceController(parkingLotManager, reservationController);
         //TODO: idk if we need a status controller (maybe slotController is enough)
         StatusController statusController = new StatusController(parkingLotManager, reservationManager);

@@ -175,4 +175,6 @@ public class ParkingLotManager {
     public Map<Integer,Integer> getOccupancyLastHour() {
         return parkingLogDao.getOccupancyLastHour();
     }
+
+    public void vacateSpacesByUserId(int id) {parkingSpaceDao.vacateSpacesByUserId(id);}
 }

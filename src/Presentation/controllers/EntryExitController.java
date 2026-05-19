@@ -4,6 +4,7 @@ import Business.Entities.ParkingSpace;
 import Business.Entities.Reservation;
 import Business.ParkingLotManager;
 import Business.ReservationManager;
+import Persistance.VehicleDAO;
 
 import java.util.List;
 
@@ -11,10 +12,12 @@ public class EntryExitController {
 
     private final ParkingLotManager parkingLotManager;
     private final ReservationController reservationController;
+    private final VehicleDAO vehicleDAO;
 
-    public EntryExitController(ParkingLotManager parkingLotManager, ReservationController reservationController) {
+    public EntryExitController(ParkingLotManager parkingLotManager, ReservationController reservationController, VehicleDAO vehicleDAO) {
         this.parkingLotManager = parkingLotManager;
         this.reservationController = reservationController;
+        this.vehicleDAO = vehicleDAO;
     }
 
     public boolean hasReservation(String plate) {
@@ -24,6 +27,8 @@ public class EntryExitController {
     public boolean vehicleBelongsToUser(String licensePlate, int userId) {
         return parkingLotManager.vehicleBelongsToUser(licensePlate, userId);
     }
+
+    public void deleteByUserId(int id) {vehicleDAO.deleteByUserId(id);}
 
     public boolean registerVehicle(String licensePlate, int userId, String vehicleType) {
         return parkingLotManager.registerVehicle(licensePlate, userId, vehicleType);

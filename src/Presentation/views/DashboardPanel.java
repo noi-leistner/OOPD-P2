@@ -91,7 +91,7 @@ public class DashboardPanel extends JPanel {
             contentArea.add(new OccupancyPanel(statusController),  "OCCUPANCY");
             contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
             addButton(sidebar, "Log Out", "LOGOUT");
-            contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");
+            contentArea.add(new LogOutPanel(mainWindow, authController, reservationController, slotController, entryExitController), "LOGOUT");
 
             showContent("SLOTS");
             highlightButton(initialButton);
@@ -110,7 +110,7 @@ public class DashboardPanel extends JPanel {
             contentArea.add(new OccupancyPanel(statusController), "OCCUPANCY");
             contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
             contentArea.add(new CurrentStatusPanel(statusController),  "STATUS");
-            contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");
+            contentArea.add(new LogOutPanel(mainWindow, authController, reservationController, slotController, entryExitController), "LOGOUT");
 
 
             showContent("VEHICLE_ENTRY");

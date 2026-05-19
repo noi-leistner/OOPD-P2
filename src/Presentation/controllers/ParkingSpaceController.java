@@ -22,6 +22,8 @@ public class ParkingSpaceController {
         return parkingLotManager.addSpace(space);
     }
 
+    public void vacateSpacesByUserId(int id) {parkingLotManager.vacateSpacesByUserId(id);}
+
     public DaoResult editSpace(int code, int floor, String vehicleType) {
         boolean occupied = getSpaceDetails(code).isOccupied();
         boolean reserved = getSpaceDetails(code).isReserved();

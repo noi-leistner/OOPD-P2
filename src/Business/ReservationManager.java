@@ -82,4 +82,8 @@ public class ReservationManager {
     public boolean reservationExistsForPlate(String licensePlate) {
         return reservationDao.findReservationByPlate(licensePlate) != null;
     }
+
+    public void deleteReservationByUserId(int id) {
+        reservationDao.deleteReservationsByUserId(id);
+    }
 }
