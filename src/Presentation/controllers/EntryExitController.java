@@ -2,22 +2,28 @@ package Presentation.controllers;
 
 import Business.Entities.ParkingSpace;
 import Business.Entities.Reservation;
+import Business.Entities.Vehicle;
+import Business.ParkingLogManager;
 import Business.ParkingLotManager;
 import Business.ReservationManager;
 import Persistance.VehicleDAO;
+import Business.VehicleManager;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class EntryExitController {
 
     private final ParkingLotManager parkingLotManager;
     private final ReservationController reservationController;
-    private final VehicleDAO vehicleDAO;
+    private final VehicleManager vehicleManager;
+    private final ParkingLogManager parkingLogManager;
 
-    public EntryExitController(ParkingLotManager parkingLotManager, ReservationController reservationController, VehicleDAO vehicleDAO) {
+    public EntryExitController(ParkingLotManager parkingLotManager, ReservationController reservationController, VehicleManager vehicleManager, ParkingLogManager parkingLogManager) {
         this.parkingLotManager = parkingLotManager;
         this.reservationController = reservationController;
-        this.vehicleDAO = vehicleDAO;
+        this.vehicleManager = vehicleManager;
+        this.parkingLogManager = parkingLogManager;
     }
 
     public boolean hasReservation(String plate) {
@@ -25,7 +31,7 @@ public class EntryExitController {
     }
 
     public boolean vehicleBelongsToUser(String licensePlate, int userId) {
-        return parkingLotManager.vehicleBelongsToUser(licensePlate, userId);
+        return vehicleManager.vehicleBelongsToUser(licensePlate, userId);
     }
 
     public void deleteByUserId(int id) {vehicleDAO.deleteByUserId(id);}
@@ -39,26 +45,49 @@ public class EntryExitController {
     }
 
     public String getVehicleType(String licensePlate) {
-        return parkingLotManager.getVehicleType(licensePlate);
+        return vehicleManager.getVehicleType(licensePlate);
     }
 
     public ParkingSpace enterWithReservation(String plate, int userId) {
-        return parkingLotManager.enterWithReservation(plate, userId);
+        ParkingSpace space = parkingLotManager.enterWithReservation(plate, userId);
+        if (space != null) {
+            parkingLogManager.logEntry(space.getId(), plate, userId);
+        }
+        return space;
     }
 
     public ParkingSpace enterWithoutReservation(String plate, int spaceId, int userId) {
-        return parkingLotManager.enterWithoutReservation(plate, spaceId, userId);
+        ParkingSpace space = parkingLotManager.enterWithoutReservation(plate, spaceId, userId);
+        if (space != null) {
+            parkingLogManager.logEntry(space.getId(), plate, userId);
+        }
+        return space;
     }
 
     public ParkingSpace exitParking(String plate, int userId) {
-        return parkingLotManager.exit(plate, userId);
+        ParkingSpace space = parkingLotManager.exit(plate, userId);
+        if (space != null) {
+            parkingLogManager.logExit(space.getId(), plate, userId);
+        }
+        return space;
     }
 
-    public Reservation getReservationForSpace(int spaceId) {
-        return reservationController.getReservationBySlotId(spaceId);
+    public Reservation getFirstReservationForSpace(int spaceId) {
+        List<Reservation> reservations = reservationController.getReservationsBySlotId(spaceId);
+        if (reservations.isEmpty()) return null;
+
+        return reservations.stream().min(Comparator.comparing(Reservation::getStartDateTime)).orElse(null);
     }
 
     public List<ParkingSpace> getAvailableSpacesForType(String vehicleType) {
         return parkingLotManager.getAvailableSpacesForType(vehicleType);
+    }
+
+    public boolean vehicleExistsForOtherUser(String plate, int userId) {
+        return vehicleManager.existsForOtherUser(plate, userId);
+    }
+
+    public Vehicle ensureVehicleExists(String plate, String type, int userId) {
+        return vehicleManager.ensureVehicleExists(plate, type, userId);
     }
 }

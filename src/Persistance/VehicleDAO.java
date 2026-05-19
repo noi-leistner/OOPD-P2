@@ -7,4 +7,5 @@ public interface VehicleDAO {
     boolean deleteByUserId(int userId);
     boolean addVehicle(String licensePlate, int userId, String vehicleType);
     boolean existsByPlate(String licensePlate);
+    void addVehicle(Vehicle vehicle);
 }

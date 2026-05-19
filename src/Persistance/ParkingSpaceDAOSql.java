@@ -13,15 +13,14 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     @Override
     public boolean addParkingSpace(ParkingSpace space) {
-        String sql = "INSERT INTO parking_slots (identifier, floor, occupation_status, reservation_status, vehicle_type) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO parking_slots (identifier, floor, occupation_status, vehicle_type) VALUES (?, ?, ?, ?)";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, space.getId());
             stmt.setInt(2, space.getFloor());
             stmt.setBoolean(3, space.isOccupied());
-            stmt.setBoolean(4, space.isReserved());
-            stmt.setString(5, space.getType());
+            stmt.setString(4, space.getType());
             stmt.executeUpdate();
             return true;
 
@@ -33,15 +32,14 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     @Override
     public boolean updateParkingSpace(ParkingSpace space) {
-        String sql = "UPDATE parking_slots SET floor = ?, occupation_status = ?, reservation_status = ?, vehicle_type = ? WHERE identifier = ?";
+        String sql = "UPDATE parking_slots SET floor = ?, occupation_status = ?, vehicle_type = ? WHERE identifier = ?";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, space.getFloor());
             stmt.setBoolean(2, space.isOccupied());
-            stmt.setBoolean(3, space.isReserved());
-            stmt.setString(4, space.getType());
-            stmt.setInt(5, space.getId());
+            stmt.setString(3, space.getType());
+            stmt.setInt(4, space.getId());
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
 
@@ -69,7 +67,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     @Override
     public List<ParkingSpace> getAllParkingSpaces() {
-        String sql = "SELECT identifier, floor, occupation_status, reservation_status, vehicle_type FROM parking_slots";
+        String sql = "SELECT identifier, floor, occupation_status, vehicle_type FROM parking_slots";
         List<ParkingSpace> spaces = new ArrayList<>();
 
         try (Connection conn = ConfigDAO.getConnection();
@@ -81,7 +79,6 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
                         rs.getInt("identifier"),
                         rs.getInt("floor"),
                         rs.getBoolean("occupation_status"),
-                        rs.getBoolean("reservation_status"),
                         rs.getString("vehicle_type")
                 ));
             }
@@ -111,7 +108,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     @Override
     public ParkingSpace getParkingSpaceById(int id) {
-        String sql = "SELECT identifier, floor, occupation_status, reservation_status, vehicle_type FROM parking_slots WHERE identifier = ?";
+        String sql = "SELECT identifier, floor, occupation_status, vehicle_type FROM parking_slots WHERE identifier = ?";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -122,7 +119,6 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
                             rs.getInt("identifier"),
                             rs.getInt("floor"),
                             rs.getBoolean("occupation_status"),
-                            rs.getBoolean("reservation_status"),
                             rs.getString("vehicle_type")
                     );
                 }
@@ -135,9 +131,8 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     @Override
     public List<ParkingSpace> getAvailableSpacesForType(String vehicleType) {
-        String sql = "SELECT identifier, floor, occupation_status, reservation_status, vehicle_type " +
-                "FROM parking_slots " +
-                "WHERE vehicle_type = ? AND occupation_status = FALSE AND reservation_status = FALSE";
+        String sql = "SELECT identifier, floor, occupation_status, vehicle_type " +
+                "FROM parking_slots WHERE vehicle_type = ? AND occupation_status = FALSE";
         List<ParkingSpace> spaces = new ArrayList<>();
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -149,7 +144,6 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
                             rs.getInt("identifier"),
                             rs.getInt("floor"),
                             rs.getBoolean("occupation_status"),
-                            rs.getBoolean("reservation_status"),
                             rs.getString("vehicle_type")
                     ));
                 }
@@ -162,10 +156,8 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     @Override
     public ParkingSpace getFirstAvailableSpaceForType(String vehicleType) {
-        String sql = "SELECT identifier, floor, occupation_status, reservation_status, vehicle_type " +
-                "FROM parking_slots " +
-                "WHERE vehicle_type = ? AND occupation_status = FALSE AND reservation_status = FALSE " +
-                "LIMIT 1";
+        String sql = "SELECT identifier, floor, occupation_status, vehicle_type " +
+                "FROM parking_slots WHERE vehicle_type = ? AND occupation_status = FALSE LIMIT 1";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -176,7 +168,6 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
                             rs.getInt("identifier"),
                             rs.getInt("floor"),
                             rs.getBoolean("occupation_status"),
-                            rs.getBoolean("reservation_status"),
                             rs.getString("vehicle_type")
                     );
                 }
@@ -189,7 +180,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     @Override
     public ParkingSpace getReservedSpaceByPlate(String licensePlate) {
-        String sql = "SELECT ps.identifier, ps.floor, ps.occupation_status, ps.reservation_status, ps.vehicle_type " +
+        String sql = "SELECT ps.identifier, ps.floor, ps.occupation_status, ps.vehicle_type " +
                 "FROM parking_slots ps " +
                 "JOIN reservations r ON r.parking_slot_id = ps.identifier " +
                 "WHERE r.vehicle_license_plate = ? " +
@@ -204,7 +195,6 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
                             rs.getInt("identifier"),
                             rs.getInt("floor"),
                             rs.getBoolean("occupation_status"),
-                            rs.getBoolean("reservation_status"),
                             rs.getString("vehicle_type")
                     );
                 }
@@ -217,7 +207,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     @Override
     public ParkingSpace getOccupiedSpaceByPlate(String licensePlate) {
-        String sql = "SELECT identifier, floor, occupation_status, reservation_status, vehicle_type " +
+        String sql = "SELECT identifier, floor, occupation_status, vehicle_type " +
                 "FROM parking_slots " +
                 "WHERE parked_license_plate = ? AND occupation_status = TRUE " +
                 "LIMIT 1";
@@ -231,7 +221,6 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
                             rs.getInt("identifier"),
                             rs.getInt("floor"),
                             rs.getBoolean("occupation_status"),
-                            rs.getBoolean("reservation_status"),
                             rs.getString("vehicle_type")
                     );
                 }

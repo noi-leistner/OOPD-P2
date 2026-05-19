@@ -14,22 +14,21 @@ public class ReservationController {
         this.manager = manager;
     }
 
-    public void makeReservation(String vehicle_type, String license_plate) {
-        //TODO: Implement
+    public DaoResult makeReservation(Reservation reservation) {
+        return manager.makeReservation(reservation);
     }
 
     //normal user cancel
-    public DaoResult cancelReservation(int reservation_id) {
-        //TODO: Implement
-        return DaoResult.SUCCESS;
+    public DaoResult cancelReservation(int reservationId) {
+        return manager.deleteReservation(reservationId);
     }
 
     public List<Reservation> getAllReservations() {
         return manager.getAllReservations();
     }
 
-    public void getUserReservations() {
-        //TODO: Implement
+    public List<Reservation> getReservationsByUserId(int userId) {
+        return manager.getReservationsByUserId(userId);
     }
 
     public void deleteReservationByUserId(int id) {manager.deleteReservationByUserId(id);}
@@ -37,9 +36,13 @@ public class ReservationController {
     public Reservation getReservationBySlotId(int id) {
         return manager.getReservationBySlot(id);
     }
+      
+    public List<Reservation> getReservationsBySlotId(int id) {
+        return manager.getReservationsBySlot(id);
+    }
 
-    public void cancelReservationFromAdmin(int reservationId) {
-        manager.cancelReservationByAdmin(reservationId);
+    public DaoResult cancelReservationFromAdmin(int reservationId) {
+        return manager.cancelReservationByAdmin(reservationId);
     }
 
     public DaoResult editReservation(Reservation reservation) {
@@ -64,5 +67,9 @@ public class ReservationController {
 
     public boolean reservationExistsForPlate(String plate) {
         return manager.reservationExistsForPlate(plate);
+    }
+
+    public void deleteExpiredReservations() {
+        manager.deleteExpiredReservations();
     }
 }
