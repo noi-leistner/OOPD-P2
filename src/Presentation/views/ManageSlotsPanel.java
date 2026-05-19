@@ -159,7 +159,12 @@ public class ManageSlotsPanel extends BaseManagePanel {
 
             if (space != null) {
                 // Edit existing slot
-                if ((!space.getType().equals(vehicleType) || !reservationController.getReservationsBySlotId(space.getId()).isEmpty())) {
+
+                boolean typeChanged = !space.getType().equals(vehicleType);
+                boolean isOccupied = space.isOccupied();
+                boolean isReserved = !reservationController.getReservationsBySlotId(space.getId()).isEmpty();
+
+                if (typeChanged && (isOccupied || isReserved)) {
                     JOptionPane.showMessageDialog(dialog, "The slot type of a reserved or occupied space can't be changed!");
                     return;
                 }
