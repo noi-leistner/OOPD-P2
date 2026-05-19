@@ -11,6 +11,17 @@ import java.util.List;
 
 public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
+    // Helper to build a ParkingSpace from a ResultSet row
+    private ParkingSpace mapRow(ResultSet rs) throws SQLException {
+        return new ParkingSpace(
+                rs.getInt("identifier"),
+                rs.getInt("floor"),
+                rs.getBoolean("occupation_status"),
+                rs.getString("parked_license_plate"),
+                rs.getString("vehicle_type")
+        );
+    }
+
     @Override
     public boolean addParkingSpace(ParkingSpace space) {
         String sql = "INSERT INTO parking_slots (identifier, floor, occupation_status, vehicle_type) VALUES (?, ?, ?, ?)";
@@ -40,8 +51,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
             stmt.setBoolean(2, space.isOccupied());
             stmt.setString(3, space.getType());
             stmt.setInt(4, space.getId());
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
+            return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -56,8 +66,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
+            return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -67,7 +76,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     @Override
     public List<ParkingSpace> getAllParkingSpaces() {
-        String sql = "SELECT identifier, floor, occupation_status, vehicle_type FROM parking_slots";
+        String sql = "SELECT identifier, floor, occupation_status, parked_license_plate, vehicle_type FROM parking_slots";
         List<ParkingSpace> spaces = new ArrayList<>();
 
         try (Connection conn = ConfigDAO.getConnection();
@@ -75,14 +84,8 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                spaces.add(new ParkingSpace(
-                        rs.getInt("identifier"),
-                        rs.getInt("floor"),
-                        rs.getBoolean("occupation_status"),
-                        rs.getString("vehicle_type")
-                ));
+                spaces.add(mapRow(rs));
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -99,7 +102,6 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
             try (var rs = stmt.executeQuery()) {
                 return rs.next();
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -108,20 +110,13 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     @Override
     public ParkingSpace getParkingSpaceById(int id) {
-        String sql = "SELECT identifier, floor, occupation_status, vehicle_type FROM parking_slots WHERE identifier = ?";
+        String sql = "SELECT identifier, floor, occupation_status, parked_license_plate, vehicle_type FROM parking_slots WHERE identifier = ?";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
             try (var rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return new ParkingSpace(
-                            rs.getInt("identifier"),
-                            rs.getInt("floor"),
-                            rs.getBoolean("occupation_status"),
-                            rs.getString("vehicle_type")
-                    );
-                }
+                if (rs.next()) return mapRow(rs);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -131,7 +126,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     @Override
     public List<ParkingSpace> getAvailableSpacesForType(String vehicleType) {
-        String sql = "SELECT identifier, floor, occupation_status, vehicle_type " +
+        String sql = "SELECT identifier, floor, occupation_status, parked_license_plate, vehicle_type " +
                 "FROM parking_slots WHERE vehicle_type = ? AND occupation_status = FALSE";
         List<ParkingSpace> spaces = new ArrayList<>();
         try (Connection conn = ConfigDAO.getConnection();
@@ -139,14 +134,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
             stmt.setString(1, vehicleType);
             try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    spaces.add(new ParkingSpace(
-                            rs.getInt("identifier"),
-                            rs.getInt("floor"),
-                            rs.getBoolean("occupation_status"),
-                            rs.getString("vehicle_type")
-                    ));
-                }
+                while (rs.next()) spaces.add(mapRow(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -156,21 +144,14 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     @Override
     public ParkingSpace getFirstAvailableSpaceForType(String vehicleType) {
-        String sql = "SELECT identifier, floor, occupation_status, vehicle_type " +
+        String sql = "SELECT identifier, floor, occupation_status, parked_license_plate, vehicle_type " +
                 "FROM parking_slots WHERE vehicle_type = ? AND occupation_status = FALSE LIMIT 1";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, vehicleType);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return new ParkingSpace(
-                            rs.getInt("identifier"),
-                            rs.getInt("floor"),
-                            rs.getBoolean("occupation_status"),
-                            rs.getString("vehicle_type")
-                    );
-                }
+                if (rs.next()) return mapRow(rs);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -180,24 +161,17 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     @Override
     public ParkingSpace getReservedSpaceByPlate(String licensePlate) {
-        String sql = "SELECT ps.identifier, ps.floor, ps.occupation_status, ps.vehicle_type " +
+        String sql = "SELECT ps.identifier, ps.floor, ps.occupation_status, ps.parked_license_plate, ps.vehicle_type " +
                 "FROM parking_slots ps " +
                 "JOIN reservations r ON r.parking_slot_id = ps.identifier " +
-                "WHERE r.vehicle_license_plate = ? " +
+                "WHERE r.vehicle_license_plate = ? AND r.is_cancelled = FALSE " +
                 "LIMIT 1";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, licensePlate);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return new ParkingSpace(
-                            rs.getInt("identifier"),
-                            rs.getInt("floor"),
-                            rs.getBoolean("occupation_status"),
-                            rs.getString("vehicle_type")
-                    );
-                }
+                if (rs.next()) return mapRow(rs);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -207,23 +181,15 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     @Override
     public ParkingSpace getOccupiedSpaceByPlate(String licensePlate) {
-        String sql = "SELECT identifier, floor, occupation_status, vehicle_type " +
+        String sql = "SELECT identifier, floor, occupation_status, parked_license_plate, vehicle_type " +
                 "FROM parking_slots " +
-                "WHERE parked_license_plate = ? AND occupation_status = TRUE " +
-                "LIMIT 1";
+                "WHERE parked_license_plate = ? AND occupation_status = TRUE LIMIT 1";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, licensePlate);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return new ParkingSpace(
-                            rs.getInt("identifier"),
-                            rs.getInt("floor"),
-                            rs.getBoolean("occupation_status"),
-                            rs.getString("vehicle_type")
-                    );
-                }
+                if (rs.next()) return mapRow(rs);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -270,13 +236,14 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
                 "WHERE v.user_id = ?";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setInt(1, userId);
             stmt.executeUpdate();
             return true;
+
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
-
 }

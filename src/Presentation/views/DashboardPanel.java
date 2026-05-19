@@ -129,7 +129,7 @@ public class DashboardPanel extends JPanel {
             contentArea.add(manageReservationsPanel, "RESERVE");
             contentArea.add(new OccupancyPanel(statusController), "OCCUPANCY");
             contentArea.add(new CurrentStatusPanel(statusController, reservationController),  "STATUS");
-            contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");
+            contentArea.add(new LogOutPanel(mainWindow, authController, reservationController, slotController, entryExitController), "LOGOUT");
             sidebar.add(Box.createVerticalGlue());
             sidebar.add(buildDivider());
             sidebar.add(Box.createRigidArea(new Dimension(0, 10)));

@@ -224,6 +224,7 @@ public class ManageReservationsPanel extends BaseManagePanel {
             }
 
             Reservation newReservation = new Reservation(
+                    0,                                                    // id — auto-assigned by DB
                     currentUser.getId(),
                     licenseField.getText(),
                     ((ParkingSpace) spotsCombo.getSelectedItem()).getId(),

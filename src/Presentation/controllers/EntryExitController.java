@@ -34,14 +34,14 @@ public class EntryExitController {
         return vehicleManager.vehicleBelongsToUser(licensePlate, userId);
     }
 
-    public void deleteByUserId(int id) {vehicleDAO.deleteByUserId(id);}
+    public void deleteByUserId(int id) {vehicleManager.deleteByUserID(id);}
 
     public boolean registerVehicle(String licensePlate, int userId, String vehicleType) {
-        return parkingLotManager.registerVehicle(licensePlate, userId, vehicleType);
+        return vehicleManager.registerVehicle(licensePlate, userId, vehicleType);
     }
 
     public boolean vehiclePlateExistsInSystem(String licensePlate) {
-        return parkingLotManager.vehiclePlateExistsInSystem(licensePlate);
+        return vehicleManager.vehiclePlateExistsInSystem(licensePlate);
     }
 
     public String getVehicleType(String licensePlate) {

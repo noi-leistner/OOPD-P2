@@ -33,9 +33,7 @@ public class ReservationController {
 
     public void deleteReservationByUserId(int id) {manager.deleteReservationByUserId(id);}
 
-    public Reservation getReservationBySlotId(int id) {
-        return manager.getReservationBySlot(id);
-    }
+    //public Reservation getReservationBySlotId(int id) {return manager.getReservationBySlot(id);}
       
     public List<Reservation> getReservationsBySlotId(int id) {
         return manager.getReservationsBySlot(id);
