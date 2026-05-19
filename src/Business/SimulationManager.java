@@ -52,7 +52,7 @@ public class SimulationManager {
                     int delay = random.nextInt(maxDelay) + 1;
                     Thread.sleep(delay*1000L);
 
-                    if (running) {tick()};
+                    if (running) {tick();}
                 } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
                     break;
@@ -73,11 +73,48 @@ public class SimulationManager {
 
     private void tick() {
         List<ParkingSpace> available = parkingSpaceDAO.findAvailableUnreserved();
-        int totalUnreserved = parkingSpaceDAO.getAllParkingSpaces().stream().filter(s -> !s.isReserved()).toList().size();
+        int totalUnreserved = parkingSpaceDAO.getAllParkingSpaces().stream().filter(s -> !s.isOccupied()).toList().size();
         if (totalUnreserved == 0) return;
     }
 
-    private void simulateEntry() {
+    private void simulateEntry(List<ParkingSpace> available) {
+        if (available.isEmpty()) return;
 
+        ParkingSpace space = available.get(random.nextInt(available.size()));
+        String plate = plateGenerator(); // Implement later
+
+        ParkingSpace result = parkingLotManager.enterWithoutReservation(plate, space.getId(), SIMULATED_USER_ID);
+        if (result != null) {
+            simulatedPlates.add(plate);
+            parkingLogDAO.insertLog(space.getId(), plate, SIMULATED_USER_ID, "ENTRY");
+            logger.info("Simmulation created for plate " + plate+ "Spot: " + space.getId());
+        }
     }
+
+    private void simulateExit(List<ParkingSpace> available) {
+        if (available.isEmpty()) return;
+
+        ParkingSpace space = available.get(random.nextInt(available.size()));
+        String plate = simulatedPlates.get(random.nextInt(simulatedPlates.size()));
+
+        ParkingSpace result = parkingLotManager.exit(plate, SIMULATED_USER_ID);
+        if (result != null) {
+            simulatedPlates.remove(plate);
+            parkingLogDAO.insertLog(space.getId(), plate, SIMULATED_USER_ID, "EXIT");
+            logger.info("Simmulation created for plate (EXIT)" + plate + "Spot: " + space.getId());
+        }
+    }
+
+    private String plateGenerator() {
+        String plate = "";
+        String letters = "BCDFGHJKLMNPQRSTVWXYZ";
+        char l1 = letters.charAt(random.nextInt(letters.length()));
+        char l2 = letters.charAt(random.nextInt(letters.length()));
+        char l3 = letters.charAt(random.nextInt(letters.length()));
+        char l4 = letters.charAt(random.nextInt(letters.length()));
+        int nums = random.nextInt(9000) + 1000;
+        return "" + l1 + l2 + l3 + l4 + nums;
+    }
+
+    public boolean isRunning () {return running;}
 }

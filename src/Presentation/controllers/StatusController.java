@@ -3,6 +3,7 @@ package Presentation.controllers;
 import Business.Entities.ParkingSpace;
 import Business.ParkingLogManager;
 import Business.ParkingLotManager;
+import Business.SimulationManager;
 import Business.ReservationManager;
 import Persistance.ParkingLogDAO;
 
@@ -14,10 +15,12 @@ public class StatusController {
 
     private final ParkingLotManager parkingLotManager;
     private final ParkingLogManager parkingLogManager;
+    private final SimulationManager simulationManager;
 
-    public StatusController(ParkingLotManager parkingLotManager, ParkingLogManager parkingLogManager) {
+    public StatusController(ParkingLotManager parkingLotManager, ParkingLogManager parkingLogManager, SimulationManager simulationManager) {
         this.parkingLotManager = parkingLotManager;
         this.parkingLogManager = parkingLogManager;
+        this.simulationManager = simulationManager;
     }
 
     // Returns all parking spaces with the current state. Each space already contains:
@@ -30,6 +33,9 @@ public class StatusController {
     public Map<Integer, Integer> getOccupancyChartData(){
         return parkingLogManager.getOccupancyLastHour();
     }
+
+    public void startSimulation() { simulationManager.start(); }
+    public void stopSimulation()  { simulationManager.stop();  }
 
 
 }

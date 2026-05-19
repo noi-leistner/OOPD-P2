@@ -43,10 +43,11 @@ public class MainWindow extends JFrame {
         VehicleManager vehicleManager = new VehicleManager(vehicleDAO);
         ParkingLogManager parkingLogManager = new ParkingLogManager(parkingLogDAO);
         ReservationManager reservationManager = new ReservationManager(reservationDAO);
+        SimulationManager simulationManager = new SimulationManager(parkingLotManager, parkingSpaceDAO, parkingLogDAO);
         ReservationController reservationController = new ReservationController(reservationManager);
         EntryExitController entryExitController = new EntryExitController(parkingLotManager, reservationController, vehicleManager, parkingLogManager);
         ParkingSpaceController slotController = new ParkingSpaceController(parkingLotManager, reservationController);
-        StatusController statusController = new StatusController(parkingLotManager, parkingLogManager);
+        StatusController statusController = new StatusController(parkingLotManager, parkingLogManager, simulationManager);
 
         AuthPanel authPanel = new AuthPanel(this, authController);
 

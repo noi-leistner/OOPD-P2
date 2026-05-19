@@ -58,6 +58,9 @@ public class DashboardPanel extends JPanel {
         add(buildSidebar(), BorderLayout.WEST);
         add(contentArea, BorderLayout.CENTER);
         showCancelledReservationNotification();
+
+        statusController.startSimulation();
+
         revalidate();
         repaint();
     }
