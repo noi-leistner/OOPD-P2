@@ -8,6 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
@@ -260,6 +262,30 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public List<ParkingSpace> findAvailableUnreserved() {
+        String sql = "SELECT identifier, floor, occupation_status, vehicle type " +
+                     "FROM parking_slots " +
+                     "WHERE occupation_status = FALSE AND reservation_status = FALSE ";
+        List<ParkingSpace> spaces = new ArrayList<>();
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                spaces.add(new ParkingSpace(
+                    rs.getInt("identifier"),
+                    rs.getInt("floor"),
+                    rs.getBoolean("occupation_status"),
+                    rs.getString("vehicle_type")
+                ));
+            }
+
+        } catch (SQLException e) {
+            Logger.getLogger(ConfigDAO.class.getName()).log(Level.SEVERE, "Error reading config.json", e);
+        }
+        return spaces;
     }
 
 }

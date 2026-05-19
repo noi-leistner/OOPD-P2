@@ -3,6 +3,10 @@ package Persistance;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class charged with the configuration to stablish connection with the MySQL inside Docker:
@@ -33,6 +37,26 @@ public class ConfigDAO {
         return connection;
     }
 
+    public static int getVehicleEntryTime() {
+        String path = "config.json";
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while((line = reader.readLine()) != null) sb.append(line);
+
+            String json = sb.toString();
+            String key = "\"vehicle_entry_time\"";
+            int index = json.indexOf(key);
+            if (index == -1) return 30;
+
+            String after = json.substring(index + key.length());
+            after = after.replaceAll("[^0-9]", " ").trim();
+            return Integer.parseInt(after.split("\\s+")[0]);
+        } catch (Exception e) {
+            Logger.getLogger(ConfigDAO.class.getName()).log(Level.SEVERE, "Error reading config.json", e);
+            return 30; // fallback
+        }
+    }
 
 
 
