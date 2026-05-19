@@ -34,28 +34,6 @@ public class VehicleDAOSql implements VehicleDAO {
     }
 
     @Override
-    public List<Vehicle> findByUserId(int userId) {
-        String sql = "SELECT license_plate, user_id, vehicle_type FROM vehicles WHERE user_id = ?";
-        List<Vehicle> vehicles = new ArrayList<>();
-        try (Connection conn = ConfigDAO.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, userId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    vehicles.add(new Vehicle(
-                            rs.getString("license_plate"),
-                            rs.getInt("user_id"),
-                            rs.getString("vehicle_type")
-                    ));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return vehicles;
-    }
-
-    @Override
     public boolean deleteByUserId(int userId) {
         String sql = "DELETE FROM vehicles WHERE user_id = ?";
         try (Connection conn = ConfigDAO.getConnection();

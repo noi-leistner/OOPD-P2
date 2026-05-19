@@ -31,8 +31,8 @@ public class UserDAOSql implements UserDAO {
         }
     }
 
-    // TODO: Choose the order of deleting, either with database knowladge (cascade), or oopd knowladge (delete information reversing how it was created).
-    // TODO: Delete ALL information, from RAM and all else.
+
+    // Information is deleted reversing the creation.
     @Override
     public boolean deleteUser(int id) {
         String sql = "DELETE FROM users WHERE id = ?";
