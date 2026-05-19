@@ -21,6 +21,15 @@ public class Reservation {
         this.isCancelled = isCancelled;
     }
 
+    public Reservation (int user_id, String vehicle_license_plate, int parking_slot_id, Date startDateTime, Date endDateTime, boolean isCancelled) {
+        this.user_id = user_id;
+        this.vehicle_license_plate = vehicle_license_plate;
+        this.parking_slot_id = parking_slot_id;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+        this.isCancelled = isCancelled;
+    }
+
     public int getId() {return id;}
 
     public int getUser_id() {return user_id;}
