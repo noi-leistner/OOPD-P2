@@ -25,6 +25,14 @@ public class EntryExitController {
         return parkingLotManager.vehicleBelongsToUser(licensePlate, userId);
     }
 
+    public boolean registerVehicle(String licensePlate, int userId, String vehicleType) {
+        return parkingLotManager.registerVehicle(licensePlate, userId, vehicleType);
+    }
+
+    public boolean vehiclePlateExistsInSystem(String licensePlate) {
+        return parkingLotManager.vehiclePlateExistsInSystem(licensePlate);
+    }
+
     public String getVehicleType(String licensePlate) {
         return parkingLotManager.getVehicleType(licensePlate);
     }

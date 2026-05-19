@@ -35,6 +35,14 @@ public class ParkingLotManager {
         return v != null && v.getUserId() == userId;
     }
 
+    public boolean registerVehicle(String licensePlate, int userId, String vehicleType) {
+        return vehicleDao.addVehicle(licensePlate, userId, vehicleType);
+    }
+
+    public boolean vehiclePlateExistsInSystem(String licensePlate) {
+        return vehicleDao.existsByPlate(licensePlate);
+    }
+
     public void logParkingAction(int spaceId, String licensePlate, int userId, String action) {
         parkingLogDao.insertLog(spaceId, licensePlate, userId, action);
     }

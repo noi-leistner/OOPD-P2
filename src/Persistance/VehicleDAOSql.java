@@ -45,4 +45,34 @@ public class VehicleDAOSql implements VehicleDAO {
             return false;
         }
     }
+
+    @Override
+    public boolean addVehicle(String licensePlate, int userId, String vehicleType) {
+        String sql = "INSERT INTO vehicles (license_plate, user_id, vehicle_type) VALUES (?, ?, ?)";
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, licensePlate);
+            stmt.setInt(2, userId);
+            stmt.setString(3, vehicleType);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean existsByPlate(String licensePlate) {
+        String sql = "SELECT 1 FROM vehicles WHERE UPPER(license_plate) = UPPER(?)";
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, licensePlate);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
