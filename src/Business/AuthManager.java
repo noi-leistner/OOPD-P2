@@ -9,15 +9,9 @@ import java.util.List;
 public class AuthManager {
 
     private final UserDAO userDAO;
-    private final VehicleDAO vehicleDAO;
-    private final ParkingSpaceDAO parkingSpaceDAO;
-    private final ReservationDAO reservationDAO;
 
-    public AuthManager(UserDAO userDAO, VehicleDAO vehicleDAO, ParkingSpaceDAO parkingSpaceDAO, ReservationDAO reservationDAO) {
+    public AuthManager(UserDAO userDAO) {
         this.userDAO = userDAO;
-        this.vehicleDAO = vehicleDAO;
-        this.parkingSpaceDAO = parkingSpaceDAO;
-        this.reservationDAO = reservationDAO;
     }
 
     public User login(String email, String password) {

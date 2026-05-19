@@ -39,7 +39,7 @@ public class MainWindow extends JFrame {
         VehicleDAO vehicleDAO = new VehicleDAOSql();
         ParkingLogDAO parkingLogDAO = new ParkingLogDAOSql();
 
-        AuthManager authManager = new AuthManager(userDAO, vehicleDAO, parkingSpaceDAO, reservationDAO);
+        AuthManager authManager = new AuthManager(userDAO);
         SessionManager sessionManager = SessionManager.getInstance();
         AuthController authController = new AuthController(authManager, sessionManager);
         ParkingLotManager parkingLotManager = new ParkingLotManager(parkingSpaceDAO, vehicleDAO, parkingLogDAO);
