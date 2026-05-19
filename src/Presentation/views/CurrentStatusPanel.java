@@ -218,7 +218,7 @@ public class CurrentStatusPanel extends JPanel {
             boolean isReserved = !reservations.isEmpty();
             boolean isOccupied = reservations.stream().anyMatch(r -> r.getStartDateTime().before(new Date()) && r.getEndDateTime().after(new Date()));
 
-            String plate = space.isOccupied() ? space.getParkedLicensePlate() : "-";
+            //String plate = space.isOccupied() ? space.getParkedLicensePlate() : "-";
 
             tableModel.addRow(new Object[]{
                     space.getId(),
@@ -226,7 +226,7 @@ public class CurrentStatusPanel extends JPanel {
                     space.getType(),
                     isOccupied ? "Occupied" : "Free",
                     isReserved ? "Reserved" : "Unreserved",
-                    plate
+                    "-"                     // Change when we can get the license plate
             });
         }
     }

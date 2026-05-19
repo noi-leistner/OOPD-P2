@@ -37,4 +37,5 @@ public class ParkingSpace {
         public String toString() {
                 return "Slot " + id + " - Floor " + floor + " (" + type + ")";
         }
+
 }
