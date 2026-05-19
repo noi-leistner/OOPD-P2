@@ -209,6 +209,7 @@ public class VehicleEntryPanel extends JPanel {
             currentPlate = plate;
             clearStatus();
 
+            //TODO: check that reservation is rn, if not treat as normal car
             if (controller.hasReservation(plate)) {
                 // Has a reservation — ask for confirmation first
                 int confirm = JOptionPane.showConfirmDialog(
