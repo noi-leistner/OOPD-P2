@@ -89,6 +89,7 @@ public class DashboardPanel extends JPanel {
             addButton(sidebar, "Manage Bookings",  "BOOKINGS");
             addButton(sidebar, "Last Hour Occupancy",  "OCCUPANCY");
             addButton(sidebar, "Current Parking status", "STATUS");
+            addButton(sidebar, "Log out", "LOGOUT");
 
             ManageSlotsPanel manageSlotsPanel = new ManageSlotsPanel(slotController, reservationController);
             manageSlotsPanel.refreshTable();
@@ -100,11 +101,11 @@ public class DashboardPanel extends JPanel {
             contentArea.add(manageBookingsPanel,   "BOOKINGS");
             contentArea.add(new OccupancyPanel(statusController),  "OCCUPANCY");
             contentArea.add(new CurrentStatusPanel(statusController, reservationController),  "STATUS");
-            contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");
+            contentArea.add(new LogOutPanel(mainWindow, authController, reservationController, slotController, entryExitController), "LOGOUT");
+          
 
             sidebar.add(Box.createVerticalGlue());
             sidebar.add(buildDivider());
-            addButton(sidebar, "Log out", "LOGOUT");
             sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
 
             showContent("SLOTS");
@@ -119,6 +120,7 @@ public class DashboardPanel extends JPanel {
             addButton(sidebar, "Manage Reservations", "RESERVE");
             addButton(sidebar, "Last Hour Occupancy",  "OCCUPANCY");
             addButton(sidebar, "Current Parking status", "STATUS");
+            addButton(sidebar, "Log Out", "LOGOUT");
 
             contentArea.add(new VehicleEntryPanel(entryExitController), "VEHICLE_ENTRY");
             contentArea.add(new VehicleExitPanel(entryExitController), "VEHICLE_EXIT");
@@ -127,10 +129,9 @@ public class DashboardPanel extends JPanel {
             contentArea.add(manageReservationsPanel, "RESERVE");
             contentArea.add(new OccupancyPanel(statusController), "OCCUPANCY");
             contentArea.add(new CurrentStatusPanel(statusController, reservationController),  "STATUS");
-            contentArea.add(new LogOutPanel(mainWindow, authController), "LOGOUT");
+            contentArea.add(new LogOutPanel(mainWindow, authController, reservationController, slotController, entryExitController), "LOGOUT");
             sidebar.add(Box.createVerticalGlue());
             sidebar.add(buildDivider());
-            addButton(sidebar, "Log Out", "LOGOUT");
             sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
 
 

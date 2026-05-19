@@ -44,6 +44,8 @@ public class AuthController {
         sessionManager.logout();
     }
 
+    public int getUserID() {return sessionManager.getCurrentUser().getId();}
+
     public boolean deleteAccount(){
         Business.Entities.User currentUser = sessionManager.getCurrentUser();
         if (currentUser == null) return false;

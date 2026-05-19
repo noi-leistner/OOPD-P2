@@ -132,4 +132,6 @@ public class ParkingLotManager {
     public boolean slotExistsById(int id) {
         return parkingSpaceDao.existsById(id);
     }
+
+    public void vacateSpacesByUserId(int id) {parkingSpaceDao.vacateSpacesByUserId(id);}
 }

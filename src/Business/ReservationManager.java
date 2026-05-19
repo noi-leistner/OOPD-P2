@@ -96,6 +96,10 @@ public class ReservationManager {
         return reservationDao.findReservationByPlate(licensePlate) != null;
     }
 
+    public void deleteReservationByUserId(int id) {
+        reservationDao.deleteReservationsByUserId(id);
+    }
+  
     public void deleteExpiredReservations() {
         reservationDao.deleteExpiredReservations();
     }

@@ -18,13 +18,15 @@ public class ParkingSpaceController {
     }
 
     public DaoResult addSpace(int code, int floor, String vehicleType, boolean occStatus) {
-        ParkingSpace space = new ParkingSpace(code, floor, occStatus, vehicleType);
+        ParkingSpace space = new ParkingSpace(code, floor, occStatus, vehicleType, null);
         return parkingLotManager.addSpace(space);
     }
 
+    public void vacateSpacesByUserId(int id) {parkingLotManager.vacateSpacesByUserId(id);}
+
     public DaoResult editSpace(int code, int floor, String vehicleType) {
         boolean occupied = getSpaceDetails(code).isOccupied();
-        ParkingSpace space = new ParkingSpace(code, floor, occupied, vehicleType);
+        ParkingSpace space = new ParkingSpace(code, floor, occupied, vehicleType, null);
 
         return parkingLotManager.editSpace(space);
     }

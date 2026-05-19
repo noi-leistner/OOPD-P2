@@ -1,8 +1,10 @@
 package Business;
 
 import Business.Entities.User;
-import Persistance.UserDAO;
+import Persistance.*;
 import org.mindrot.jbcrypt.BCrypt;
+
+import java.util.List;
 
 public class AuthManager {
 
