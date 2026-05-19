@@ -273,4 +273,21 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
         }
     }
 
+    @Override
+    public boolean vacateSpacesByUserId(int userId) {
+        String sql = "UPDATE parking_slots ps " +
+                "JOIN vehicles v ON v.license_plate = ps.parked_license_plate " +
+                "SET ps.occupation_status = FALSE, ps.parked_license_plate = NULL " +
+                "WHERE v.user_id = ?";
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            stmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

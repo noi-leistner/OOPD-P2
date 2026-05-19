@@ -21,7 +21,9 @@ CREATE TABLE parking_slots (
                                floor      INT NOT NULL,
                                vehicle_type VARCHAR(30) NOT NULL,
                                occupation_status BOOLEAN NOT NULL DEFAULT FALSE,
-                               reservation_status BOOLEAN NOT NULL DEFAULT FALSE
+                               reservation_status BOOLEAN NOT NULL DEFAULT FALSE,
+                               parked_license_plate VARCHAR(20) NULL DEFAULT NULL,
+                               FOREIGN KEY (parked_license_plate) REFERENCES vehicles(license_plate),
 );
 
 -- Create reservations table (ternary relationship: User 1 - Vehicle 1 - Parking Slot N)
@@ -62,9 +64,4 @@ INSERT INTO parking_slots (identifier, vehicle_type, occupation_status, reservat
 (3, 'motorcycle', FALSE, FALSE, 0),
 (4, 'motorcycle', FALSE, FALSE, 1);
 
--- Add ADMIN CANCELLATION flag to RESERVATION table
-ALTER TABLE reservations ADD COLUMN is_cancelled BOOLEAN NOT NULL DEFAULT FALSE;
 
--- Add plate of parked vehicle in the parking slot
-ALTER TABLE parking_slots
-    ADD COLUMN parked_license_plate VARCHAR(20) NULL DEFAULT NULL;

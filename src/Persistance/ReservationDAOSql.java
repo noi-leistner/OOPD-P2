@@ -171,4 +171,16 @@ public class ReservationDAOSql implements ReservationDAO {
         }
         return null;
     }
+
+    @Override
+    public void deleteReservationsByUserId(int userId) {
+        String sql = "DELETE FROM reservations WHERE user_id = ?";
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+    }
 }

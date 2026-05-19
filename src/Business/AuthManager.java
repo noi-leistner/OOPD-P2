@@ -1,15 +1,23 @@
 package Business;
 
 import Business.Entities.User;
-import Persistance.UserDAO;
+import Persistance.*;
 import org.mindrot.jbcrypt.BCrypt;
+
+import java.util.List;
 
 public class AuthManager {
 
     private final UserDAO userDAO;
+    private final VehicleDAO vehicleDAO;
+    private final ParkingSpaceDAO parkingSpaceDAO;
+    private final ReservationDAO reservationDAO;
 
-    public AuthManager(UserDAO userDAO) {
+    public AuthManager(UserDAO userDAO, VehicleDAO vehicleDAO, ParkingSpaceDAO parkingSpaceDAO, ReservationDAO reservationDAO) {
         this.userDAO = userDAO;
+        this.vehicleDAO = vehicleDAO;
+        this.parkingSpaceDAO = parkingSpaceDAO;
+        this.reservationDAO = reservationDAO;
     }
 
     public User login(String email, String password) {
@@ -46,6 +54,9 @@ public class AuthManager {
 
 
     public boolean deleteAccount(int userId) {
+        reservationDAO.deleteReservationsByUserId(userId);
+        parkingSpaceDAO.vacateSpacesByUserId(userId);
+        vehicleDAO.deleteByUserId(userId);
         return userDAO.deleteUser(userId);
     }
 
