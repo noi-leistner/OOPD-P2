@@ -106,7 +106,7 @@ public class ManageReservationsPanel extends BaseManagePanel {
                     reservation.getVehiclePlate(),
                     space != null ? space.getId() : "N/A",
                     space != null ? space.getType() : "N/A",
-                    reservation.getEndDateTime(),
+                    reservation.getStartDateTime(),
                     reservation.getEndDateTime()
             });
         }
@@ -123,7 +123,7 @@ public class ManageReservationsPanel extends BaseManagePanel {
 
         JDialog dialog = createBaseDialog("Make Reservation", new Dimension(400, 500), formPanel, okBtn, cancelBtn);
 
-        JLabel titleLabel = new JLabel("Edit Reservation");
+        JLabel titleLabel = new JLabel("Make Reservation");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 14));
         titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         formPanel.add(titleLabel);
@@ -286,7 +286,7 @@ public class ManageReservationsPanel extends BaseManagePanel {
         endTimeSpinner.setEditor(new JSpinner.DateEditor(endTimeSpinner, "HH:mm"));
         endTimeSpinner.setValue(reservation.getEndDateTime());
 
-        List<ParkingSpace> availableSpots = slotController.getAvailableSpotsByType(currentSpot.getType());
+        List<ParkingSpace> availableSpots = slotController.getSpotsByType(currentSpot.getType());
 
         if (availableSpots == null) {
             availableSpots = new ArrayList<>();
@@ -350,16 +350,16 @@ public class ManageReservationsPanel extends BaseManagePanel {
     }
 
     private void updateSpotsCombo(JComboBox<ParkingSpace> spotsCombo, String type, JDialog dialog) {
-        List<ParkingSpace> availableSpots = slotController.getAvailableSpotsByType(type);
+        List<ParkingSpace> spotsByType = slotController.getSpotsByType(type);
 
         spotsCombo.removeAllItems();
 
-        if (availableSpots == null || availableSpots.isEmpty()) {
+        if (spotsByType == null || spotsByType.isEmpty()) {
             JOptionPane.showMessageDialog(dialog, "There are no parking spots available for this type!");
             return;
         }
 
-        for (ParkingSpace space : availableSpots) {
+        for (ParkingSpace space : spotsByType) {
             spotsCombo.addItem(space);
         }
     }

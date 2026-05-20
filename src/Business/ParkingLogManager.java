@@ -23,4 +23,8 @@ public class ParkingLogManager {
     public Map<Integer, Integer> getOccupancyLastHour() {
         return parkingLogDao.getOccupancyLastHour();
     }
+
+    public boolean isVehicleCurrentlyParked(String licensePlate) {
+        return parkingLogDao.isVehicleCurrentlyParked(licensePlate);
+    }
 }

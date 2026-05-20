@@ -4,6 +4,7 @@ import Business.Entities.ParkingSpace;
 import Business.Entities.Reservation;
 import Business.SessionManager;
 import Presentation.controllers.EntryExitController;
+import Presentation.controllers.ParkingSpaceController;
 import Presentation.theme.AppColors;
 
 import javax.swing.*;
@@ -14,7 +15,8 @@ import java.util.List;
 
 public class VehicleEntryPanel extends JPanel {
 
-    private final EntryExitController controller;
+    private final EntryExitController entryExitController;
+    private final ParkingSpaceController spaceController;
 
     // Step 1 — plate input
     private JPanel stepOnePanel;
@@ -31,8 +33,9 @@ public class VehicleEntryPanel extends JPanel {
     private String currentPlate;
     private String currentVehicleType;
 
-    public VehicleEntryPanel(EntryExitController controller) {
-        this.controller = controller;
+    public VehicleEntryPanel(EntryExitController controller, ParkingSpaceController spaceController) {
+        this.entryExitController = controller;
+        this.spaceController = spaceController;
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(30, 40, 30, 40));
 
@@ -188,9 +191,9 @@ public class VehicleEntryPanel extends JPanel {
         try {
             int userId = SessionManager.getInstance().getCurrentUser().getId();
 
-            if (!controller.vehicleBelongsToUser(plate, userId)) {
+            if (!entryExitController.vehicleBelongsToUser(plate, userId)) {
                 // Check if it belongs to someone else
-                if (controller.vehiclePlateExistsInSystem(plate)) {
+                if (entryExitController.vehiclePlateExistsInSystem(plate)) {
                     showError("This vehicle is registered to another account.");
                     return;
                 }
@@ -199,7 +202,7 @@ public class VehicleEntryPanel extends JPanel {
                         (Frame) SwingUtilities.getWindowAncestor(this), plate);
                 if (!dialog.isConfirmed()) return;
 
-                boolean added = controller.registerVehicle(plate, userId, dialog.getSelectedType());
+                boolean added = entryExitController.registerVehicle(plate, userId, dialog.getSelectedType());
                 if (!added) {
                     showError("Failed to register vehicle. Please try again.");
                     return;
@@ -209,8 +212,12 @@ public class VehicleEntryPanel extends JPanel {
             currentPlate = plate;
             clearStatus();
 
-            //TODO: check that reservation is rn, if not treat as normal car
-            if (controller.hasReservation(plate)) {
+            if (entryExitController.isVehicleCurrentlyParked(plate)) {
+                showError("This vehicle is already parked.");
+                return;
+            }
+
+            if (entryExitController.hasReservationNow(plate)) {
                 // Has a reservation — ask for confirmation first
                 int confirm = JOptionPane.showConfirmDialog(
                         this,
@@ -223,8 +230,21 @@ public class VehicleEntryPanel extends JPanel {
                 );
                 if (confirm != JOptionPane.YES_OPTION) return;
 
-                ParkingSpace space = controller.enterWithReservation(plate, userId);
-                if (space != null) {
+                ParkingSpace space = entryExitController.getReservedSpaceForPlate(plate);
+                if (space.isOccupied()) {
+                    String occupantPlate = spaceController.getParkedPlateAtSpace(space.getId());
+
+                    JOptionPane.showMessageDialog(this,
+                            "<html>Your reserved space <b>#" + space.getId() + "</b> is occupied and no alternative spaces are available.<br>" +
+                                    "The other user will be kicked out of the parking spot.</html>",
+                            "No Alternative Available",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    entryExitController.exitParking(occupantPlate, userId);
+                }
+
+                ParkingSpace entered = entryExitController.enterWithReservation(plate, userId);
+                if (entered != null) {
                     showSuccess("✓  Parked at reserved space #" + space.getId() + "  (Floor " + space.getFloor() + ")");
                     plateField.setText("");
                 } else {
@@ -232,7 +252,7 @@ public class VehicleEntryPanel extends JPanel {
                 }
             } else {
                 // No reservation — auto-detect type and show space selection
-                String vehicleType = controller.getVehicleType(plate);
+                String vehicleType = entryExitController.getVehicleType(plate);
                 if (vehicleType == null) {
                     showError("Could not determine vehicle type.");
                     return;
@@ -254,7 +274,7 @@ public class VehicleEntryPanel extends JPanel {
 
         int userId = SessionManager.getInstance().getCurrentUser().getId();
 
-        Reservation reservation = controller.getFirstReservationForSpace(selected.id);
+        Reservation reservation = entryExitController.getFirstReservationForSpace(selected.id);
 
         if (reservation != null) {
             String dateStr = new SimpleDateFormat("dd/MM/yyyy").format(reservation.getStartDateTime());
@@ -281,7 +301,7 @@ public class VehicleEntryPanel extends JPanel {
             if (choice != JOptionPane.YES_OPTION) return;
         }
 
-        ParkingSpace space = controller.enterWithoutReservation(currentPlate, selected.id, userId);
+        ParkingSpace space = entryExitController.enterWithoutReservation(currentPlate, selected.id, userId);
 
         if (space != null) {
             showSuccess("✓  Parked at space #" + space.getId() + "  (Floor " + space.getFloor() + ")");
@@ -302,7 +322,7 @@ public class VehicleEntryPanel extends JPanel {
     }
 
     private void refreshSpaceCombo(String vehicleType) {
-        List<ParkingSpace> spaces = controller.getAvailableSpacesForType(vehicleType);
+        List<ParkingSpace> spaces = entryExitController.getAvailableSpacesForType(vehicleType);
         spaceCombo.removeAllItems();
 
         if (spaces == null || spaces.isEmpty()) {

@@ -160,24 +160,6 @@ public class CurrentStatusPanel extends JPanel {
             content.add(reservationTitle);
 
             content.add(makeField("User:", "— (not yet available)")); // TODO: get user by reservation
-
-            JButton cancelBtn = new JButton("Cancel Reservation");
-            cancelBtn.setBackground(AppColors.RED);
-            cancelBtn.setForeground(Color.WHITE);
-            cancelBtn.setOpaque(true);
-            cancelBtn.setBorderPainted(false);
-            cancelBtn.setFocusPainted(false);
-            cancelBtn.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
-            cancelBtn.addActionListener(e -> {
-                int confirm = JOptionPane.showConfirmDialog(dialog,
-                        "Do you want to cancel the reservation for space " + space.getId() + "?",
-                        "Confirm", JOptionPane.YES_NO_OPTION);
-                if (confirm == JOptionPane.YES_OPTION) {
-                    // TODO: call function to cancel reservation
-                    dialog.dispose();
-                }
-            });
-            buttonPanel.add(cancelBtn);
         }
 
         JButton closeBtn = new JButton("Close");
@@ -214,18 +196,15 @@ public class CurrentStatusPanel extends JPanel {
         tableModel.setRowCount(0);
         spaces = statusController.getParkingTableData();
         for (ParkingSpace space : spaces) {
-            List<Reservation> reservations = reservationController.getReservationsBySlotId(space.getId());
-            boolean isReserved = !reservations.isEmpty();
-            boolean isOccupied = reservations.stream().anyMatch(r -> r.getStartDateTime().before(new Date()) && r.getEndDateTime().after(new Date()));
-
+            Reservation reservation = reservationController.getActiveReservationForPlate(space.getParkedLicensePlate());
             String plate = space.isOccupied() ? space.getParkedLicensePlate() : "-";
 
             tableModel.addRow(new Object[]{
                     space.getId(),
                     space.getFloor(),
                     space.getType(),
-                    isOccupied ? "Occupied" : "Free",
-                    isReserved ? "Reserved" : "Unreserved",
+                    space.isOccupied() ? "Occupied" : "Free",
+                    reservation != null ? "Reserved" : "Unreserved",
                     plate
             });
         }

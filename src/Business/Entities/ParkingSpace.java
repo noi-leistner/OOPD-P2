@@ -42,4 +42,8 @@ public class ParkingSpace {
         }
 
         public String getParkedLicensePlate() {return parked_license_plate;}
+
+        public void setParkedLicensePlate(String plate) {
+                this.parked_license_plate = plate;
+        }
 }

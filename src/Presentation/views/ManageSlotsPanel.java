@@ -80,15 +80,13 @@ public class ManageSlotsPanel extends BaseManagePanel {
         tableModel.setRowCount(0);
 
         for (ParkingSpace space : spaces) {
-            List<Reservation> reservations = reservationController.getReservationsBySlotId(space.getId());
-            boolean isReserved = !reservations.isEmpty();
-            boolean isOccupied = reservations.stream().anyMatch(r -> r.getStartDateTime().before(new Date()) && r.getEndDateTime().after(new Date()));
+            Reservation reservation = reservationController.getActiveReservationForPlate(space.getParkedLicensePlate());
 
             tableModel.addRow(new Object[]{
                     space.getId(),
                     space.getFloor(),
-                    isOccupied ? "Occupied" : "Free",
-                    isReserved ? "Reserved" : "Unreserved",
+                    space.isOccupied() ? "Occupied" : "Free",
+                    reservation != null ? "Reserved" : "Unreserved",
                     space.getType()
             });
         }

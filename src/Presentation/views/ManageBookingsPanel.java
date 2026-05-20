@@ -53,7 +53,7 @@ public class ManageBookingsPanel extends BaseManagePanel {
                     "Cancel reservation " + selectedReservation.getId() + "?",
                     "Confirm", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                DaoResult cancelResult = reservationController.cancelReservationFromAdmin(selectedReservation.getId());
+                DaoResult cancelResult = reservationController.cancelReservationWithNotification(selectedReservation.getId());
                 if (cancelResult != DaoResult.SUCCESS) {
                     JOptionPane.showMessageDialog(this, "Failed to cancel reservation.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
@@ -142,7 +142,7 @@ public class ManageBookingsPanel extends BaseManagePanel {
         addField(formPanel, "End time:", endTimeSpinner);
         endTimeSpinner.setValue(reservation.getEndDateTime());
 
-        List<ParkingSpace> availableSpots = slotController.getAvailableSpotsByType(currentSpot.getType());
+        List<ParkingSpace> availableSpots = slotController.getSpotsByType(currentSpot.getType());
 
         if (availableSpots == null) {
             availableSpots = new ArrayList<>();
