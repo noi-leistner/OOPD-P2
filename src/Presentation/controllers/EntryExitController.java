@@ -5,6 +5,8 @@ import Business.Entities.Reservation;
 import Business.Entities.Vehicle;
 import Business.ParkingLogManager;
 import Business.ParkingLotManager;
+import Business.ReservationManager;
+import Persistance.VehicleDAO;
 import Business.VehicleManager;
 
 import java.util.Comparator;
@@ -30,6 +32,16 @@ public class EntryExitController {
 
     public boolean vehicleBelongsToUser(String licensePlate, int userId) {
         return vehicleManager.vehicleBelongsToUser(licensePlate, userId);
+    }
+
+    public void deleteByUserId(int id) {vehicleManager.deleteByUserID(id);}
+
+    public boolean registerVehicle(String licensePlate, int userId, String vehicleType) {
+        return vehicleManager.registerVehicle(licensePlate, userId, vehicleType);
+    }
+
+    public boolean vehiclePlateExistsInSystem(String licensePlate) {
+        return vehicleManager.vehiclePlateExistsInSystem(licensePlate);
     }
 
     public String getVehicleType(String licensePlate) {

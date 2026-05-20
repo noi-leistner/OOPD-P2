@@ -4,13 +4,16 @@ public class ParkingSpace {
         int id;
         int floor;
         boolean current_status;
+        String parked_license_plate;
         String type;
 
-        public ParkingSpace (int id, int floor, boolean current_status, String type) {
+
+        public ParkingSpace (int id, int floor, boolean current_status, String parked_license_plate, String type) {
                 this.id = id;
                 this.floor = floor;
                 this.current_status = current_status;
                 this.type = type;
+                this.parked_license_plate = parked_license_plate;
         }
 
         public int getId() {
@@ -38,4 +41,5 @@ public class ParkingSpace {
                 return "Slot " + id + " - Floor " + floor + " (" + type + ")";
         }
 
+        public String getParkedLicensePlate() {return parked_license_plate;}
 }

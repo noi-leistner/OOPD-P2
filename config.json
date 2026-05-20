@@ -6,5 +6,5 @@
     "user_email": "example@gmail.com",
     "db_password": "userpassword",
     "admin_password": "adminpassword",
-    "vehicle_delay": 0
+    "vehicle_delay": 6
 }

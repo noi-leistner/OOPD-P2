@@ -19,16 +19,16 @@ public class ReservationDAOSql implements ReservationDAO {
                 rs.getInt("user_id"),
                 rs.getString("vehicle_license_plate"),
                 rs.getInt("parking_slot_id"),
-                rs.getTimestamp("start_datetime"),
-                rs.getTimestamp("end_datetime"),
+                rs.getDate("start_date"),
+                rs.getDate("end_date"),
                 rs.getBoolean("is_cancelled")
         );
     }
 
     @Override
     public void addReservation(Reservation reservation) {
-        String sql = "INSERT INTO reservations (user_id, vehicle_license_plate, parking_slot_id, date) " +
-                "VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO reservations (user_id, vehicle_license_plate, parking_slot_id, start_date, end_date) " +
+                "VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -44,28 +44,29 @@ public class ReservationDAOSql implements ReservationDAO {
     }
 
     @Override
-    public DaoResult deleteReservation(int spotId) {
+    public DaoResult deleteReservation(int reservationId) {
         String sql = "DELETE FROM reservations WHERE id = ?";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, spotId);
+            stmt.setInt(1, reservationId);
             stmt.executeUpdate();
+            return DaoResult.SUCCESS;
 
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
             return DaoResult.DATABASE_ERROR;
         }
-        return DaoResult.SUCCESS;
     }
 
     @Override
     public DaoResult createReservation(Reservation reservation) {
+        // Check for overlapping reservations on the same slot
         String checkSql = "SELECT 1 FROM reservations " +
                 "WHERE parking_slot_id = ? " +
                 "AND is_cancelled = FALSE " +
-                "AND start_datetime < ? " +
-                "AND end_datetime > ?";
+                "AND start_date < ? " +
+                "AND end_date > ?";
 
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
@@ -83,7 +84,7 @@ public class ReservationDAOSql implements ReservationDAO {
             return DaoResult.DATABASE_ERROR;
         }
 
-        String sql = "INSERT INTO reservations (user_id, vehicle_license_plate, parking_slot_id, start_datetime, end_datetime) " +
+        String sql = "INSERT INTO reservations (user_id, vehicle_license_plate, parking_slot_id, start_date, end_date) " +
                 "VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = ConfigDAO.getConnection();
@@ -106,7 +107,6 @@ public class ReservationDAOSql implements ReservationDAO {
     @Override
     public void cancelReservation(int reservationId) {
         String sql = "UPDATE reservations SET is_cancelled = TRUE WHERE id = ?";
-
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -144,7 +144,6 @@ public class ReservationDAOSql implements ReservationDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, userId);
-
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     list.add(mapRow(rs));
@@ -153,7 +152,6 @@ public class ReservationDAOSql implements ReservationDAO {
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-
         return list;
     }
 
@@ -183,8 +181,8 @@ public class ReservationDAOSql implements ReservationDAO {
                 "WHERE parking_slot_id = ? " +
                 "AND is_cancelled = FALSE " +
                 "AND id != ? " +
-                "AND start_datetime < ? " +
-                "AND end_datetime > ?";
+                "AND start_date < ? " +
+                "AND end_date > ?";
 
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
@@ -204,7 +202,7 @@ public class ReservationDAOSql implements ReservationDAO {
         }
 
         String sql = "UPDATE reservations " +
-                "SET parking_slot_id = ?, start_datetime = ?, end_datetime = ? " +
+                "SET parking_slot_id = ?, start_date = ?, end_date = ? " +
                 "WHERE id = ?";
 
         try (Connection conn = ConfigDAO.getConnection();
@@ -241,14 +239,23 @@ public class ReservationDAOSql implements ReservationDAO {
     }
 
     @Override
-    public void deleteExpiredReservations() {
-        String sql = "DELETE FROM reservations WHERE end_datetime < NOW() AND is_cancelled = FALSE";
-
+    public void deleteReservationsByUserId(int userId) {
+        String sql = "DELETE FROM reservations WHERE user_id = ?";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+            stmt.setInt(1, userId);
             stmt.executeUpdate();
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+    }
 
+    @Override
+    public void deleteExpiredReservations() {
+        String sql = "DELETE FROM reservations WHERE end_date < NOW()";
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.executeUpdate();
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }

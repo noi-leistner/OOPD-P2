@@ -37,4 +37,14 @@ public class VehicleManager {
         }
         return existing;
     }
+
+    public void deleteByUserID(int id) {vehicleDao.deleteByUserId(id);}
+
+    public boolean registerVehicle(String licensePlate, int userId, String vehicleType) {
+        return vehicleDao.addVehicle(licensePlate, userId, vehicleType);
+    }
+
+    public boolean vehiclePlateExistsInSystem(String licensePlate) {
+        return vehicleDao.existsByPlate(licensePlate);
+    }
 }

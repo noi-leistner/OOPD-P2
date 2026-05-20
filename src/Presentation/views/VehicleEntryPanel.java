@@ -189,13 +189,27 @@ public class VehicleEntryPanel extends JPanel {
             int userId = SessionManager.getInstance().getCurrentUser().getId();
 
             if (!controller.vehicleBelongsToUser(plate, userId)) {
-                showError("This vehicle is not registered to your account.");
-                return;
+                // Check if it belongs to someone else
+                if (controller.vehiclePlateExistsInSystem(plate)) {
+                    showError("This vehicle is registered to another account.");
+                    return;
+                }
+                // Plate doesn't exist at all — offer to register it
+                AddVehicleDialog dialog = new AddVehicleDialog(
+                        (Frame) SwingUtilities.getWindowAncestor(this), plate);
+                if (!dialog.isConfirmed()) return;
+
+                boolean added = controller.registerVehicle(plate, userId, dialog.getSelectedType());
+                if (!added) {
+                    showError("Failed to register vehicle. Please try again.");
+                    return;
+                }
             }
 
             currentPlate = plate;
             clearStatus();
 
+            //TODO: check that reservation is rn, if not treat as normal car
             if (controller.hasReservation(plate)) {
                 // Has a reservation — ask for confirmation first
                 int confirm = JOptionPane.showConfirmDialog(
