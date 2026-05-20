@@ -25,7 +25,7 @@ public class RegisterForm extends JPanel {
             private final Image bg = loadBackground();
 
             private Image loadBackground() {
-                URL url = getClass().getResource("/Presentation/theme/resources/image_login_1.jpg");
+                URL url = getClass().getResource("/image_login_1.jpg");
                 if (url == null) {
                     System.err.println("[RegisterForm] Background image not found. " +
                             "Mark the resources folder as Resources Root in IntelliJ.");

@@ -7,11 +7,13 @@ import Persistance.ParkingLogDAO;
 import Persistance.ParkingSpaceDAO;
 
 import javax.swing.SwingUtilities;
+import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.io.InputStreamReader;
 
 public class SimulationManager {
     private static final Logger logger = Logger.getLogger(SimulationManager.class.getName());
@@ -72,22 +74,44 @@ public class SimulationManager {
     }
 
     private void tick() {
-        List<ParkingSpace> available = parkingSpaceDAO.findAvailableUnreserved();
-        int totalUnreserved = parkingSpaceDAO.getAllParkingSpaces().stream().filter(s -> !s.isOccupied()).toList().size();
-        if (totalUnreserved == 0) return;
+            List<ParkingSpace> available = parkingSpaceDAO.findAvailableUnreserved();
+            int totalOccupied = simulatedPlates.size();
+            int totalSpaces = parkingSpaceDAO.getAllParkingSpaces().size();
+
+            // decide entry or exit based on current occupancy
+            boolean parkingFull = available.isEmpty();
+            boolean parkingEmpty = simulatedPlates.isEmpty();
+
+            if (parkingFull) {
+                simulateExit(available);
+            } else if (parkingEmpty) {
+                simulateEntry(available);
+            } else {
+                // 60% chance entry, 40% chance exit
+                if (random.nextInt(100) < 60) {
+                    simulateEntry(available);
+                } else {
+                    simulateExit(available);
+                }
+            }
+
+            // notify UI to refresh chart
+            if (onTickCallBack != null) {
+                SwingUtilities.invokeLater(onTickCallBack);
+            }
     }
 
-    private void simulateEntry(List<ParkingSpace> available) {
+    public void simulateEntry(List<ParkingSpace> available) {
         if (available.isEmpty()) return;
 
         ParkingSpace space = available.get(random.nextInt(available.size()));
-        String plate = plateGenerator(); // Implement later
+        String plate = plateGenerator();
 
         ParkingSpace result = parkingLotManager.enterWithoutReservation(plate, space.getId(), SIMULATED_USER_ID);
         if (result != null) {
             simulatedPlates.add(plate);
-            parkingLogDAO.insertLog(space.getId(), plate, SIMULATED_USER_ID, "ENTRY");
-            logger.info("Simmulation created for plate " + plate+ "Spot: " + space.getId());
+            parkingLogDAO.insertLog(space.getId(), plate, SIMULATED_USER_ID, "enter");
+            logger.info("simulated plate " + plate);
         }
     }
 
