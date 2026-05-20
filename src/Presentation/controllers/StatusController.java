@@ -36,6 +36,7 @@ public class StatusController {
 
     public void startSimulation() { simulationManager.start(); }
     public void stopSimulation()  { simulationManager.stop();  }
+    public void setSimulationCallback(Runnable callback) {simulationManager.setOnTickCallBack(callback);}
 
 
 }

@@ -36,7 +36,7 @@ public class ConfigDAO {
 
     public static int getVehicleEntryTime() {
         try {
-            String json = new String(ConfigDAO.class.getResourceAsStream("config.json").toString());
+            String json = new String(ConfigDAO.class.getResourceAsStream("/config.json").readAllBytes());
             String after = json.substring(json.indexOf("\"vehicle_entry_time\"") + 20).replaceAll("[^0-9]", " ").trim();
             return Integer.parseInt(after.split("\\s+")[0]);
         } catch (Exception e) {

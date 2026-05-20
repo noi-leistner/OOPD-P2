@@ -6,8 +6,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -93,6 +91,33 @@ public class VehicleDAOSql implements VehicleDAO {
 
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public boolean insertSimulatedVehicle(String plate, String vehicleType) {
+        String sql = "INSERT INTO vehicles (license_plate, user_id, vehicle_type) VALUES (?, -1, ?)";
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, plate);
+            stmt.setString(2, vehicleType);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "insertSimulatedVehicle failed", e);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean deleteSimulatedVehicle(String plate) {
+        String sql = "DELETE FROM vehicles WHERE license_plate = ? AND user_id = -1";
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, plate);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "deleteSimulatedVehicle failed", e);
+            return false;
         }
     }
 }

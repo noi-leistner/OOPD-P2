@@ -61,6 +61,11 @@ public class DashboardPanel extends JPanel {
 
         statusController.startSimulation();
 
+        statusController.setSimulationCallback(() -> {
+            contentArea.repaint();
+            revalidate();
+        });
+
         revalidate();
         repaint();
     }

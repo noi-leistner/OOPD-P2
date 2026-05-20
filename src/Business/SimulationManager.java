@@ -5,6 +5,7 @@ import Business.Entities.ParkingSpace;
 import Persistance.ConfigDAO;
 import Persistance.ParkingLogDAO;
 import Persistance.ParkingSpaceDAO;
+import Persistance.VehicleDAO;
 
 import javax.swing.SwingUtilities;
 import java.io.BufferedReader;
@@ -12,8 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
-import java.util.logging.Level;
-import java.io.InputStreamReader;
 
 public class SimulationManager {
     private static final Logger logger = Logger.getLogger(SimulationManager.class.getName());
@@ -22,6 +21,7 @@ public class SimulationManager {
     private final ParkingLotManager parkingLotManager;
     private final ParkingSpaceDAO parkingSpaceDAO;
     private final ParkingLogDAO parkingLogDAO;
+    private final VehicleDAO vehicleDAO;
 
     private final List<String> simulatedPlates = new ArrayList<>();
     private final Random random = new Random();
@@ -33,10 +33,12 @@ public class SimulationManager {
 
     public SimulationManager (ParkingLotManager parkingLotManager,
                               ParkingSpaceDAO parkingSpaceDAO,
-                              ParkingLogDAO parkingLogDAO) {
+                              ParkingLogDAO parkingLogDAO,
+                              VehicleDAO vehicleDAO) {
         this.parkingLotManager = parkingLotManager;
         this.parkingSpaceDAO = parkingSpaceDAO;
         this.parkingLogDAO = parkingLogDAO;
+        this.vehicleDAO = vehicleDAO;
     }
 
     public void setOnTickCallBack(Runnable onTickCallBack) {
@@ -87,8 +89,8 @@ public class SimulationManager {
             } else if (parkingEmpty) {
                 simulateEntry(available);
             } else {
-                // 60% chance entry, 40% chance exit
-                if (random.nextInt(100) < 60) {
+                // 50% chance entry, 50% chance exit
+                if (random.nextInt(100) < 50) {
                     simulateEntry(available);
                 } else {
                     simulateExit(available);
@@ -107,25 +109,26 @@ public class SimulationManager {
         ParkingSpace space = available.get(random.nextInt(available.size()));
         String plate = plateGenerator();
 
+        vehicleDAO.insertSimulatedVehicle(plate, space.getType());
+
         ParkingSpace result = parkingLotManager.enterWithoutReservation(plate, space.getId(), SIMULATED_USER_ID);
         if (result != null) {
             simulatedPlates.add(plate);
-            parkingLogDAO.insertLog(space.getId(), plate, SIMULATED_USER_ID, "enter");
-            logger.info("simulated plate " + plate);
+            parkingLogDAO.insertLog(space.getId(), plate, SIMULATED_USER_ID, "ENTRY");
+            logger.info("simulated plate " + plate + "-> ENTRY");
         }
     }
 
     private void simulateExit(List<ParkingSpace> available) {
         if (available.isEmpty()) return;
-
-        ParkingSpace space = available.get(random.nextInt(available.size()));
         String plate = simulatedPlates.get(random.nextInt(simulatedPlates.size()));
 
         ParkingSpace result = parkingLotManager.exit(plate, SIMULATED_USER_ID);
         if (result != null) {
             simulatedPlates.remove(plate);
-            parkingLogDAO.insertLog(space.getId(), plate, SIMULATED_USER_ID, "EXIT");
-            logger.info("Simmulation created for plate (EXIT)" + plate + "Spot: " + space.getId());
+            parkingLogDAO.insertLog(result.getId(), plate, SIMULATED_USER_ID, "EXIT");
+            vehicleDAO.deleteSimulatedVehicle(plate);
+            logger.info("Simmulation created for plate (EXIT)" + plate + "-> EXIT");
         }
     }
 

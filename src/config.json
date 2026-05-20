@@ -6,6 +6,6 @@
     "user_email": "example@gmail.com",
     "db_password": "userpassword",
     "admin_password": "adminpassword",
-    "vehicle_entry_time": 30,
-    "max_stay_minutes": 60
+    "vehicle_entry_time": 15,
+    "max_stay_minutes": 3
 }

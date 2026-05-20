@@ -251,9 +251,9 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
         }
     }
     public List<ParkingSpace> findAvailableUnreserved() {
-        String sql = "SELECT identifier, floor, occupation_status, vehicle type " +
-                     "FROM parking_slots " +
-                     "WHERE occupation_status = FALSE AND reservation_status = FALSE ";
+        String sql = "SELECT identifier, floor, occupation_status, vehicle_type, parked_license_plate " +
+                "FROM parking_slots " +
+                "WHERE occupation_status = FALSE ";
         List<ParkingSpace> spaces = new ArrayList<>();
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
