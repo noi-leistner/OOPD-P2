@@ -68,9 +68,9 @@ public class DashboardPanel extends JPanel {
         statusController.startSimulation();
 
         statusController.setSimulationCallback(() -> {
-            manageSlotsPanel.refreshTable();
-            currentStatusPanel.loadData();
-            occupancyPanel.loadData();
+            if (manageSlotsPanel != null)   manageSlotsPanel.refreshTable();
+            if (currentStatusPanel != null) currentStatusPanel.loadData();
+            if (occupancyPanel != null)     occupancyPanel.loadData();
             contentArea.repaint();
             revalidate();
         });
@@ -119,7 +119,6 @@ public class DashboardPanel extends JPanel {
             contentArea.add(manageBookingsPanel,   "BOOKINGS");
             currentStatusPanel = new CurrentStatusPanel(statusController, reservationController, authController);
             contentArea.add(currentStatusPanel,   "STATUS");
-            occupancyPanel = new OccupancyPanel(statusController);
             contentArea.add(new LogOutPanel(mainWindow, authController, reservationController, slotController, entryExitController), "LOGOUT");
 
 
@@ -146,7 +145,8 @@ public class DashboardPanel extends JPanel {
             manageReservationsPanel = new ManageReservationsPanel(reservationController, slotController, entryExitController);
             manageReservationsPanel.refreshTable();
             contentArea.add(manageReservationsPanel, "RESERVE");
-            contentArea.add(new OccupancyPanel(statusController), "OCCUPANCY");
+            occupancyPanel = new OccupancyPanel(statusController);
+            contentArea.add(occupancyPanel, "OCCUPANCY");
             CurrentStatusPanel currentStatusPanel = new CurrentStatusPanel(statusController, reservationController, authController);
             currentStatusPanel.loadData();
             contentArea.add(currentStatusPanel,  "STATUS");

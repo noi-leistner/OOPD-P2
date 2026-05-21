@@ -77,24 +77,24 @@ public class SimulationManager {
 
     private void tick() {
             List<ParkingSpace> available = parkingSpaceDAO.findAvailableUnreserved();
-            int totalOccupied = simulatedPlates.size();
             int totalUnreserved = parkingSpaceDAO.getTotalUnreservedSpaces();
 
-            // decide entry or exit based on current occupancy
-            boolean parkingFull = available.isEmpty();
+            // decide entry or exit based on current occupanc7
             boolean parkingEmpty = simulatedPlates.isEmpty();
+
+            if (totalUnreserved == 0) return;
 
             double pEntry = (double) available.size() / totalUnreserved;
 
-            if (simulatedPlates.size() == totalOccupied) {
-                simulateExit(available);
+            if (simulatedPlates.isEmpty()){
+                simulateExit();
             } else if (parkingEmpty) {
                 simulateEntry(available);
             } else {
                 if (random.nextDouble() < pEntry) {
                     simulateEntry(available);
                 } else {
-                    simulateExit(available);
+                    simulateExit();
                 }
             }
 
@@ -105,10 +105,11 @@ public class SimulationManager {
     }
 
     public void simulateEntry(List<ParkingSpace> available) {
-        if (available.isEmpty()) return;
 
         ParkingSpace space = available.get(random.nextInt(available.size()));
         String plate = plateGenerator();
+        logger.info("ENTRY attempt — plate: " + plate + " slot: " + space.getId()); // ← afegir
+
 
         vehicleDAO.insertSimulatedVehicle(plate, space.getType());
 
@@ -118,9 +119,10 @@ public class SimulationManager {
             parkingLogDAO.insertLog(space.getId(), plate, SIMULATED_USER_ID, "ENTRY");
             logger.info("\u001B[34m" + "[ENTRY] " + plate + " → slot " + space.getId() + " at " + new java.text.SimpleDateFormat("HH:mm:ss").format(new java.util.Date()) + "\u001B[0m)");
         }
+
     }
 
-    private void simulateExit(List<ParkingSpace> available) {
+    private void simulateExit() {
         if (simulatedPlates.isEmpty()) return;
         String plate = simulatedPlates.get(random.nextInt(simulatedPlates.size()));
 
