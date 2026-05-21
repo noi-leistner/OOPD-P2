@@ -39,7 +39,7 @@ public class ReservationController {
         return manager.getReservationsBySlot(id);
     }
 
-    public DaoResult cancelReservationFromAdmin(int reservationId) {
+    public DaoResult cancelReservationWithNotification(int reservationId) {
         return manager.cancelReservationByAdmin(reservationId);
     }
 
@@ -69,5 +69,13 @@ public class ReservationController {
 
     public void deleteExpiredReservations() {
         manager.deleteExpiredReservations();
+    }
+
+    public boolean hasActiveReservationForPlate(String plate) {
+        return manager.hasActiveReservationForPlate(plate);
+    }
+
+    public Reservation getActiveReservationForPlate(String plate) {
+        return manager.getActiveReservationForPlate(plate);
     }
 }

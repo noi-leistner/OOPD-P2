@@ -83,6 +83,11 @@ public class VehicleExitPanel extends JPanel {
                 return;
             }
 
+            if (!controller.isVehicleCurrentlyParked(plate)) {
+                showError("This vehicle is not parked.");
+                return;
+            }
+
             int confirm = JOptionPane.showConfirmDialog(
                     this,
                     "<html>Mark vehicle <b>" + plate + "</b> as exited?<br>" +

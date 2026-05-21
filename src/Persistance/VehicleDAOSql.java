@@ -6,8 +6,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -86,7 +84,7 @@ public class VehicleDAOSql implements VehicleDAO {
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, vehicle.getLicense_plate());
+            stmt.setString(1, vehicle.getLicensePlate());
             stmt.setInt(2, vehicle.getUserId());
             stmt.setString(3, vehicle.getType());
             stmt.executeUpdate();

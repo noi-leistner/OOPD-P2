@@ -4,6 +4,7 @@ import Business.Entities.Reservation;
 import Persistance.ReservationDAO;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ReservationManager {
@@ -37,7 +38,7 @@ public class ReservationManager {
         if (reservations.isEmpty()) return;
 
         for (Reservation reservation : reservations) {
-            reservation.setParking_slot_id(toSlotId);
+            reservation.setParkingSlotId(toSlotId);
             reservationDao.editReservation(reservation);
         }
     }
@@ -102,5 +103,19 @@ public class ReservationManager {
   
     public void deleteExpiredReservations() {
         reservationDao.deleteExpiredReservations();
+    }
+
+    public boolean hasActiveReservationForPlate(String plate) {
+        Reservation reservation = reservationDao.findReservationByPlate(plate);
+        if (reservation == null) {
+            return false;
+        }
+        Date now = new Date();
+
+        return reservation.getStartDateTime().before(now) && reservation.getEndDateTime().after(now);
+    }
+
+    public Reservation getActiveReservationForPlate(String plate) {
+        return reservationDao.getActiveReservationForPlate(plate);
     }
 }

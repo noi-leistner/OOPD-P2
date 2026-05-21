@@ -24,7 +24,6 @@ public class ParkingLotManager {
     public DaoResult addSpace(ParkingSpace space) {
         if (space == null) return DaoResult.DATABASE_ERROR;
         if (parkingSpaceDao.existsById(space.getId())) return DaoResult.ALREADY_EXISTS;
-
         boolean saved = parkingSpaceDao.addParkingSpace(space);
         return saved ? DaoResult.SUCCESS : DaoResult.DATABASE_ERROR;
     }
@@ -38,6 +37,10 @@ public class ParkingLotManager {
 
     public DaoResult deleteSpace(int spaceId) {
         return parkingSpaceDao.deleteParkingSpace(spaceId) ? DaoResult.SUCCESS : DaoResult.DATABASE_ERROR;
+    }
+
+    public String getParkedPlateAtSpace(int id) {
+        return parkingSpaceDao.getParkedPlateAtSpace(id);
     }
 
     public ParkingSpace findAlternativeSpace(String type, int excludeId) {
@@ -72,11 +75,15 @@ public class ParkingLotManager {
         return parkingSpaceDao.getAvailableSpacesForType(vehicleType);
     }
 
+    public List<ParkingSpace> getSpotsByType(String type) {
+        return parkingSpaceDao.getSpotsByType(type);
+    }
+
     public ParkingSpace enterWithReservation(String licensePlate, int userId) {
         ParkingSpace space = parkingSpaceDao.getReservedSpaceByPlate(licensePlate);
         if (space == null) return null;
         ParkingSpace fresh = parkingSpaceDao.getParkingSpaceById(space.getId());
-        if (fresh == null || fresh.isOccupied()) return null;
+        if (fresh == null) return null;
 
         if (parkingSpaceDao.occupySpace(space.getId(), licensePlate)) {
             return parkingSpaceDao.getParkingSpaceById(space.getId());

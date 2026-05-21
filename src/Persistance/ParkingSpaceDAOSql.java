@@ -8,8 +8,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
+
+    private static final Logger log = Logger.getLogger(ParkingSpaceDAOSql.class.getName());
 
     // Helper to build a ParkingSpace from a ResultSet row
     private ParkingSpace mapRow(ResultSet rs) throws SQLException {
@@ -143,6 +147,24 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
     }
 
     @Override
+    public List<ParkingSpace> getSpotsByType(String type) {
+        String sql = "SELECT identifier, floor, occupation_status, parked_license_plate, vehicle_type " +
+                "FROM parking_slots WHERE vehicle_type = ?";
+        List<ParkingSpace> spaces = new ArrayList<>();
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, type);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) spaces.add(mapRow(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return spaces;
+    }
+
+    @Override
     public ParkingSpace getFirstAvailableSpaceForType(String vehicleType) {
         String sql = "SELECT identifier, floor, occupation_status, parked_license_plate, vehicle_type " +
                 "FROM parking_slots WHERE vehicle_type = ? AND occupation_status = FALSE LIMIT 1";
@@ -155,6 +177,26 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public String getParkedPlateAtSpace(int id) {
+        String sql = "SELECT license_plate FROM parking_log " +
+                "WHERE parking_slot_id = ? AND action = 'ENTRY' " +
+                "ORDER BY timestamp DESC LIMIT 1";
+
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getString("license_plate");
+            }
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
         }
         return null;
     }

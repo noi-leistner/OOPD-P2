@@ -19,4 +19,5 @@ public interface ReservationDAO {
     Reservation findReservationByPlate(String licensePlate);
     void deleteReservationsByUserId(int userId);
     void deleteExpiredReservations();
+    Reservation getActiveReservationForPlate(String plate);
 }

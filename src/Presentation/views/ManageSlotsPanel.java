@@ -13,12 +13,11 @@ import java.util.Date;
 import java.util.List;
 
 public class ManageSlotsPanel extends BaseManagePanel {
-
-    private DefaultTableModel tableModel;
-    private JTable table;
     private ParkingSpaceController slotController;
     private ReservationController reservationController;
 
+    private DefaultTableModel tableModel;
+    private JTable table;
     private ParkingSpace selectedSpace;
     private List<ParkingSpace> currentSpaces = new ArrayList<>();
 
@@ -80,15 +79,13 @@ public class ManageSlotsPanel extends BaseManagePanel {
         tableModel.setRowCount(0);
 
         for (ParkingSpace space : spaces) {
-            List<Reservation> reservations = reservationController.getReservationsBySlotId(space.getId());
-            boolean isReserved = !reservations.isEmpty();
-            boolean isOccupied = reservations.stream().anyMatch(r -> r.getStartDateTime().before(new Date()) && r.getEndDateTime().after(new Date()));
+            Reservation reservation = reservationController.getActiveReservationForPlate(space.getParkedLicensePlate());
 
             tableModel.addRow(new Object[]{
                     space.getId(),
                     space.getFloor(),
-                    isOccupied ? "Occupied" : "Free",
-                    isReserved ? "Reserved" : "Unreserved",
+                    space.isOccupied() ? "Occupied" : "Free",
+                    reservation != null ? "Reserved" : "Unreserved",
                     space.getType()
             });
         }
@@ -251,7 +248,7 @@ public class ManageSlotsPanel extends BaseManagePanel {
                     refreshTable();
                 }
                 case CANNOT_REMOVE_OCCUPIED ->
-                        JOptionPane.showMessageDialog(this, "Slot is occupied and no alternative spaces are available.", "Cannot Remove", JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "Slot is occupied and no alternative spaces are available.\nThe slot can not be removed!", "Cannot Remove", JOptionPane.WARNING_MESSAGE);
                 case NOT_FOUND ->
                         JOptionPane.showMessageDialog(this, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
                 case DATABASE_ERROR ->

@@ -1,12 +1,12 @@
 package Business.Entities;
 
 public class User {
-    String name;
-    String surname;
-    String email;
-    String password;
-    int id;
-    String role;
+    private int id;
+    private String name;
+    private String surname;
+    private String email;
+    private String password;
+    private String role;
 
     public User(String name, String surname, String email, String password, String role) {
         this.name = name;
