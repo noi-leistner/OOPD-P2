@@ -17,7 +17,7 @@ public class LoginForm extends BaseAuthForm {
     public LoginForm(MainWindow mainWindow, AuthController auth, AuthPanel authPanel) {
         setLayout(new GridLayout(1,2));
         setOpaque(false);
-        add(buildImagePanel("/Presentation/theme/resources/image_login_1.jpg"));
+        add(buildImagePanel("/image_login_1.jpg"));
         add(buildCenterPanel(mainWindow, auth, authPanel));
     }
 

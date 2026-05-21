@@ -16,7 +16,7 @@ public class RegisterForm extends BaseAuthForm {
     public RegisterForm(MainWindow app, AuthController auth, AuthPanel authPanel) {
         setLayout(new GridLayout(1, 2));
         setOpaque(false); // let the parent background show; avoids gray bleed
-        add(buildImagePanel("/Presentation/theme/resources/image_login_1.jpg"));
+        add(buildImagePanel("/image_login_1.jpg"));
         add(buildCenterPanel(app, auth, authPanel));
     }
 
