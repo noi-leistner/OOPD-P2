@@ -91,7 +91,7 @@ public class ManageBookingsPanel extends BaseManagePanel {
         for (Reservation reservation : reservations) {
             ParkingSpace space = slotController.getSpaceDetails(reservation.getParkingSlotId());
             tableModel.addRow(new Object[]{
-                    reservation.getUser_id(),
+                    reservation.getUserId(),
                     reservation.getVehiclePlate(),
                     space != null ? space.getId() : "N/A",
                     space != null ? space.getType() : "N/A",
@@ -189,7 +189,7 @@ public class ManageBookingsPanel extends BaseManagePanel {
                 return;
             }
 
-            Reservation editedReservation = new Reservation(reservation.getId(), reservation.getUser_id(), reservation.getVehiclePlate(), ((ParkingSpace) spotsCombo.getSelectedItem()).getId(), start, end, false);
+            Reservation editedReservation = new Reservation(reservation.getId(), reservation.getUserId(), reservation.getVehiclePlate(), ((ParkingSpace) spotsCombo.getSelectedItem()).getId(), start, end, false);
 
             switch (reservationController.editReservation(editedReservation)) {
                 case SUCCESS -> {

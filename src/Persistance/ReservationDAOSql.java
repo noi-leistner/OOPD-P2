@@ -32,7 +32,7 @@ public class ReservationDAOSql implements ReservationDAO {
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, reservation.getUser_id());
+            stmt.setInt(1, reservation.getUserId());
             stmt.setString(2, reservation.getVehiclePlate());
             stmt.setInt(3, reservation.getParkingSlotId());
             stmt.setTimestamp(4, new java.sql.Timestamp(reservation.getStartDateTime().getTime()));
@@ -90,7 +90,7 @@ public class ReservationDAOSql implements ReservationDAO {
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, reservation.getUser_id());
+            stmt.setInt(1, reservation.getUserId());
             stmt.setString(2, reservation.getVehiclePlate());
             stmt.setInt(3, reservation.getParkingSlotId());
             stmt.setTimestamp(4, new java.sql.Timestamp(reservation.getStartDateTime().getTime()));

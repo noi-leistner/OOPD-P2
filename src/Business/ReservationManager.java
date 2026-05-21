@@ -38,7 +38,7 @@ public class ReservationManager {
         if (reservations.isEmpty()) return;
 
         for (Reservation reservation : reservations) {
-            reservation.setParking_slot_id(toSlotId);
+            reservation.setParkingSlotId(toSlotId);
             reservationDao.editReservation(reservation);
         }
     }

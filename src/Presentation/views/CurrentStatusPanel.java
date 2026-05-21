@@ -9,14 +9,12 @@ import Presentation.controllers.StatusController;
 import Presentation.theme.AppColors;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.HierarchyEvent;
 
 public class CurrentStatusPanel extends JPanel {
 
@@ -157,7 +155,7 @@ public class CurrentStatusPanel extends JPanel {
                     .orElse(null);
 
             if (activeRes != null) {
-                User user = authController.getUserById(activeRes.getUser_id());
+                User user = authController.getUserById(activeRes.getUserId());
 
                 content.add(makeField("Vehicle plate:", activeRes.getVehiclePlate()));
                 content.add(makeField("Start:", activeRes.getStartDateTime().toString()));
