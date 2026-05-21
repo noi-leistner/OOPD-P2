@@ -13,12 +13,11 @@ import java.util.Date;
 import java.util.List;
 
 public class ManageSlotsPanel extends BaseManagePanel {
-
-    private DefaultTableModel tableModel;
-    private JTable table;
     private ParkingSpaceController slotController;
     private ReservationController reservationController;
 
+    private DefaultTableModel tableModel;
+    private JTable table;
     private ParkingSpace selectedSpace;
     private List<ParkingSpace> currentSpaces = new ArrayList<>();
 

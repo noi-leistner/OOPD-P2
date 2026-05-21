@@ -27,8 +27,7 @@ public class CurrentStatusPanel extends JPanel {
     private final ReservationController reservationController;
     private final AuthController authController;
 
-    private Timer timer;
-    private List<ParkingSpace> spaces = new ArrayList<>(); //TODO: Change once functions have been made, this isn't good architecture
+    private List<ParkingSpace> spaces = new ArrayList<>();
 
     public CurrentStatusPanel(StatusController statusController, ReservationController reservationController, AuthController authController) {
         this.statusController = statusController;
@@ -43,20 +42,6 @@ public class CurrentStatusPanel extends JPanel {
         addTableClickListener();
 
         loadData();
-
-        // Timer that calls loadData() every 5 seconds
-        timer = new Timer(5000, e -> loadData());
-
-        // Timer only starts when currentStatusPanel is visible to optimize
-        addHierarchyListener(e -> {
-            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-                if (isShowing()) {
-                    timer.start();
-                } else {
-                    timer.stop();
-                }
-            }
-        });
     }
 
     private JPanel buildHeader() {
@@ -219,7 +204,7 @@ public class CurrentStatusPanel extends JPanel {
         return row;
     }
 
-    private void loadData() {
+    public void loadData() {
         tableModel.setRowCount(0);
         spaces = statusController.getParkingTableData();
         for (ParkingSpace space : spaces) {

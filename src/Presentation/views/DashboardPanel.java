@@ -25,7 +25,7 @@ public class DashboardPanel extends JPanel {
     private AuthController authController;
     private StatusController statusController;
 
-    private final java.util.List<JButton> buttons = new java.util.ArrayList<>();
+    private final List<JButton> buttons = new java.util.ArrayList<>();
     private JButton initialButton;
 
     private ParkingSpaceController slotController;
@@ -100,7 +100,9 @@ public class DashboardPanel extends JPanel {
             contentArea.add(manageSlotsPanel,   "SLOTS");
             contentArea.add(manageBookingsPanel,   "BOOKINGS");
             contentArea.add(new OccupancyPanel(statusController),  "OCCUPANCY");
-            contentArea.add(new CurrentStatusPanel(statusController, reservationController, authController),  "STATUS");
+            CurrentStatusPanel currentStatusPanel = new CurrentStatusPanel(statusController, reservationController, authController);
+            currentStatusPanel.loadData();
+            contentArea.add(currentStatusPanel,  "STATUS");
             contentArea.add(new LogOutPanel(mainWindow, authController, reservationController, slotController, entryExitController), "LOGOUT");
           
 
@@ -128,7 +130,9 @@ public class DashboardPanel extends JPanel {
             manageReservationsPanel.refreshTable();
             contentArea.add(manageReservationsPanel, "RESERVE");
             contentArea.add(new OccupancyPanel(statusController), "OCCUPANCY");
-            contentArea.add(new CurrentStatusPanel(statusController, reservationController, authController),  "STATUS");
+            CurrentStatusPanel currentStatusPanel = new CurrentStatusPanel(statusController, reservationController, authController);
+            currentStatusPanel.loadData();
+            contentArea.add(currentStatusPanel,  "STATUS");
             contentArea.add(new LogOutPanel(mainWindow, authController, reservationController, slotController, entryExitController), "LOGOUT");
             sidebar.add(Box.createVerticalGlue());
             sidebar.add(buildDivider());

@@ -1,11 +1,11 @@
 package Business.Entities;
 
 public class ParkingSpace {
-        int id;
-        int floor;
-        boolean current_status;
-        String parked_license_plate;
-        String type;
+        private int id;
+        private int floor;
+        private boolean current_status;
+        private String parked_license_plate;
+        private String type;
 
 
         public ParkingSpace (int id, int floor, boolean current_status, String parked_license_plate, String type) {
