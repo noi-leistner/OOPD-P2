@@ -87,14 +87,16 @@ public class SimulationManager {
             double pEntry = (double) available.size() / totalUnreserved;
 
             if (simulatedPlates.isEmpty()){
-                simulateExit();
-            } else if (parkingEmpty) {
                 simulateEntry(available);
             } else {
-                if (random.nextDouble() < pEntry) {
-                    simulateEntry(available);
-                } else {
+                if (available.isEmpty()) {
                     simulateExit();
+                } else {
+                    if (random.nextDouble() < pEntry) {
+                        simulateEntry(available);
+                    } else {
+                        simulateExit();
+                    }
                 }
             }
 
@@ -117,9 +119,9 @@ public class SimulationManager {
         if (result != null) {
             simulatedPlates.add(plate);
             parkingLogDAO.insertLog(space.getId(), plate, SIMULATED_USER_ID, "ENTRY");
-            logger.info("\u001B[34m" + "[ENTRY] " + plate + " → slot " + space.getId() + " at " + new java.text.SimpleDateFormat("HH:mm:ss").format(new java.util.Date()) + "\u001B[0m)");
+            logger.info("\u001B[34m" + "[ENTRY] " + plate + " → slot " + space.getId());
         }
-
+        
     }
 
     private void simulateExit() {
