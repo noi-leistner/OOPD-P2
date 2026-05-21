@@ -2,6 +2,8 @@ package Presentation.views;
 
 import Business.Entities.ParkingSpace;
 import Business.Entities.Reservation;
+import Business.Entities.User;
+import Presentation.controllers.AuthController;
 import Presentation.controllers.ReservationController;
 import Presentation.controllers.StatusController;
 import Presentation.theme.AppColors;
@@ -20,14 +22,18 @@ public class CurrentStatusPanel extends JPanel {
 
     private DefaultTableModel tableModel;
     private JTable table;
+
     private final StatusController statusController;
     private final ReservationController reservationController;
+    private final AuthController authController;
+
     private Timer timer;
     private List<ParkingSpace> spaces = new ArrayList<>(); //TODO: Change once functions have been made, this isn't good architecture
 
-    public CurrentStatusPanel(StatusController statusController, ReservationController reservationController) {
+    public CurrentStatusPanel(StatusController statusController, ReservationController reservationController, AuthController authController) {
         this.statusController = statusController;
         this.reservationController = reservationController;
+        this.authController = authController;
 
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -159,7 +165,28 @@ public class CurrentStatusPanel extends JPanel {
             reservationTitle.setFont(new Font("Arial", Font.BOLD, 13));
             content.add(reservationTitle);
 
-            content.add(makeField("User:", "— (not yet available)")); // TODO: get user by reservation
+            Reservation activeRes = reservationController.getReservationsBySlotId(space.getId())
+                    .stream()
+                    .filter(r -> r.getStartDateTime().before(new Date()) && r.getEndDateTime().after(new Date()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (activeRes != null) {
+                User user = authController.getUserById(activeRes.getUser_id());
+
+                content.add(makeField("Vehicle plate:", activeRes.getVehiclePlate()));
+                content.add(makeField("Start:", activeRes.getStartDateTime().toString()));
+                content.add(makeField("End:", activeRes.getEndDateTime().toString()));
+
+                if (user != null) {
+                    content.add(makeField("User:", user.getName() + " " + user.getSurname()));
+                    content.add(makeField("Email:", user.getEmail()));
+                } else {
+                    content.add(makeField("User:", "Unknown"));
+                }
+            }
+
+            //content.add(makeField("User:", "— (not yet available)")); // TODO: get user by reservation
         }
 
         JButton closeBtn = new JButton("Close");

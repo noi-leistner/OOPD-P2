@@ -100,7 +100,7 @@ public class DashboardPanel extends JPanel {
             contentArea.add(manageSlotsPanel,   "SLOTS");
             contentArea.add(manageBookingsPanel,   "BOOKINGS");
             contentArea.add(new OccupancyPanel(statusController),  "OCCUPANCY");
-            contentArea.add(new CurrentStatusPanel(statusController, reservationController),  "STATUS");
+            contentArea.add(new CurrentStatusPanel(statusController, reservationController, authController),  "STATUS");
             contentArea.add(new LogOutPanel(mainWindow, authController, reservationController, slotController, entryExitController), "LOGOUT");
           
 
@@ -128,7 +128,7 @@ public class DashboardPanel extends JPanel {
             manageReservationsPanel.refreshTable();
             contentArea.add(manageReservationsPanel, "RESERVE");
             contentArea.add(new OccupancyPanel(statusController), "OCCUPANCY");
-            contentArea.add(new CurrentStatusPanel(statusController, reservationController),  "STATUS");
+            contentArea.add(new CurrentStatusPanel(statusController, reservationController, authController),  "STATUS");
             contentArea.add(new LogOutPanel(mainWindow, authController, reservationController, slotController, entryExitController), "LOGOUT");
             sidebar.add(Box.createVerticalGlue());
             sidebar.add(buildDivider());

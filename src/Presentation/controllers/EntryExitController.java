@@ -53,7 +53,6 @@ public class EntryExitController {
     public ParkingSpace enterWithReservation(String plate, int userId) {
         ParkingSpace space = parkingLotManager.enterWithReservation(plate, userId);
         if (space != null) {
-            System.out.println("entryexitcontroller: Space isnt null");
             parkingLogManager.logEntry(space.getId(), plate, userId);
         }
         return space;

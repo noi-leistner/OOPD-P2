@@ -231,8 +231,9 @@ public class VehicleEntryPanel extends JPanel {
                 if (confirm != JOptionPane.YES_OPTION) return;
 
                 ParkingSpace space = entryExitController.getReservedSpaceForPlate(plate);
+                String occupantPlate = null;
                 if (space.isOccupied()) {
-                    String occupantPlate = spaceController.getParkedPlateAtSpace(space.getId());
+                    occupantPlate = spaceController.getParkedPlateAtSpace(space.getId());
 
                     JOptionPane.showMessageDialog(this,
                             "<html>Your reserved space <b>#" + space.getId() + "</b> is occupied and no alternative spaces are available.<br>" +
@@ -240,11 +241,13 @@ public class VehicleEntryPanel extends JPanel {
                             "No Alternative Available",
                             JOptionPane.ERROR_MESSAGE
                     );
-                    entryExitController.exitParking(occupantPlate, userId);
                 }
 
                 ParkingSpace entered = entryExitController.enterWithReservation(plate, userId);
                 if (entered != null) {
+                    if (space.isOccupied()) {
+                        entryExitController.exitParking(occupantPlate, userId);
+                    }
                     showSuccess("✓  Parked at reserved space #" + space.getId() + "  (Floor " + space.getFloor() + ")");
                     plateField.setText("");
                 } else {

@@ -249,7 +249,7 @@ public class ManageSlotsPanel extends BaseManagePanel {
                     refreshTable();
                 }
                 case CANNOT_REMOVE_OCCUPIED ->
-                        JOptionPane.showMessageDialog(this, "Slot is occupied and no alternative spaces are available.", "Cannot Remove", JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "Slot is occupied and no alternative spaces are available.\nThe slot can not be removed!", "Cannot Remove", JOptionPane.WARNING_MESSAGE);
                 case NOT_FOUND ->
                         JOptionPane.showMessageDialog(this, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
                 case DATABASE_ERROR ->

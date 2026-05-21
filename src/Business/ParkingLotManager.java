@@ -83,7 +83,7 @@ public class ParkingLotManager {
         ParkingSpace space = parkingSpaceDao.getReservedSpaceByPlate(licensePlate);
         if (space == null) return null;
         ParkingSpace fresh = parkingSpaceDao.getParkingSpaceById(space.getId());
-        if (fresh == null || fresh.isOccupied()) return null;
+        if (fresh == null) return null;
 
         if (parkingSpaceDao.occupySpace(space.getId(), licensePlate)) {
             return parkingSpaceDao.getParkingSpaceById(space.getId());
