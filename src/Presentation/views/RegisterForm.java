@@ -11,48 +11,13 @@ import java.awt.*;
 import java.awt.event.*;
 import java.net.URL;
 
-public class RegisterForm extends JPanel {
+public class RegisterForm extends BaseAuthForm {
 
     public RegisterForm(MainWindow app, AuthController auth, AuthPanel authPanel) {
         setLayout(new GridLayout(1, 2));
         setOpaque(false); // let the parent background show; avoids gray bleed
-        add(buildLeftPanel());
+        add(buildImagePanel("/Presentation/theme/resources/image_login_1.jpg"));
         add(buildCenterPanel(app, auth, authPanel));
-    }
-
-    private JPanel buildLeftPanel() {
-        JPanel left = new JPanel() {
-            private final Image bg = loadBackground();
-
-            private Image loadBackground() {
-                URL url = getClass().getResource("/image_login_1.jpg");
-                if (url == null) {
-                    System.err.println("[RegisterForm] Background image not found. " +
-                            "Mark the resources folder as Resources Root in IntelliJ.");
-                    return null;
-                }
-                return new ImageIcon(url).getImage();
-            }
-
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2 = (Graphics2D) g.create();
-
-                // Step 1 — solid blue base (shown when image is missing)
-                g2.setColor(AppColors.BRAND_MID);
-                g2.fillRect(0, 0, getWidth(), getHeight());
-
-                // Step 2 — image at 50% opacity so the blue tints through
-                if (bg != null) {
-                    g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-                    g2.drawImage(bg, 0, 0, getWidth(), getHeight(), null);
-                }
-                g2.dispose();
-            }
-        };
-        // CHANGE: no setPreferredSize — GridLayout ignores it and gives each column exactly 50%
-        return left;
     }
 
     // ── Right panel ───────────────────────────────────────────────────────────
@@ -71,16 +36,8 @@ public class RegisterForm extends JPanel {
         form.setBorder(new EmptyBorder(10, 40, 10, 40));
         form.setMaximumSize(new Dimension(340, Integer.MAX_VALUE));
 
-        // Title + subtitle — same font/colour pattern as LoginForm
-        JLabel title = new JLabel("REGISTER");
-        title.setFont(new Font("SansSerif", Font.BOLD, 26));
-        title.setForeground(AppColors.BRAND_DARK);
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel sub = new JLabel("CREATE ACCOUNT");
-        sub.setFont(new Font("SansSerif", Font.PLAIN, 11));
-        sub.setForeground(AppColors.TEXT_MUTED);
-        sub.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel title = buildTitle("REGISTER");
+        JLabel sub = buildSubtitle("CREATE ACCOUNT");
 
         // CHANGE: all fields now go through buildField() for consistent styling.
         //         Previously each field was a raw new JTextField with no styling.
@@ -155,17 +112,8 @@ public class RegisterForm extends JPanel {
             }
         });
 
-        // Back-to-login link
-        JLabel loginLink = new JLabel("Already have an account? Login");
-        loginLink.setFont(new Font("SansSerif", Font.PLAIN, 11));
-        loginLink.setForeground(AppColors.BRAND_MID);
-        loginLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        loginLink.setAlignmentX(Component.CENTER_ALIGNMENT);
-        loginLink.addMouseListener(new MouseAdapter() {
-            @Override public void mouseClicked(MouseEvent e) {
-                authPanel.showLogin(app, auth);
-            }
-        });
+        JLabel loginLink = buildLink("Already have an account? Login",
+                () -> authPanel.showLogin(app, auth));
 
         // Assembly — vertical struts control spacing between fields
         form.add(title);
@@ -190,65 +138,5 @@ public class RegisterForm extends JPanel {
 
         right.add(form);
         return right;
-    }
-
-    // ── Helpers — exact copies from LoginForm ─────────────────────────────────
-    // CHANGE: these were missing entirely in RegisterForm; fields had no styling.
-
-    /** Underline-style field with grey placeholder text (text fields only). */
-    private JTextField buildField(String placeholder, boolean isPassword) {
-        JTextField field = isPassword ? new JPasswordField(20) : new JTextField(20);
-        field.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        field.setForeground(new Color(60, 60, 70));
-        field.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 2, 0, AppColors.FIELD_BORDER),
-                new EmptyBorder(8, 4, 8, 4)
-        ));
-        field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
-        field.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        if (!isPassword) {
-            field.setForeground(AppColors.TEXT_MUTED);
-            field.setText(placeholder);
-            field.addFocusListener(new FocusAdapter() {
-                @Override public void focusGained(FocusEvent e) {
-                    if (field.getText().equals(placeholder)) {
-                        field.setText("");
-                        field.setForeground(new Color(60, 60, 70));
-                    }
-                }
-                @Override public void focusLost(FocusEvent e) {
-                    if (field.getText().isBlank()) {
-                        field.setForeground(AppColors.TEXT_MUTED);
-                        field.setText(placeholder);
-                    }
-                }
-            });
-        }
-        return field;
-    }
-
-    /** Rounded blue pill button — same custom paintComponent as LoginForm. */
-    private JButton buildPrimaryButton(String text) {
-        JButton btn = new JButton(text) {
-            @Override protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(getModel().isPressed() ? AppColors.BRAND_DARK : AppColors.ACCENT);
-                g2.fillRect(0, 0, getWidth(), getHeight());
-                g2.dispose();
-                super.paintComponent(g);
-            }
-        };
-        btn.setFont(new Font("SansSerif", Font.BOLD, 13));
-        btn.setForeground(Color.WHITE);
-        btn.setContentAreaFilled(false);
-        btn.setBorderPainted(false);
-        btn.setFocusPainted(false);
-        btn.setOpaque(false);
-        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
-        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        return btn;
     }
 }

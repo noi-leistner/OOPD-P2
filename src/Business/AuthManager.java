@@ -51,4 +51,8 @@ public class AuthManager {
         return userDAO.deleteUser(userId);
     }
 
+    public User getUserById(int id) {
+        return userDAO.getUserById(id);
+    }
+
 }

@@ -58,5 +58,9 @@ public class AuthController {
         return deleted;
     }
 
+    public User getUserById(int id) {
+        return authManager.getUserById(id);
+    }
+
     // When implementing the button for logging out / delete account, just call these two functions.
 }

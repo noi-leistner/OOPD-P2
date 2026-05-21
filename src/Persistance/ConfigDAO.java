@@ -10,7 +10,7 @@ import java.util.logging.Logger;
  */
 public class ConfigDAO {
     /** URL from .env (inside .gitignore) from docker */
-    private static final String URL = "jdbc:mysql://localhost:3306/mydb?serverTimezone=UTC";
+    private static final String URL = "jdbc:mysql://localhost:3306/mydb?connectionTimeZone=Europe/Madrid";
     private static final String USER = "root";
     private static final String PASS = "";
 

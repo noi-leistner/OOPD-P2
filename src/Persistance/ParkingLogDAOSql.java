@@ -12,6 +12,8 @@ import java.util.logging.Logger;
 
 public class ParkingLogDAOSql implements ParkingLogDAO {
 
+    private static final Logger log = Logger.getLogger(ParkingLogDAOSql.class.getName());
+
     @Override
     public void insertLog(int spaceId, String licensePlate, int userId, String action) {
         String sql = "INSERT INTO parking_log (parking_slot_id, license_plate, user_id, action, timestamp) " +
@@ -59,5 +61,30 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
         return result;
     }
 
+    @Override
+    public boolean isVehicleCurrentlyParked(String licensePlate) {
+        String sql = "SELECT 1 FROM parking_log " +
+                "WHERE license_plate = ? " +
+                "AND action = 'ENTRY' " +
+                "AND NOT EXISTS (" +
+                "  SELECT 1 FROM parking_log p2 " +
+                "  WHERE p2.license_plate = ? " +
+                "  AND p2.action = 'EXIT' " +
+                "  AND p2.timestamp > parking_log.timestamp" +
+                ")";
 
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, licensePlate);
+            stmt.setString(2, licensePlate);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            return false;
+        }
+    }
 }

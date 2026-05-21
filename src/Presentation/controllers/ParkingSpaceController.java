@@ -18,7 +18,7 @@ public class ParkingSpaceController {
     }
 
     public DaoResult addSpace(int code, int floor, String vehicleType, boolean occStatus) {
-        ParkingSpace space = new ParkingSpace(code, floor, occStatus, vehicleType, null);
+        ParkingSpace space = new ParkingSpace(code, floor, occStatus, null, vehicleType);
         return parkingLotManager.addSpace(space);
     }
 
@@ -29,6 +29,10 @@ public class ParkingSpaceController {
         ParkingSpace space = new ParkingSpace(code, floor, occupied, vehicleType, null);
 
         return parkingLotManager.editSpace(space);
+    }
+
+    public String getParkedPlateAtSpace(int spaceId) {
+        return parkingLotManager.getParkedPlateAtSpace(spaceId);
     }
 
     public DaoResult removeSpace(int spaceId, boolean hasReservation) {
@@ -72,5 +76,13 @@ public class ParkingSpaceController {
 
     public List<ParkingSpace> getAvailableSpotsByType(String type) {
         return parkingLotManager.getAvailableSpacesForType(type);
+    }
+
+    public List<ParkingSpace> getSpotsByType(String type) {
+        return parkingLotManager.getSpotsByType(type);
+    }
+
+    public void removeVehicleFromSpot() {
+
     }
 }

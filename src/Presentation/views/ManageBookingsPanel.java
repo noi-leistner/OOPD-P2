@@ -53,7 +53,7 @@ public class ManageBookingsPanel extends BaseManagePanel {
                     "Cancel reservation " + selectedReservation.getId() + "?",
                     "Confirm", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                DaoResult cancelResult = reservationController.cancelReservationFromAdmin(selectedReservation.getId());
+                DaoResult cancelResult = reservationController.cancelReservationWithNotification(selectedReservation.getId());
                 if (cancelResult != DaoResult.SUCCESS) {
                     JOptionPane.showMessageDialog(this, "Failed to cancel reservation.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
@@ -91,7 +91,7 @@ public class ManageBookingsPanel extends BaseManagePanel {
         for (Reservation reservation : reservations) {
             ParkingSpace space = slotController.getSpaceDetails(reservation.getParkingSlotId());
             tableModel.addRow(new Object[]{
-                    reservation.getUser_id(),
+                    reservation.getUserId(),
                     reservation.getVehiclePlate(),
                     space != null ? space.getId() : "N/A",
                     space != null ? space.getType() : "N/A",
@@ -142,7 +142,7 @@ public class ManageBookingsPanel extends BaseManagePanel {
         addField(formPanel, "End time:", endTimeSpinner);
         endTimeSpinner.setValue(reservation.getEndDateTime());
 
-        List<ParkingSpace> availableSpots = slotController.getAvailableSpotsByType(currentSpot.getType());
+        List<ParkingSpace> availableSpots = slotController.getSpotsByType(currentSpot.getType());
 
         if (availableSpots == null) {
             availableSpots = new ArrayList<>();
@@ -189,7 +189,7 @@ public class ManageBookingsPanel extends BaseManagePanel {
                 return;
             }
 
-            Reservation editedReservation = new Reservation(reservation.getId(), reservation.getUser_id(), reservation.getVehiclePlate(), ((ParkingSpace) spotsCombo.getSelectedItem()).getId(), start, end, false);
+            Reservation editedReservation = new Reservation(reservation.getId(), reservation.getUserId(), reservation.getVehiclePlate(), ((ParkingSpace) spotsCombo.getSelectedItem()).getId(), start, end, false);
 
             switch (reservationController.editReservation(editedReservation)) {
                 case SUCCESS -> {

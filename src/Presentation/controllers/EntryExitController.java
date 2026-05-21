@@ -5,8 +5,6 @@ import Business.Entities.Reservation;
 import Business.Entities.Vehicle;
 import Business.ParkingLogManager;
 import Business.ParkingLotManager;
-import Business.ReservationManager;
-import Persistance.VehicleDAO;
 import Business.VehicleManager;
 
 import java.util.Comparator;
@@ -26,8 +24,12 @@ public class EntryExitController {
         this.parkingLogManager = parkingLogManager;
     }
 
-    public boolean hasReservation(String plate) {
-        return reservationController.reservationExistsForPlate(plate);
+    public boolean hasReservationNow(String plate) {
+        return reservationController.hasActiveReservationForPlate(plate);
+    }
+
+    public boolean isVehicleCurrentlyParked(String plate) {
+        return parkingLogManager.isVehicleCurrentlyParked(plate);
     }
 
     public boolean vehicleBelongsToUser(String licensePlate, int userId) {
@@ -54,6 +56,12 @@ public class EntryExitController {
             parkingLogManager.logEntry(space.getId(), plate, userId);
         }
         return space;
+    }
+
+    public ParkingSpace getReservedSpaceForPlate(String plate) {
+        Reservation reservation = reservationController.getActiveReservationForPlate(plate);
+        if (reservation == null) return null;
+        return parkingLotManager.getSpaceDetails(reservation.getParkingSlotId());
     }
 
     public ParkingSpace enterWithoutReservation(String plate, int spaceId, int userId) {

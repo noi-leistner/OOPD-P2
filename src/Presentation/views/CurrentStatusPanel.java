@@ -2,6 +2,8 @@ package Presentation.views;
 
 import Business.Entities.ParkingSpace;
 import Business.Entities.Reservation;
+import Business.Entities.User;
+import Presentation.controllers.AuthController;
 import Presentation.controllers.ReservationController;
 import Presentation.controllers.StatusController;
 import Presentation.theme.AppColors;
@@ -20,14 +22,17 @@ public class CurrentStatusPanel extends JPanel {
 
     private DefaultTableModel tableModel;
     private JTable table;
+
     private final StatusController statusController;
     private final ReservationController reservationController;
-    private Timer timer;
-    private List<ParkingSpace> spaces = new ArrayList<>(); //TODO: Change once functions have been made, this isn't good architecture
+    private final AuthController authController;
 
-    public CurrentStatusPanel(StatusController statusController, ReservationController reservationController) {
+    private List<ParkingSpace> spaces = new ArrayList<>();
+
+    public CurrentStatusPanel(StatusController statusController, ReservationController reservationController, AuthController authController) {
         this.statusController = statusController;
         this.reservationController = reservationController;
+        this.authController = authController;
 
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -37,20 +42,6 @@ public class CurrentStatusPanel extends JPanel {
         addTableClickListener();
 
         loadData();
-
-        // Timer that calls loadData() every 5 seconds
-        timer = new Timer(5000, e -> loadData());
-
-        // Timer only starts when currentStatusPanel is visible to optimize
-        addHierarchyListener(e -> {
-            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-                if (isShowing()) {
-                    timer.start();
-                } else {
-                    timer.stop();
-                }
-            }
-        });
     }
 
     private JPanel buildHeader() {
@@ -159,25 +150,28 @@ public class CurrentStatusPanel extends JPanel {
             reservationTitle.setFont(new Font("Arial", Font.BOLD, 13));
             content.add(reservationTitle);
 
-            content.add(makeField("User:", "— (not yet available)")); // TODO: get user by reservation
+            Reservation activeRes = reservationController.getReservationsBySlotId(space.getId())
+                    .stream()
+                    .filter(r -> r.getStartDateTime().before(new Date()) && r.getEndDateTime().after(new Date()))
+                    .findFirst()
+                    .orElse(null);
 
-            JButton cancelBtn = new JButton("Cancel Reservation");
-            cancelBtn.setBackground(AppColors.RED);
-            cancelBtn.setForeground(Color.WHITE);
-            cancelBtn.setOpaque(true);
-            cancelBtn.setBorderPainted(false);
-            cancelBtn.setFocusPainted(false);
-            cancelBtn.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
-            cancelBtn.addActionListener(e -> {
-                int confirm = JOptionPane.showConfirmDialog(dialog,
-                        "Do you want to cancel the reservation for space " + space.getId() + "?",
-                        "Confirm", JOptionPane.YES_NO_OPTION);
-                if (confirm == JOptionPane.YES_OPTION) {
-                    // TODO: call function to cancel reservation
-                    dialog.dispose();
+            if (activeRes != null) {
+                User user = authController.getUserById(activeRes.getUserId());
+
+                content.add(makeField("Vehicle plate:", activeRes.getVehiclePlate()));
+                content.add(makeField("Start:", activeRes.getStartDateTime().toString()));
+                content.add(makeField("End:", activeRes.getEndDateTime().toString()));
+
+                if (user != null) {
+                    content.add(makeField("User:", user.getName() + " " + user.getSurname()));
+                    content.add(makeField("Email:", user.getEmail()));
+                } else {
+                    content.add(makeField("User:", "Unknown"));
                 }
-            });
-            buttonPanel.add(cancelBtn);
+            }
+
+            //content.add(makeField("User:", "— (not yet available)")); // TODO: get user by reservation
         }
 
         JButton closeBtn = new JButton("Close");
@@ -214,9 +208,9 @@ public class CurrentStatusPanel extends JPanel {
         tableModel.setRowCount(0);
         spaces = statusController.getParkingTableData();
         for (ParkingSpace space : spaces) {
+            Reservation reservation = reservationController.getActiveReservationForPlate(space.getParkedLicensePlate());
             List<Reservation> reservations = reservationController.getReservationsBySlotId(space.getId());
-            boolean isReserved = !reservations.isEmpty();
-            boolean isOccupied = space.isOccupied();
+
 
             String plate = space.isOccupied() ? space.getParkedLicensePlate() : "-";
 
@@ -224,8 +218,8 @@ public class CurrentStatusPanel extends JPanel {
                     space.getId(),
                     space.getFloor(),
                     space.getType(),
-                    isOccupied ? "Occupied" : "Free",
-                    isReserved ? "Reserved" : "Unreserved",
+                    space.isOccupied() ? "Occupied" : "Free",
+                    reservation != null ? "Reserved" : "Unreserved",
                     plate
             });
         }

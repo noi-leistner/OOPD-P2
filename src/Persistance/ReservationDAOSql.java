@@ -19,8 +19,8 @@ public class ReservationDAOSql implements ReservationDAO {
                 rs.getInt("user_id"),
                 rs.getString("vehicle_license_plate"),
                 rs.getInt("parking_slot_id"),
-                rs.getDate("start_date"),
-                rs.getDate("end_date"),
+                rs.getTimestamp("start_date"),
+                rs.getTimestamp("end_date"),
                 rs.getBoolean("is_cancelled")
         );
     }
@@ -32,7 +32,7 @@ public class ReservationDAOSql implements ReservationDAO {
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, reservation.getUser_id());
+            stmt.setInt(1, reservation.getUserId());
             stmt.setString(2, reservation.getVehiclePlate());
             stmt.setInt(3, reservation.getParkingSlotId());
             stmt.setTimestamp(4, new java.sql.Timestamp(reservation.getStartDateTime().getTime()));
@@ -90,7 +90,7 @@ public class ReservationDAOSql implements ReservationDAO {
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, reservation.getUser_id());
+            stmt.setInt(1, reservation.getUserId());
             stmt.setString(2, reservation.getVehiclePlate());
             stmt.setInt(3, reservation.getParkingSlotId());
             stmt.setTimestamp(4, new java.sql.Timestamp(reservation.getStartDateTime().getTime()));
@@ -224,7 +224,7 @@ public class ReservationDAOSql implements ReservationDAO {
 
     @Override
     public Reservation findReservationByPlate(String licensePlate) {
-        String sql = "SELECT * FROM reservations WHERE vehicle_license_plate = ? AND is_cancelled = FALSE";
+        String sql = "SELECT * FROM reservations WHERE vehicle_license_plate = ? AND is_cancelled = 0";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -259,5 +259,27 @@ public class ReservationDAOSql implements ReservationDAO {
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
+    }
+
+    @Override
+    public Reservation getActiveReservationForPlate(String plate) {
+        String sql = "SELECT * FROM reservations " +
+                "WHERE vehicle_license_plate = ? " +
+                "AND is_cancelled = FALSE " +
+                "AND start_date <= NOW() " +
+                "AND end_date >= NOW()";
+
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, plate);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return null;
     }
 }

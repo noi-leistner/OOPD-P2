@@ -9,7 +9,7 @@ public class AddVehicleDialog extends JDialog {
     private boolean confirmed = false;
     private JComboBox<String> typeCombo;
 
-    private static final String[] VEHICLE_TYPES = {"car", "motorcycle", "large vehicle"};
+    private static final String[] VEHICLE_TYPES = {"car", "motorcycle", "Truck"};
 
     public AddVehicleDialog(Frame parent, String licensePlate) {
         super(parent, "Register Vehicle", true);
