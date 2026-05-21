@@ -210,15 +210,15 @@ public class CurrentStatusPanel extends JPanel {
         return row;
     }
 
-    private void loadData() {
+    public void loadData() {
         tableModel.setRowCount(0);
         spaces = statusController.getParkingTableData();
         for (ParkingSpace space : spaces) {
             List<Reservation> reservations = reservationController.getReservationsBySlotId(space.getId());
             boolean isReserved = !reservations.isEmpty();
-            boolean isOccupied = reservations.stream().anyMatch(r -> r.getStartDateTime().before(new Date()) && r.getEndDateTime().after(new Date()));
+            boolean isOccupied = space.isOccupied();
 
-            //String plate = space.isOccupied() ? space.getParkedLicensePlate() : "-";
+            String plate = space.isOccupied() ? space.getParkedLicensePlate() : "-";
 
             tableModel.addRow(new Object[]{
                     space.getId(),
@@ -226,7 +226,7 @@ public class CurrentStatusPanel extends JPanel {
                     space.getType(),
                     isOccupied ? "Occupied" : "Free",
                     isReserved ? "Reserved" : "Unreserved",
-                    "-"                     // Change when we can get the license plate
+                    plate
             });
         }
     }

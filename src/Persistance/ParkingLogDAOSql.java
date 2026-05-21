@@ -29,28 +29,6 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
             e.printStackTrace();
         }
     }
-
-    /*
-    public Map<Integer, Integer> getOccupancyLastHour() {
-        int[] netChange =  new int[60];
-        String sql = "SELECT * FROM parking_log ORDER BY timestamp DESC LIMIT 60";
-        try (Connection conn = ConfigDAO.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-
-            }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    */
-    /*
-    // Gives a map with cars / minutes each minute, and displays it in statusController.
-     */
     @Override
     public Map<Integer, Integer> getOccupancyLastHour() {
         Map<Integer, Integer> netByMinute = new LinkedHashMap<>();

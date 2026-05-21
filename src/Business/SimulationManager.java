@@ -26,7 +26,7 @@ public class SimulationManager {
     private final List<String> simulatedPlates = new ArrayList<>();
     private final Random random = new Random();
 
-    private boolean running = false;
+    private volatile boolean running = false;
     private Thread simulationThread;
 
     private Runnable onTickCallBack;
@@ -115,12 +115,11 @@ public class SimulationManager {
         if (result != null) {
             simulatedPlates.add(plate);
             parkingLogDAO.insertLog(space.getId(), plate, SIMULATED_USER_ID, "ENTRY");
-            logger.info("simulated plate " + plate + "-> ENTRY");
+            logger.info("\u001B[34m" + "[ENTRY] " + plate + " → slot " + space.getId() + " at " + new java.text.SimpleDateFormat("HH:mm:ss").format(new java.util.Date()) + "\u001B[0m)");
         }
     }
 
     private void simulateExit(List<ParkingSpace> available) {
-        if (available.isEmpty()) return;
         String plate = simulatedPlates.get(random.nextInt(simulatedPlates.size()));
 
         ParkingSpace result = parkingLotManager.exit(plate, SIMULATED_USER_ID);
@@ -128,7 +127,7 @@ public class SimulationManager {
             simulatedPlates.remove(plate);
             parkingLogDAO.insertLog(result.getId(), plate, SIMULATED_USER_ID, "EXIT");
             vehicleDAO.deleteSimulatedVehicle(plate);
-            logger.info("Simmulation created for plate (EXIT)" + plate + "-> EXIT");
+            logger.info("\u001B[34m" + "[EXIT]  " + plate + " ← slot " + result.getId() + " at " + new java.text.SimpleDateFormat("HH:mm:ss").format(new java.util.Date()) + "\u001B[0m)");
         }
     }
 
@@ -138,9 +137,8 @@ public class SimulationManager {
         char l1 = letters.charAt(random.nextInt(letters.length()));
         char l2 = letters.charAt(random.nextInt(letters.length()));
         char l3 = letters.charAt(random.nextInt(letters.length()));
-        char l4 = letters.charAt(random.nextInt(letters.length()));
         int nums = random.nextInt(9000) + 1000;
-        return "" + l1 + l2 + l3 + l4 + nums;
+        return "" + nums + l1 + l2 + l3;
     }
 
     public boolean isRunning () {return running;}
