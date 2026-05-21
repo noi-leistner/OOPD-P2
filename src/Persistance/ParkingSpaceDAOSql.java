@@ -293,7 +293,10 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
     public List<ParkingSpace> findAvailableUnreserved() {
         String sql = "SELECT identifier, floor, occupation_status, vehicle_type, parked_license_plate " +
                 "FROM parking_slots " +
-                "WHERE occupation_status = FALSE ";
+                "WHERE occupation_status = FALSE " +
+                "AND identifier NOT IN (" +
+                "  SELECT parking_slot_id FROM reservations WHERE is_cancelled = FALSE" +
+                ")";
         List<ParkingSpace> spaces = new ArrayList<>();
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -306,6 +309,22 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
             Logger.getLogger(ConfigDAO.class.getName()).log(Level.SEVERE, "Error reading config.json", e);
         }
         return spaces;
+    }
+
+    @Override
+    public int getTotalUnreservedSpaces() {
+        String sql = "SELECT COUNT(*) FROM parking_slots " +
+                "WHERE identifier NOT IN (" +
+                "  SELECT parking_slot_id FROM reservations WHERE is_cancelled = FALSE" +
+                ")";
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            Logger.getLogger(ConfigDAO.class.getName()).log(Level.SEVERE, "Get total unreserved spaces failed", e);
+        }
+        return 0;
     }
 
 }

@@ -78,19 +78,20 @@ public class SimulationManager {
     private void tick() {
             List<ParkingSpace> available = parkingSpaceDAO.findAvailableUnreserved();
             int totalOccupied = simulatedPlates.size();
-            int totalSpaces = parkingSpaceDAO.getAllParkingSpaces().size();
+            int totalUnreserved = parkingSpaceDAO.getTotalUnreservedSpaces();
 
             // decide entry or exit based on current occupancy
             boolean parkingFull = available.isEmpty();
             boolean parkingEmpty = simulatedPlates.isEmpty();
 
-            if (parkingFull) {
+            double pEntry = (double) available.size() / totalUnreserved;
+
+            if (simulatedPlates.size() == totalOccupied) {
                 simulateExit(available);
             } else if (parkingEmpty) {
                 simulateEntry(available);
             } else {
-                // 50% chance entry, 50% chance exit
-                if (random.nextInt(100) < 50) {
+                if (random.nextDouble() < pEntry) {
                     simulateEntry(available);
                 } else {
                     simulateExit(available);
@@ -120,6 +121,7 @@ public class SimulationManager {
     }
 
     private void simulateExit(List<ParkingSpace> available) {
+        if (simulatedPlates.isEmpty()) return;
         String plate = simulatedPlates.get(random.nextInt(simulatedPlates.size()));
 
         ParkingSpace result = parkingLotManager.exit(plate, SIMULATED_USER_ID);

@@ -22,4 +22,5 @@ public interface ParkingSpaceDAO {
     boolean vacateSpace(int spaceId);
     boolean vacateSpacesByUserId(int userId);
     List<ParkingSpace> findAvailableUnreserved();
+    int getTotalUnreservedSpaces();
 }
