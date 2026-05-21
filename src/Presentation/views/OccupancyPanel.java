@@ -4,9 +4,13 @@ import Presentation.controllers.StatusController;
 import Presentation.theme.AppColors;
 
 import javax.swing.*;
+import javax.swing.Timer;
+
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 
 /**
  * Displays a bar chart of parking occupancy over the last day.
@@ -16,6 +20,7 @@ public class OccupancyPanel extends JPanel {
 
     private final StatusController statusController;
     private final ChartPanel chartPanel;
+    private Timer timer;
 
     public OccupancyPanel(StatusController statusController) {
         this.statusController = statusController;
@@ -47,6 +52,15 @@ public class OccupancyPanel extends JPanel {
 
         // Load data immediately on creation
         loadData();
+
+        timer = new Timer(60_000, e -> loadData());
+
+        addHierarchyListener(e -> {
+            if ((e.getChangeFlags() & 1) != 0) {
+                if (isShowing()) timer.start();
+                else             timer.stop();
+            }
+        });
     }
 
     /** Fetches fresh data from StatusController and repaints the chart. */
@@ -103,7 +117,7 @@ public class OccupancyPanel extends JPanel {
             if (data == null || data.isEmpty()) {
                 g2.setFont(new Font("Arial", Font.ITALIC, 12));
                 g2.setColor(Color.GRAY);
-                g2.drawString("No data available for the last 24 hours.",
+                g2.drawString("No data available for the last hour.",
                         chartX + chartW / 2 - 120, chartY + chartH / 2);
                 return;
             }

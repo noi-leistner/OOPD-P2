@@ -10,10 +10,10 @@ import Presentation.controllers.StatusController;
 import Presentation.theme.AppColors;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -43,6 +43,14 @@ public class CurrentStatusPanel extends JPanel {
         addTableClickListener();
 
         loadData();
+        Timer timer = new Timer(5000, e -> loadData());
+
+        addHierarchyListener(e -> {
+            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                if (isShowing()) timer.start();
+                else             timer.stop();
+            }
+        });
     }
 
     private JPanel buildHeader() {
@@ -210,11 +218,18 @@ public class CurrentStatusPanel extends JPanel {
     public void loadData() {
         tableModel.setRowCount(0);
         spaces = statusController.getParkingTableData();
+        boolean isReserved = false;
         for (ParkingSpace space : spaces) {
             List<Reservation> reservation = reservationController.getReservationsBySlotId(space.getId());
-
-
-            String plate = space.isOccupied() ? space.getParkedLicensePlate() : "-";
+            isReserved = !reservation.isEmpty();
+            String plate;
+            if (space.isOccupied()) {
+                plate = space.getParkedLicensePlate();
+            } else if (isReserved) {
+                plate = reservation.get(0).getVehiclePlate();
+            } else {
+                plate = "-";
+            }
 
             tableModel.addRow(new Object[]{
                     space.getId(),
