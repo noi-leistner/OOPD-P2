@@ -12,25 +12,21 @@ public class AuthController {
     private AuthManager authManager;
     private SessionManager sessionManager;
 
-
     public AuthController(AuthManager authManager, SessionManager sessionManager) {
         this.authManager = authManager;
         this.sessionManager = sessionManager;
     }
 
     public AuthResult logIn(String email, String password) {
-        if (email.isEmpty() || password.isEmpty()) {  // ← també arreglat (punt 4)
-            return AuthResult.EMPTY_FIELDS;
+        if (email.isEmpty() && password.isEmpty()) { return AuthResult.EMPTY_FIELDS; }
+
+        User[] outUser = new User[1];
+        AuthResult result = authManager.loginWithResult(email, password, outUser);
+
+        if (result == AuthResult.SUCCESS && outUser[0] != null) {
+            SessionManager.getInstance().login(outUser[0]);
         }
-
-        User user = authManager.login(email, password);  // ← ara retorna User
-
-        if (user == null) {
-            return AuthResult.INVALID_CREDENTIALS;
-        }
-
-        SessionManager.getInstance().login(user);
-        return AuthResult.SUCCESS;
+        return result;
     }
 
     public AuthResult signUp(User user) {
@@ -41,7 +37,7 @@ public class AuthController {
         return result;
     }
 
-    // TODO: Delete everything!!!
+
     public void logOut() {
         System.out.println("\nUser logged out.");
         sessionManager.logout();

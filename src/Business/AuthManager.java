@@ -44,6 +44,21 @@ public class AuthManager {
         return user;
     }
 
+    public AuthResult loginWithResult(String email, String password, User[] outUser) {
+        if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
+            return AuthResult.EMPTY_FIELDS;
+        }
+        User user = userDAO.getUserByEmail(email.trim());
+        if (user == null) {
+            return AuthResult.USER_NOT_FOUND;
+        }
+        if (BCrypt.checkpw(password, user.getPassword())) {
+            if (outUser != null && outUser.length > 0) outUser[0] = user;
+            return AuthResult.SUCCESS;
+        }
+        return AuthResult.INVALID_CREDENTIALS;
+    }
+
     public AuthResult signUp(User user) {
         if (user == null) return AuthResult.DATABASE_ERROR;
         // Check for email requirements:

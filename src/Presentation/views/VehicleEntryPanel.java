@@ -16,7 +16,6 @@ import java.util.List;
 public class VehicleEntryPanel extends JPanel {
 
     private final EntryExitController entryExitController;
-    private final ParkingSpaceController spaceController;
 
     // Step 1 — plate input
     private JPanel stepOnePanel;
@@ -33,9 +32,8 @@ public class VehicleEntryPanel extends JPanel {
     private String currentPlate;
     private String currentVehicleType;
 
-    public VehicleEntryPanel(EntryExitController controller, ParkingSpaceController spaceController) {
+    public VehicleEntryPanel(EntryExitController controller) {
         this.entryExitController = controller;
-        this.spaceController = spaceController;
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(30, 40, 30, 40));
 
@@ -233,7 +231,7 @@ public class VehicleEntryPanel extends JPanel {
                 ParkingSpace space = entryExitController.getReservedSpaceForPlate(plate);
                 String occupantPlate = null;
                 if (space.isOccupied()) {
-                    occupantPlate = spaceController.getParkedPlateAtSpace(space.getId());
+                    occupantPlate = entryExitController.getParkedPlateAtSpace(space.getId());
 
                     JOptionPane.showMessageDialog(this,
                             "<html>Your reserved space <b>#" + space.getId() + "</b> is occupied and no alternative spaces are available.<br>" +
