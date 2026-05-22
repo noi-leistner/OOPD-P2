@@ -50,9 +50,8 @@ public class LoginForm extends BaseAuthForm {
 
                 }
                 case EMPTY_FIELDS        -> JOptionPane.showMessageDialog(this, "Please fill all the fields!");
-                case INVALID_CREDENTIALS -> {
-                    JOptionPane.showMessageDialog(this, "Invalid credentials!");
-                }
+                case USER_NOT_FOUND      -> JOptionPane.showMessageDialog(this, "No account found with that email.");
+                case INVALID_CREDENTIALS -> JOptionPane.showMessageDialog(this, "Wrong password. Please try again.");
                 case DATABASE_ERROR      -> JOptionPane.showMessageDialog(this, "Something went wrong, please try again!");
                 default                  -> JOptionPane.showMessageDialog(this, "Something went wrong!");
             }
