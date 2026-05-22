@@ -140,7 +140,7 @@ public class DashboardPanel extends JPanel {
             addButton(sidebar, "Current Parking status", "STATUS");
             addButton(sidebar, "Log Out", "LOGOUT");
 
-            contentArea.add(new VehicleEntryPanel(entryExitController, slotController), "VEHICLE_ENTRY");
+            contentArea.add(new VehicleEntryPanel(entryExitController), "VEHICLE_ENTRY");
             contentArea.add(new VehicleExitPanel(entryExitController), "VEHICLE_EXIT");
             manageReservationsPanel = new ManageReservationsPanel(reservationController, slotController, entryExitController);
             manageReservationsPanel.refreshTable();

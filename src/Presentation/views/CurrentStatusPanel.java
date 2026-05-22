@@ -181,8 +181,6 @@ public class CurrentStatusPanel extends JPanel {
                     content.add(makeField("User:", "Unknown"));
                 }
             }
-
-            //content.add(makeField("User:", "— (not yet available)")); // TODO: get user by reservation
         }
 
         JButton closeBtn = new JButton("Close");

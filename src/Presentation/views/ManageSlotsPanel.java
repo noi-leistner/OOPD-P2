@@ -238,22 +238,25 @@ public class ManageSlotsPanel extends BaseManagePanel {
 
     private void showRemoveSlotDialog(int spaceId) {
         int confirm = JOptionPane.showConfirmDialog(this, "Delete slot " + spaceId + "?", "Confirm", JOptionPane.YES_NO_OPTION);
+        if (confirm != JOptionPane.YES_OPTION) return;
 
-        if (confirm == JOptionPane.YES_OPTION) {
-            boolean hasReservation = reservationController.getReservationsBySlotId(spaceId)
-                    .stream().anyMatch(r -> r.getStartDateTime().before(new Date()) && r.getEndDateTime().after(new Date()));
-            switch (slotController.removeSpace(spaceId, hasReservation)) {
-                case SUCCESS -> {
-                    JOptionPane.showMessageDialog(this, "Slot removed!");
-                    refreshTable();
-                }
-                case CANNOT_REMOVE_OCCUPIED ->
-                        JOptionPane.showMessageDialog(this, "Slot is occupied and no alternative spaces are available.\nThe slot can not be removed!", "Cannot Remove", JOptionPane.WARNING_MESSAGE);
-                case NOT_FOUND ->
-                        JOptionPane.showMessageDialog(this, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
-                case DATABASE_ERROR ->
-                        JOptionPane.showMessageDialog(this, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
+        boolean hasReservation = reservationController.getReservationsBySlotId(spaceId)
+                .stream().anyMatch(r -> r.getStartDateTime().before(new Date()) && r.getEndDateTime().after(new Date()));
+        if (hasReservation) {
+            ParkingSpace alternative = slotController.findAlternativeSpace(slotController.getSpaceDetails(spaceId).getType(), spaceId);
+
+            if (alternative != null) {
+                reservationController.moveReservation(spaceId, alternative.getId());
+            } else {
+                reservationController.cancelReservationBySlot(spaceId);
             }
+        }
+
+        switch (slotController.removeSpace(spaceId)) {
+            case SUCCESS -> { JOptionPane.showMessageDialog(this, "Slot removed!"); refreshTable(); }
+            case CANNOT_REMOVE_OCCUPIED -> JOptionPane.showMessageDialog(this, "Slot is occupied and no alternative spaces are available.", "Cannot Remove", JOptionPane.WARNING_MESSAGE);
+            case NOT_FOUND -> JOptionPane.showMessageDialog(this, "Slot not found.", "Error", JOptionPane.WARNING_MESSAGE);
+            case DATABASE_ERROR -> JOptionPane.showMessageDialog(this, "Something went wrong.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
