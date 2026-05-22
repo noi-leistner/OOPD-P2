@@ -124,7 +124,7 @@ public class SimulationManager {
                 parkingLogManager.logEntry(result.getId(), plate, SIMULATED_USER_ID);
                 logger.info("[ENTRY]>  " + plate + " ← slot: [" + result.getId() + "]");
             } else {
-                logger.warning("- Spot was full and the driver" + plate + " left.");
+                logger.warning("- Spot was full and the driver: " + plate + " left.");
                 vehicleManager.deleteSimulatedVehicle(plate);
             }
         }

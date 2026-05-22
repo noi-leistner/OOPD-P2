@@ -53,10 +53,10 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
 
         // Convert net-per-minute → cumulative running total (walk 59→0)
         Map<Integer, Integer> result = new LinkedHashMap<>();
-        int running = 0;
+        int currentOccupancy = getSnapshotOccupancy();
         for (int m = 59; m >= 0; m--) {
-            running += netByMinute.getOrDefault(m, 0);
-            result.put(m, Math.max(running, 0));
+            currentOccupancy -= netByMinute.getOrDefault(m, 0);
+            result.put(m, currentOccupancy);
         }
         return result;
     }
@@ -105,5 +105,20 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
             log.log(Level.SEVERE, "Failed to remove parking log with ID: " + logId, e);
             return false;
         }
+    }
+
+    public int getSnapshotOccupancy() {
+        String sql = "SELECT COUNT(*) FROM parking_slots WHERE occupation_status = TRUE";
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(ParkingSpaceDAOSql.class.getName()).log(Level.SEVERE, "Failed to count occupied spaces", e);
+        }
+        return 0;
     }
 }
