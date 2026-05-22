@@ -35,7 +35,7 @@ public class ParkingSpaceController {
         return parkingLotManager.getParkedPlateAtSpace(spaceId);
     }
 
-    public DaoResult removeSpace(int spaceId, boolean hasReservation) {
+    public DaoResult removeSpace(int spaceId) {
         ParkingSpace space = parkingLotManager.getSpaceDetails(spaceId);
         if (space == null) return DaoResult.NOT_FOUND;
 
@@ -45,16 +45,11 @@ public class ParkingSpaceController {
             parkingLotManager.moveVehicle(space, alternative);
         }
 
-        if (hasReservation) {
-            ParkingSpace alternative = parkingLotManager.findAlternativeSpace(space.getType(), spaceId);
-            if (alternative != null) {
-                reservationController.moveReservation(spaceId, alternative.getId());
-            } else {
-                reservationController.cancelReservationBySlot(spaceId);
-            }
-        }
-
         return parkingLotManager.deleteSpace(spaceId);
+    }
+
+    public ParkingSpace findAlternativeSpace(String type, int excludeId) {
+        return parkingLotManager.findAlternativeSpace(type, excludeId);
     }
 
     public ParkingSpace getSpaceDetails(int spaceId) {
@@ -80,9 +75,5 @@ public class ParkingSpaceController {
 
     public List<ParkingSpace> getSpotsByType(String type) {
         return parkingLotManager.getSpotsByType(type);
-    }
-
-    public void removeVehicleFromSpot() {
-
     }
 }
