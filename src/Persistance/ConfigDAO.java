@@ -10,9 +10,26 @@ import java.util.logging.Logger;
  */
 public class ConfigDAO {
     /** URL from .env (inside .gitignore) from docker */
-    private static final String URL = "jdbc:mysql://localhost:3306/mydb?connectionTimeZone=Europe/Madrid";
-    private static final String USER = "root";
-    private static final String PASS = "";
+    private static final String DB_URL;
+    private static final String DB_USER;
+    private static final String DB_PASS;
+
+    static {
+        String host = "localhost", port = "3306", name = "mydb", user = "root", pass = "";
+        try {
+            String json = new String(ConfigDAO.class.getResourceAsStream("/config.json").readAllBytes());
+            host = extractString(json, "db_host");
+            port = extractNumber(json, "db_port");
+            name = extractString(json, "db_name");
+            user = extractString(json, "db_username");
+            pass = extractString(json, "db_password");
+        } catch (Exception e) {
+            Logger.getLogger(ConfigDAO.class.getName()).log(Level.SEVERE, "Failed to load config.json at start", e);
+        }
+        DB_URL  = "jdbc:mysql://" + host + ":" + port + "/" + name + "?connectionTimeZone=Europe/Madrid";
+        DB_USER = user;
+        DB_PASS = pass;
+    }
 
     /**
      * Starts and returns an active MySQL connection:
@@ -24,7 +41,7 @@ public class ConfigDAO {
             // Charge the Driver dynamically
             Class.forName("com.mysql.cj.jdbc.Driver");
             // Connection try:
-            connection = DriverManager.getConnection(URL, USER, PASS);
+            connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
 
         } catch (ClassNotFoundException e) {
             System.err.println("Driver not found:" + e.getMessage());
@@ -37,14 +54,27 @@ public class ConfigDAO {
     public static int getVehicleEntryTime() {
         try {
             String json = new String(ConfigDAO.class.getResourceAsStream("/config.json").readAllBytes());
-            String after = json.substring(json.indexOf("\"vehicle_entry_time\"") + 20).replaceAll("[^0-9]", " ").trim();
-            return Integer.parseInt(after.split("\\s+")[0]);
+            return Integer.parseInt(extractNumber(json, "vehicle_entry_time"));
         } catch (Exception e) {
-            Logger.getLogger(ConfigDAO.class.getName()).log(Level.SEVERE, "Error reading config.json", e);
+            Logger.getLogger(ConfigDAO.class.getName()).log(Level.SEVERE, null, e);
             return 30;
         }
     }
 
 
+    // Helpers:
+    private static String extractString(String json, String key) {
+        int keyId = json.indexOf("\"" + key + "\"");
+        int colonId = json.indexOf(":", keyId);
+        int open = json.indexOf('"', colonId);
+        int close = json.indexOf('"', open + 1);
+        return json.substring(open + 1, close);
+    }
+
+    private static String extractNumber(String json, String key) {
+        int keyId = json.indexOf("\"" + key + "\"");
+        String after = json.substring(json.indexOf(':', keyId) + 1).trim();
+        return after.replaceAll("[^0-9]", " ").trim().split("\\s+")[0];
+    }
 
 }
