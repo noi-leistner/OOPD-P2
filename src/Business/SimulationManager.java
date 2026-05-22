@@ -19,9 +19,8 @@ public class SimulationManager {
     private static final int SIMULATED_USER_ID = -1;
 
     private final ParkingLotManager parkingLotManager;
-    private final ParkingSpaceDAO parkingSpaceDAO;
-    private final ParkingLogDAO parkingLogDAO;
-    private final VehicleDAO vehicleDAO;
+    private final ParkingLogManager parkingLogManager;
+    private final VehicleManager vehicleManager;
 
     private final List<String> simulatedPlates = new ArrayList<>();
     private final Random random = new Random();
@@ -31,16 +30,11 @@ public class SimulationManager {
 
     private Runnable onTickCallBack;
 
-    public SimulationManager (ParkingLotManager parkingLotManager,
-                              ParkingSpaceDAO parkingSpaceDAO,
-                              ParkingLogDAO parkingLogDAO,
-                              VehicleDAO vehicleDAO) {
+    public SimulationManager(ParkingLotManager parkingLotManager, ParkingLogManager parkingLogManager, VehicleManager vehicleManager) {
         this.parkingLotManager = parkingLotManager;
-        this.parkingSpaceDAO = parkingSpaceDAO;
-        this.parkingLogDAO = parkingLogDAO;
-        this.vehicleDAO = vehicleDAO;
+        this.parkingLogManager = parkingLogManager;
+        this.vehicleManager = vehicleManager;
     }
-
     public void setOnTickCallBack(Runnable onTickCallBack) {
         this.onTickCallBack = onTickCallBack;
     }
@@ -76,8 +70,12 @@ public class SimulationManager {
     }
 
     private void tick() {
-            List<ParkingSpace> available = parkingSpaceDAO.findAvailableUnreserved();
-            int totalUnreserved = parkingSpaceDAO.getTotalUnreservedSpaces();
+            List<ParkingSpace> availableMotos = parkingLotManager.getSpotsByType("motorcycle");
+            List<ParkingSpace> availableCars = parkingLotManager.getSpotsByType("car");
+            List<ParkingSpace> available = new ArrayList<>();
+            available.addAll(availableMotos);
+            available.addAll(availableCars);
+            int totalUnreserved = parkingLotManager.getTotalUnreservedSpaces();
 
             // decide entry or exit based on current occupanc7
             boolean parkingEmpty = simulatedPlates.isEmpty();
@@ -113,12 +111,12 @@ public class SimulationManager {
         logger.info("ENTRY attempt — plate: " + plate + " slot: " + space.getId()); // ← afegir
 
 
-        vehicleDAO.insertSimulatedVehicle(plate, space.getType());
+        vehicleManager.insertSimulatedVehicle(plate, space.getType());
 
         ParkingSpace result = parkingLotManager.enterWithoutReservation(plate, space.getId(), SIMULATED_USER_ID);
         if (result != null) {
             simulatedPlates.add(plate);
-            parkingLogDAO.insertLog(space.getId(), plate, SIMULATED_USER_ID, "ENTRY");
+            parkingLogManager.logEntry(space.getId(), plate, SIMULATED_USER_ID);
             logger.info("\u001B[34m" + "[ENTRY] " + plate + " → slot " + space.getId());
         }
         
@@ -131,8 +129,8 @@ public class SimulationManager {
         ParkingSpace result = parkingLotManager.exit(plate, SIMULATED_USER_ID);
         if (result != null) {
             simulatedPlates.remove(plate);
-            parkingLogDAO.insertLog(result.getId(), plate, SIMULATED_USER_ID, "EXIT");
-            vehicleDAO.deleteSimulatedVehicle(plate);
+            parkingLogManager.logExit(result.getId(), plate, SIMULATED_USER_ID);
+            vehicleManager.deleteSimulatedVehicle(plate);
             logger.info("\u001B[34m" + "[EXIT]  " + plate + " ← slot " + result.getId() + " at " + new java.text.SimpleDateFormat("HH:mm:ss").format(new java.util.Date()) + "\u001B[0m)");
         }
     }

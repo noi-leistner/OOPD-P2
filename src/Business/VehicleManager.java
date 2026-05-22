@@ -6,7 +6,7 @@ import Persistance.VehicleDAO;
 public class VehicleManager {
     private final VehicleDAO vehicleDao;
 
-    public VehicleManager (VehicleDAO vehicleDao) {
+    public VehicleManager(VehicleDAO vehicleDao) {
         this.vehicleDao = vehicleDao;
     }
 
@@ -38,13 +38,21 @@ public class VehicleManager {
         return existing;
     }
 
-    public void deleteByUserID(int id) {vehicleDao.deleteByUserId(id);}
+    public void deleteByUserID(int id) {
+        vehicleDao.deleteByUserId(id);
+    }
 
     public boolean registerVehicle(String licensePlate, int userId, String vehicleType) {
         return vehicleDao.addVehicle(licensePlate, userId, vehicleType);
     }
 
-    public boolean vehiclePlateExistsInSystem(String licensePlate) {
-        return vehicleDao.existsByPlate(licensePlate);
+
+    public void insertSimulatedVehicle(String plate, String type) {
+        vehicleDao.insertSimulatedVehicle(plate, type);
+    }
+
+    public void deleteSimulatedVehicle(String plate) {
+        vehicleDao.deleteSimulatedVehicle(plate);
+
     }
 }
