@@ -120,6 +120,7 @@ public class SimulationManager {
             result = parkingLotManager.enterWithoutReservation(plate, space.getId(), SIMULATED_USER_ID);
             logger.info("SECOND ENTRY attempt — plate: " + plate + " slot: " + space.getId());
             if (result != null) {
+                result = parkingLotManager.enterWithoutReservation(plate, space.getId(), SIMULATED_USER_ID);
                 simulatedPlates.add(plate);
                 parkingLogManager.logEntry(result.getId(), plate, SIMULATED_USER_ID);
                 logger.info("[ENTRY]>  " + plate + " ← slot: [" + result.getId() + "]");
