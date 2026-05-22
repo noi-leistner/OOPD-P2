@@ -220,16 +220,8 @@ public class CurrentStatusPanel extends JPanel {
         spaces = statusController.getParkingTableData();
         boolean isReserved = false;
         for (ParkingSpace space : spaces) {
-            List<Reservation> reservation = reservationController.getReservationsBySlotId(space.getId());
-            isReserved = !reservation.isEmpty();
-            String plate;
-            if (space.isOccupied()) {
-                plate = space.getParkedLicensePlate();
-            } else if (isReserved) {
-                plate = reservation.get(0).getVehiclePlate();
-            } else {
-                plate = "-";
-            }
+            Reservation reservation = reservationController.getActiveReservationForPlate(space.getParkedLicensePlate());
+            String plate = space.isOccupied() ? space.getParkedLicensePlate() : "-";
 
             tableModel.addRow(new Object[]{
                     space.getId(),
