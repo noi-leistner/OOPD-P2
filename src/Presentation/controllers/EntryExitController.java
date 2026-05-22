@@ -98,4 +98,8 @@ public class EntryExitController {
     public Vehicle ensureVehicleExists(String plate, String type, int userId) {
         return vehicleManager.ensureVehicleExists(plate, type, userId);
     }
+
+    public String getParkedPlateAtSpace(int spaceId) {
+        return parkingLotManager.getParkedPlateAtSpace(spaceId);
+    }
 }
