@@ -13,15 +13,16 @@ public class UserDAOSql implements UserDAO {
     public AuthResult addUser(User user) {
         if (existsByEmail(user.getEmail())) return AuthResult.EMAIL_ALREADY_EXISTS;
 
-        String sql = "INSERT INTO users (name, surname, email, password, role) VALUES (?, ?, ?, ?,?)";
+        String sql = "INSERT INTO users (name, surname, email, username, password, role) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, user.getName());
             stmt.setString(2, user.getSurname());
             stmt.setString(3, user.getEmail());
-            stmt.setString(4, user.getPassword());
-            stmt.setString(5, user.getRole());
+            stmt.setString(4, user.getUsername());
+            stmt.setString(5, user.getPassword());
+            stmt.setString(6, user.getRole());
             stmt.executeUpdate();
             return AuthResult.SUCCESS;
 
@@ -51,7 +52,7 @@ public class UserDAOSql implements UserDAO {
 
     @Override
     public User getUserById(int id) {
-        String sql = "SELECT id, name, surname, email, password, role FROM users WHERE id = ?";
+        String sql = "SELECT id, name, surname, email, username, password, role FROM users WHERE id = ?";
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -63,6 +64,7 @@ public class UserDAOSql implements UserDAO {
                         rs.getString("name"),
                         rs.getString("surname"),
                         rs.getString("email"),
+                        rs.getString("username"),
                         rs.getString("password"),
                         rs.getString("role")
                 );
@@ -88,6 +90,7 @@ public class UserDAOSql implements UserDAO {
                             rs.getString("name"),
                             rs.getString("surname"),
                             rs.getString("email"),
+                            rs.getString("username"),
                             rs.getString("password"),
                             rs.getString("role")
                     );
@@ -112,5 +115,31 @@ public class UserDAOSql implements UserDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public User getUserByUsername(String username) {
+        String sql = "SELECT id, name, surname, email, username, password, role " +
+                "FROM users WHERE username = ?";
+        User user = null;
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            try(var rs = stmt.executeQuery();) {
+                if (rs.next()) {
+                    user = new User(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            rs.getString("surname"),
+                            rs.getString("email"),
+                            rs.getString("username"),
+                            rs.getString("password"),
+                            rs.getString("role")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
