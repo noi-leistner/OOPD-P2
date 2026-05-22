@@ -77,7 +77,7 @@ public class SimulationManager {
             available.addAll(availableCars);
             int totalUnreserved = parkingLotManager.getTotalUnreservedSpaces();
 
-            // decide entry or exit based on current occupanc7
+            // decide entry or exit based on current occupancy
             boolean parkingEmpty = simulatedPlates.isEmpty();
 
             if (totalUnreserved == 0) return;
