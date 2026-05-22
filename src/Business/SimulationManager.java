@@ -105,21 +105,29 @@ public class SimulationManager {
     }
 
     public void simulateEntry(List<ParkingSpace> available) {
-
+        boolean simulation_quit = false;
         ParkingSpace space = available.get(random.nextInt(available.size()));
         String plate = plateGenerator();
-        logger.info("ENTRY attempt — plate: " + plate + " slot: " + space.getId()); // ← afegir
-
-
         vehicleManager.insertSimulatedVehicle(plate, space.getType());
 
         ParkingSpace result = parkingLotManager.enterWithoutReservation(plate, space.getId(), SIMULATED_USER_ID);
+        logger.info("ENTRY attempt — plate: " + plate + " slot: " + space.getId());
         if (result != null) {
             simulatedPlates.add(plate);
             parkingLogManager.logEntry(space.getId(), plate, SIMULATED_USER_ID);
-            logger.info("\u001B[34m" + "[ENTRY] " + plate + " → slot " + space.getId());
+            logger.info("[ENTRY]>  " + plate + " ← slot: [" + result.getId() + "]");
+        } else {
+            result = parkingLotManager.enterWithoutReservation(plate, space.getId(), SIMULATED_USER_ID);
+            logger.info("SECOND ENTRY attempt — plate: " + plate + " slot: " + space.getId());
+            if (result != null) {
+                simulatedPlates.add(plate);
+                parkingLogManager.logEntry(result.getId(), plate, SIMULATED_USER_ID);
+                logger.info("[ENTRY]>  " + plate + " ← slot: [" + result.getId() + "]");
+            } else {
+                logger.warning("- Spot was full and the driver" + plate + " left.");
+                vehicleManager.deleteSimulatedVehicle(plate);
+            }
         }
-        
     }
 
     private void simulateExit() {
@@ -131,7 +139,7 @@ public class SimulationManager {
             simulatedPlates.remove(plate);
             parkingLogManager.logExit(result.getId(), plate, SIMULATED_USER_ID);
             vehicleManager.deleteSimulatedVehicle(plate);
-            logger.info("\u001B[34m" + "[EXIT]  " + plate + " ← slot " + result.getId() + " at " + new java.text.SimpleDateFormat("HH:mm:ss").format(new java.util.Date()) + "\u001B[0m)");
+            logger.info("<[EXIT]  " + plate + " ← slot: [ " + result.getId() + "]");
         }
     }
 

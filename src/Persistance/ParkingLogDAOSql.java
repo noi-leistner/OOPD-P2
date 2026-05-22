@@ -87,4 +87,23 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
             return false;
         }
     }
+
+    @Override
+    public boolean removeLog(int logId) {
+        String sql = "DELETE FROM parking_log WHERE id = ?";
+
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, logId);
+            int affectedRows = stmt.executeUpdate();
+
+            // Returns true if a row was actually deleted
+            return affectedRows > 0;
+
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, "Failed to remove parking log with ID: " + logId, e);
+            return false;
+        }
+    }
 }
