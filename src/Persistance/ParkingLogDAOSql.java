@@ -28,7 +28,7 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
         }
     }
     @Override

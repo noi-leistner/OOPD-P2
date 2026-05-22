@@ -76,16 +76,7 @@ Located at `src/config.json`, loaded as a classpath resource.
 | `max_stay_minutes`   | int    | Not mapped in `Config.java` (entity has `vehicle_delay` instead); currently unenforced | `3` |
 
 > **Note:** Only `vehicle_entry_time` is actually parsed from `config.json` at runtime (`ConfigDAO.getVehicleEntryTime()`). All other fields are dead configuration — DB credentials must be changed directly in `ConfigDAO.java`.
-
-### Database credentials
-
-Hardcoded in `src/Persistance/ConfigDAO.java:13–15`:
-
-```java
-private static final String URL  = "jdbc:mysql://localhost:3306/mydb?connectionTimeZone=Europe/Madrid";
-private static final String USER = "root";
-private static final String PASS = "";
-```
+`
 
 Change these three constants to match your MySQL setup. The `.env` file in the repo root targets a Docker/phpMyAdmin setup and is **not** read by the Java application.
 
@@ -125,4 +116,56 @@ Full DDL: `mysql/schema.sql`.
 
 `SimulationManager` runs a single daemon thread that wakes on a random interval `[1, vehicle_entry_time]` seconds (read from `config.json`). On each tick: if the lot is full → force an exit; if empty → force an entry; otherwise 50 % entry / 50 % exit. Simulated vehicles are inserted with `user_id = -1` and plates in the format `{4 digits}{3 consonants}` (e.g., `4821BCF`). After every tick, `SwingUtilities.invokeLater` fires the registered callback to refresh the slot table and occupancy chart without blocking the EDT.
 
+src/
+├── Main.java
+├── Business/
+│   ├── Entities/
+│   │   ├── Config.java
+│   │   ├── ParkingSpace.java
+│   │   ├── Reservation.java
+│   │   ├── User.java
+│   │   └── Vehicle.java
+│   ├── AuthManager.java
+│   ├── AuthResult.java
+│   ├── DaoResult.java
+│   ├── ParkingLogManager.java
+│   ├── ParkingLotManager.java
+│   ├── ReservationManager.java
+│   ├── SessionManager.java
+│   ├── SimulationManager.java
+│   └── VehicleManager.java
+├── Persistance/
+│   ├── ConfigDAO.java
+│   ├── ParkingLogDAO.java       + ParkingLogDAOSql.java
+│   ├── ParkingSpaceDAO.java     + ParkingSpaceDAOSql.java
+│   ├── ReservationDAO.java      + ReservationDAOSql.java
+│   ├── UserDAO.java             + UserDAOSql.java
+│   └── VehicleDAO.java         + VehicleDAOSql.java
+└── Presentation/
+├── theme/
+│   └── AppColors.java
+├── controllers/
+│   ├── AuthController.java
+│   ├── EntryExitController.java
+│   ├── ParkingSpaceController.java
+│   ├── ReservationController.java
+│   └── StatusController.java
+└── views/
+    ├── AddVehicleDialog.java
+    ├── AuthPanel.java
+    ├── BaseAuthForm.java
+    ├── BaseManagePanel.java
+    ├── CurrentStatusPanel.java
+    ├── DashboardPanel.java
+    ├── DeleteAccountDialog.java
+    ├── LoginForm.java
+    ├── LogOutPanel.java
+    ├── MainWindow.java
+    ├── ManageBookingsPanel.java
+    ├── ManageReservationsPanel.java
+    ├── ManageSlotsPanel.java
+    ├── OccupancyPanel.java
+    ├── RegisterForm.java
+    ├── VehicleEntryPanel.java
+    └── VehicleExitPanel.java
 

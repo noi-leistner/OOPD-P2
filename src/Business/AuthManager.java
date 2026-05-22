@@ -43,19 +43,26 @@ public class AuthManager {
 
         return user;
     }
-
-    public AuthResult loginWithResult(String email, String password, User[] outUser) {
-        if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
+    public AuthResult loginWithResult(String emailOrUsername, String password, User[] outUser) {
+        if (emailOrUsername == null || emailOrUsername.isEmpty() || password == null || password.isEmpty()) {
             return AuthResult.EMPTY_FIELDS;
         }
-        User user = userDAO.getUserByEmail(email.trim());
+        // 1. Try to find the user
+        User user = userDAO.getUserByEmail(emailOrUsername.trim());
+        // 2. If not found by email, try username
+        if (user == null) {
+            user = userDAO.getUserByUsername(emailOrUsername.trim());
+        }
+        // 3. SAFE CHECK: If user is still null, they don't exist
         if (user == null) {
             return AuthResult.USER_NOT_FOUND;
         }
+        // 4. Now that we know user is not null, it is safe to check credentials
         if (BCrypt.checkpw(password, user.getPassword())) {
             if (outUser != null && outUser.length > 0) outUser[0] = user;
             return AuthResult.SUCCESS;
         }
+
         return AuthResult.INVALID_CREDENTIALS;
     }
 

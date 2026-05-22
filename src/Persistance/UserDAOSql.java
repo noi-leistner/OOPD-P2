@@ -7,7 +7,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class UserDAOSql implements UserDAO {
+
+    private static final Logger log = Logger.getLogger(ParkingSpaceDAOSql.class.getName());
 
     @Override
     public AuthResult addUser(User user) {
@@ -27,7 +32,7 @@ public class UserDAOSql implements UserDAO {
             return AuthResult.SUCCESS;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
             return AuthResult.DATABASE_ERROR;
         }
     }
@@ -45,7 +50,7 @@ public class UserDAOSql implements UserDAO {
             return rowsAffected > 0;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
             return false;
         }
     }
@@ -70,7 +75,7 @@ public class UserDAOSql implements UserDAO {
                 );
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
         }
         return null;
     }
@@ -97,7 +102,7 @@ public class UserDAOSql implements UserDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
         }
         return user;
     }
@@ -112,7 +117,7 @@ public class UserDAOSql implements UserDAO {
             return rs.next();
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
             return false;
         }
     }
@@ -139,7 +144,7 @@ public class UserDAOSql implements UserDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
         }
         return user;
     }

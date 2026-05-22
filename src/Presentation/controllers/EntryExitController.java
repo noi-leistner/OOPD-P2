@@ -43,7 +43,7 @@ public class EntryExitController {
     }
 
     public boolean vehiclePlateExistsInSystem(String licensePlate) {
-        return vehicleManager.vehiclePlateExistsInSystem(licensePlate);
+        return vehicleManager.vehiclePlateExists(licensePlate);
     }
 
     public String getVehicleType(String licensePlate) {

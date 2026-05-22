@@ -30,7 +30,7 @@ public class VehicleDAOSql implements VehicleDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
         }
         return null;
     }
@@ -43,7 +43,7 @@ public class VehicleDAOSql implements VehicleDAO {
             stmt.setInt(1, userId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
             return false;
         }
     }
@@ -58,7 +58,7 @@ public class VehicleDAOSql implements VehicleDAO {
             stmt.setString(3, vehicleType);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
             return false;
         }
     }
@@ -73,7 +73,7 @@ public class VehicleDAOSql implements VehicleDAO {
                 return rs.next();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
             return false;
         }
     }
