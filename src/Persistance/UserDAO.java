@@ -9,4 +9,5 @@ public interface UserDAO {
     User getUserById(int id);
     User getUserByEmail(String email);
     boolean existsByEmail(String email);
+    User getUserByUsername(String trim);
 }

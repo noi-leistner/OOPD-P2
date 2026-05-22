@@ -34,7 +34,7 @@ public class LoginForm extends BaseAuthForm {
 
         JLabel title = buildTitle("LOGIN");
         JLabel sub   = buildSubtitle("WELCOME BACK");
-        JTextField     emailField = buildField("Email",    false);
+        JTextField     emailField = buildField("Email or username",    false);
         JPasswordField passField  = (JPasswordField) buildField("Password", true);
         JButton loginBtn = buildPrimaryButton("LOGIN");
         JLabel registerLink = buildLink("Don't have an account? Register",

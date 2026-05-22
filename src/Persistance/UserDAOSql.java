@@ -121,6 +121,7 @@ public class UserDAOSql implements UserDAO {
         String sql = "SELECT id, name, surname, email, username, password, role " +
                 "FROM users WHERE username = ?";
         User user = null;
+
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);
@@ -140,6 +141,6 @@ public class UserDAOSql implements UserDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return user;
     }
 }

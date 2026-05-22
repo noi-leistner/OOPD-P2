@@ -12,22 +12,25 @@ public class AuthController {
     private AuthManager authManager;
     private SessionManager sessionManager;
 
+
     public AuthController(AuthManager authManager, SessionManager sessionManager) {
         this.authManager = authManager;
         this.sessionManager = sessionManager;
     }
 
     public AuthResult logIn(String email, String password) {
-        if (email.isEmpty() && password.isEmpty()) {return AuthResult.EMPTY_FIELDS;}
-
-        User user = authManager.login(email, password);
-
-        if (user != null) {
-            SessionManager.getInstance().login(user);
-            return AuthResult.SUCCESS;
+        if (email.isEmpty() || password.isEmpty()) {  // ← també arreglat (punt 4)
+            return AuthResult.EMPTY_FIELDS;
         }
 
-        return AuthResult.INVALID_CREDENTIALS;
+        User user = authManager.login(email, password);  // ← ara retorna User
+
+        if (user == null) {
+            return AuthResult.INVALID_CREDENTIALS;
+        }
+
+        SessionManager.getInstance().login(user);
+        return AuthResult.SUCCESS;
     }
 
     public AuthResult signUp(User user) {

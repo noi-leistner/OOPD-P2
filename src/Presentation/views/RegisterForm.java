@@ -44,6 +44,7 @@ public class RegisterForm extends BaseAuthForm {
         JTextField     nameField    = buildField("First name",        false);
         JTextField     surnameField = buildField("Last name",         false);
         JTextField     emailField   = buildField("Email",             false);
+        JTextField usernameField = buildField("Username",            false);
         JPasswordField passField    = (JPasswordField) buildField("Password",         true);
         JPasswordField confirmField = (JPasswordField) buildField("Confirm password", true);
 
@@ -61,6 +62,7 @@ public class RegisterForm extends BaseAuthForm {
             String name     = nameField.getText().trim();
             String surname  = surnameField.getText().trim();
             String email    = emailField.getText().trim();
+            String username  = usernameField.getText().trim();
             String password = new String(passField.getPassword()).trim();
             String confirm  = new String(confirmField.getPassword()).trim();
             String role     = roleCombo.getSelectedItem().toString().trim();
@@ -79,8 +81,13 @@ public class RegisterForm extends BaseAuthForm {
                         "Password mismatch", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            if (username.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "USername cannot be empty.",
+                        "Username empty", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
 
-            User user = new User(name, surname, email, password, role);
+            User user = new User(name, surname, email, username, password, role);
             AuthResult result = auth.signUp(user);
             switch (result) {
                 case SUCCESS -> {
@@ -90,6 +97,7 @@ public class RegisterForm extends BaseAuthForm {
                     nameField.setText("");
                     surnameField.setText("");
                     emailField.setText("");
+                    surnameField.setText("");
                     passField.setText("");
                     confirmField.setText("");
                 }
@@ -125,6 +133,8 @@ public class RegisterForm extends BaseAuthForm {
         form.add(surnameField);
         form.add(Box.createVerticalStrut(10));
         form.add(emailField);
+        form.add(Box.createVerticalStrut(10));
+        form.add(usernameField);
         form.add(Box.createVerticalStrut(10));
         form.add(passField);
         form.add(Box.createVerticalStrut(10));
