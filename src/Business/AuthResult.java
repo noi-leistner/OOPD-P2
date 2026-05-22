@@ -2,7 +2,8 @@ package Business;
 
 public enum AuthResult {
     SUCCESS,                            /*Successful log in */
-    INVALID_CREDENTIALS,                /*Either email or password wrong */
+    INVALID_CREDENTIALS,                /*Password wrong */
+    USER_NOT_FOUND,                     /*User is not registered*/
     ACCOUNT_INACTIVE,                   /*Account deactivated */
     EMPTY_FIELDS,                       /*1 or more field that are null */
     EMAIL_ALREADY_EXISTS,               /*Email already created when registering */
@@ -17,7 +18,8 @@ public enum AuthResult {
     public String toDisplayMessage () {
         return switch (this) {
             case SUCCESS -> "Login Successful";
-            case INVALID_CREDENTIALS -> "Invalid Credentials";
+            case INVALID_CREDENTIALS -> "Wrong password. Please try again.";
+            case USER_NOT_FOUND -> "No account found with that email.";
             case ACCOUNT_INACTIVE -> "Account Inactive";
             case EMPTY_FIELDS -> "Empty Fields";
             case EMAIL_ALREADY_EXISTS -> "Email Already Exists";
