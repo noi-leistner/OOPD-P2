@@ -83,15 +83,15 @@ public class RegisterForm extends BaseAuthForm {
             User user = new User(name, surname, email, password, role);
             AuthResult result = auth.signUp(user);
             switch (result) {
-                case SUCCESS -> {JOptionPane.showMessageDialog(this,
-                        "Creation successfull",
-                        "Your account has been successfully created",
-                        JOptionPane.INFORMATION_MESSAGE);
-                        nameField.setText("");
-                        surnameField.setText("");
-                        emailField.setText("");
-                        passField.setText("");
-                        confirmField.setText("");
+                case SUCCESS -> {
+                    JOptionPane.showMessageDialog(this, "Account created successfully!");
+                    app.getDashboard().refresh();
+                    app.switchTo(MainWindow.DASHBOARD_SCREEN);
+                    nameField.setText("");
+                    surnameField.setText("");
+                    emailField.setText("");
+                    passField.setText("");
+                    confirmField.setText("");
                 }
                 case EMAIL_ALREADY_EXISTS -> JOptionPane.showMessageDialog(this,
                         "An account with that email already exists.",

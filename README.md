@@ -8,15 +8,15 @@ _No screenshots committed. Add application captures here._
 
 ## Tech Stack
 
-| Layer        | Technology                       |
-|--------------|----------------------------------|
-| UI           | Java Swing (MVC, CardLayout)     |
-| Persistence  | JDBC + MySQL 8                   |
-| Auth         | jBCrypt (password hashing)       |
-| Local DB     | XAMPP / Docker + phpMyAdmin      |
-| JDBC driver  | mysql-connector-java-8.0.23.jar  |
-| IDE          | IntelliJ IDEA                    |
-| Java version | 26 (preview)                     |
+| Layer        | Technology                      |
+|--------------|---------------------------------|
+| UI           | Java Swing (MVC, CardLayout)    |
+| Persistence  | JDBC + MySQL 8                  |
+| Auth         | jBCrypt (password hashing)      |
+| Local DB     | XAMPPok  + phpMyAdmin           |
+| JDBC driver  | mysql-connector-java-8.0.23.jar |
+| IDE          | IntelliJ IDEA                   |
+| Java version | 26 (preview)                    |
 
 ## Architecture
 
