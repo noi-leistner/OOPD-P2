@@ -2,11 +2,7 @@ package Presentation.views;
 
 import Business.*;
 import Persistance.*;
-import Presentation.controllers.AuthController;
-import Presentation.controllers.EntryExitController;
-import Presentation.controllers.ParkingSpaceController;
-import Presentation.controllers.StatusController;
-import Presentation.controllers.ReservationController;
+import Presentation.controllers.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -48,10 +44,11 @@ public class MainWindow extends JFrame {
         EntryExitController entryExitController = new EntryExitController(parkingLotManager, reservationController, vehicleManager, parkingLogManager);
         ParkingSpaceController slotController = new ParkingSpaceController(parkingLotManager, reservationController);
         StatusController statusController = new StatusController(parkingLotManager, parkingLogManager, simulationManager);
+        OccupancyController occupancyController = new OccupancyController(parkingLogManager, simulationManager, new OccupancyView());
 
         AuthPanel authPanel = new AuthPanel(this, authController);
 
-        dashboardPanel = new  DashboardPanel(this, authController, slotController, reservationController, statusController, entryExitController);
+        dashboardPanel = new  DashboardPanel(this, authController, slotController, reservationController, statusController, entryExitController, occupancyController);
 
         mainPanel.add(AUTH_SCREEN, authPanel);
         mainPanel.add(DASHBOARD_SCREEN, dashboardPanel);
