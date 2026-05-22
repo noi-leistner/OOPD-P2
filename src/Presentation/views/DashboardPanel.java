@@ -118,6 +118,7 @@ public class DashboardPanel extends JPanel {
             contentArea.add(manageSlotsPanel,   "SLOTS");
             contentArea.add(manageBookingsPanel,   "BOOKINGS");
             currentStatusPanel = new CurrentStatusPanel(statusController, reservationController, authController);
+            currentStatusPanel.loadData();
             contentArea.add(currentStatusPanel,   "STATUS");
             contentArea.add(new LogOutPanel(mainWindow, authController, reservationController, slotController, entryExitController), "LOGOUT");
 
