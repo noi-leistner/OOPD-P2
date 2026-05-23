@@ -6,43 +6,26 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.List;
 
+/**
+ * Manages authentication and account opperations for parking system.
+ * --- Responsabilities ---
+ * - Validate credentials via BCrypt and resolve users by email or username
+ * - Enforce email format and password strength on sign-up
+ * - Delegate user persistance to UserDAO
+ */
 public class AuthManager {
 
+    /** Connection to UserDAO */
     private final UserDAO userDAO;
-
+    /** Constructor */
     public AuthManager(UserDAO userDAO) {
         this.userDAO = userDAO;
     }
-
-    private SessionManager sessionManager;
-
-    public User login(String emailOrUsername, String password) {
-
-        if (emailOrUsername == null || emailOrUsername.trim().isEmpty() ||
-                password == null || password.trim().isEmpty()) {
-            System.out.println("FAILED: Empty fields");
-            return null;
-        }
-
-        // Intentar per email
-        User user = userDAO.getUserByEmail(emailOrUsername.trim());
-
-        // Si no existeix, intentar per username
-        if (user == null) {
-            user = userDAO.getUserByUsername(emailOrUsername.trim());
-        }
-
-        if (user == null) {
-            return null;
-        }
-
-
-        if (!BCrypt.checkpw(password, user.getPassword())) {
-            return null;
-        }
-
-        return user;
-    }
+    /**
+     * Attempts login and returns a detailed result code. Populates outUser[0] on success.
+     * @param outUser single-element array used as an output parameter; receives the User on SUCCESS
+     * @return SUCCESS, EMPTY_FIELDS, USER_NOT_FOUND, or INVALID_CREDENTIALS
+     */
     public AuthResult loginWithResult(String emailOrUsername, String password, User[] outUser) {
         if (emailOrUsername == null || emailOrUsername.isEmpty() || password == null || password.isEmpty()) {
             return AuthResult.EMPTY_FIELDS;
@@ -65,7 +48,11 @@ public class AuthManager {
 
         return AuthResult.INVALID_CREDENTIALS;
     }
-
+    /**
+     * Registers a new user after validating email format, password strength, and email uniqueness.
+     * Hashes the password with BCrypt before persisting.
+     * @return SUCCESS, INVALID_EMAIL, WEAK_PASSWORD, EMAIL_ALREADY_EXISTS, or DATABASE_ERROR
+     */
     public AuthResult signUp(User user) {
         if (user == null) return AuthResult.DATABASE_ERROR;
         // Check for email requirements:
@@ -81,14 +68,15 @@ public class AuthManager {
         user.setPassword(hashedPass);
         return userDAO.addUser(user);
     }
-
-
+    /**
+     * Permanently deletes a user account.
+     * @return true if deleted successfully, false if a DB error occurred
+     */
     public boolean deleteAccount(int userId) {
         return userDAO.deleteUser(userId);
     }
-
+    /** Get user by id */
     public User getUserById(int id) {
         return userDAO.getUserById(id);
     }
-
 }

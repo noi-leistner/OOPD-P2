@@ -1,5 +1,11 @@
 package Business.Entities;
 
+/**
+ * Represents a registered user of the parking system.
+ * --- Responsabilities: ---
+ * - Hold user identity and credentials for users
+ * - Expose role-based access check.
+ */
 public class User {
     private int id;
     private String name;

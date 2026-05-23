@@ -2,6 +2,12 @@ package Business.Entities;
 
 import java.util.Date;
 
+/** Represents a parking space reservation made by a user.
+ * -- Responsabilities: --
+ * - Hold reservation identity and ownership (user, vehicle, solt)
+ * - Define the active time window (start/end)
+ * - Track cancellation state
+ */
 public class Reservation {
     private int id;                         // DB: id (auto-increment)
     private int user_id;
@@ -34,10 +40,6 @@ public class Reservation {
     public Date getEndDateTime() { return endDateTime; }
 
     public void setId(int id) {this.id = id;}
-
-    public void setUser_id(int user_id) {this.user_id = user_id;}
-
-    public void setVehicle_license_plate(String vehicle_license_plate) {this.vehicle_license_plate = vehicle_license_plate;}
 
     public void setParkingSlotId(int parking_slot_id) {this.parking_slot_id = parking_slot_id;}
 

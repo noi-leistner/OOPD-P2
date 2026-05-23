@@ -51,7 +51,7 @@ public class EntryExitController {
     }
 
     public ParkingSpace enterWithReservation(String plate, int userId) {
-        ParkingSpace space = parkingLotManager.enterWithReservation(plate, userId);
+        ParkingSpace space = parkingLotManager.enterWithReservation(plate);
         if (space != null) {
             parkingLogManager.logEntry(space.getId(), plate, userId);
         }
@@ -65,7 +65,7 @@ public class EntryExitController {
     }
 
     public ParkingSpace enterWithoutReservation(String plate, int spaceId, int userId) {
-        ParkingSpace space = parkingLotManager.enterWithoutReservation(plate, spaceId, userId);
+        ParkingSpace space = parkingLotManager.enterWithoutReservation(plate, userId);
         if (space != null) {
             parkingLogManager.logEntry(space.getId(), plate, userId);
         }
@@ -73,7 +73,7 @@ public class EntryExitController {
     }
 
     public ParkingSpace exitParking(String plate, int userId) {
-        ParkingSpace space = parkingLotManager.exit(plate, userId);
+        ParkingSpace space = parkingLotManager.exit(plate);
         if (space != null) {
             parkingLogManager.logExit(space.getId(), plate, userId);
         }
