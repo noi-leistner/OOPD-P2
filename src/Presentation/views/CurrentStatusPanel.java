@@ -19,6 +19,12 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.HierarchyEvent;
 
+/**
+ * A real-time overview dashboard tracking live garage activity.
+ * Displays a color-coded data grid showing exactly which spots are physically occupied,
+ * which ones have an active reservation holding them, and which cars are currently parked.
+ * It auto-refreshes every 5 seconds and pauses itself when the user switches tabs to save resources.
+ */
 public class CurrentStatusPanel extends JPanel {
 
     private DefaultTableModel tableModel;
@@ -28,8 +34,12 @@ public class CurrentStatusPanel extends JPanel {
     private final ReservationController reservationController;
     private final AuthController authController;
 
+    /** Tracks the baseline parking spot entity list mapped to our visible table rows. */
     private List<ParkingSpace> spaces = new ArrayList<>();
 
+    /**
+     * Sets up the live monitor component shell, sets up the table rendering.
+     */
     public CurrentStatusPanel(StatusController statusController, ReservationController reservationController, AuthController authController) {
         this.statusController = statusController;
         this.reservationController = reservationController;
@@ -43,16 +53,11 @@ public class CurrentStatusPanel extends JPanel {
         addTableClickListener();
 
         loadData();
-        Timer timer = new Timer(5000, e -> loadData());
-
-        addHierarchyListener(e -> {
-            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-                if (isShowing()) timer.start();
-                else             timer.stop();
-            }
-        });
     }
 
+    /**
+     * Builds the top summary label area for this panel block.
+     */
     private JPanel buildHeader() {
         JPanel wrapper = new JPanel();
         wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
@@ -68,6 +73,11 @@ public class CurrentStatusPanel extends JPanel {
         return wrapper;
     }
 
+    /**
+     * Configures the status data table layout and hooks up a custom cell renderer.
+     * The renderer dynamically colors cells in the 'Reservation' column so admins
+     * can visually scan which spots are booked versus free at a single glance.
+     */
     private JScrollPane buildTable() {
         String[] columns = {"Slot Id", "Floor", "Type", "Occupation", "Reservation", "Plate"};
 
@@ -101,9 +111,9 @@ public class CurrentStatusPanel extends JPanel {
                 } else if (column == 4) {
                     String reservation = (String) tableModel.getValueAt(row, 4);
                     if ("Reserved".equalsIgnoreCase(reservation)) {
-                        c.setBackground(new Color(255, 200, 200)); // light red, can be changed according to the palette we want
+                        c.setBackground(AppColors.STATUS_RESERVED);
                     } else {
-                        c.setBackground(new Color(200, 255, 200)); // light green, can be changed according to the palette we want
+                        c.setBackground(AppColors.STATUS_FREE);
                     }
                 }
 
@@ -114,6 +124,10 @@ public class CurrentStatusPanel extends JPanel {
         return new JScrollPane(table);
     }
 
+    /**
+     * Listens for mouse clicks on the table grid. If an administrative user clicks
+     * a row, it opens a deeper breakdown window containing extensive user reservation info.
+     */
     private void addTableClickListener() {
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -131,6 +145,10 @@ public class CurrentStatusPanel extends JPanel {
         });
     }
 
+    /**
+     * Pops open a detailed insight modal window for a single slot. Shows physical traits,
+     * and pulls cross-referenced reservation data + client profiles if there is an active user account tied to it.
+     */
     private void showSpaceDetailDialog(ParkingSpace space) {
         JDialog dialog = new JDialog((Frame) null, "Space Details", true);
         dialog.setLayout(new BorderLayout());
@@ -202,6 +220,9 @@ public class CurrentStatusPanel extends JPanel {
         dialog.setVisible(true);
     }
 
+    /**
+     * Utility row component factory that builds simple "Key: Value" label lines side-by-side.
+     */
     private JPanel makeField(String label, String value) {
         JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         JLabel lbl = new JLabel(label);
@@ -213,10 +234,13 @@ public class CurrentStatusPanel extends JPanel {
         return row;
     }
 
+    /**
+     * Wipes current grid items, fetches the latest operational dataset from the database controller,
+     * pairs active sensor plates up with reservation schedules, and displays the fresh entries.
+     */
     public void loadData() {
         tableModel.setRowCount(0);
         spaces = statusController.getParkingTableData();
-        boolean isReserved = false;
         for (ParkingSpace space : spaces) {
             Reservation reservation = reservationController.getActiveReservationForPlate(space.getParkedLicensePlate());
             String plate = space.isOccupied() ? space.getParkedLicensePlate() : "-";

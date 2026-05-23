@@ -26,27 +26,32 @@ public class AuthManager {
      * @param outUser single-element array used as an output parameter; receives the User on SUCCESS
      * @return SUCCESS, EMPTY_FIELDS, USER_NOT_FOUND, or INVALID_CREDENTIALS
      */
-    public AuthResult loginWithResult(String emailOrUsername, String password, User[] outUser) {
+    public AuthResult login(String emailOrUsername, String password, User[] outUser) {
         if (emailOrUsername == null || emailOrUsername.isEmpty() || password == null || password.isEmpty()) {
             return AuthResult.EMPTY_FIELDS;
         }
-        // 1. Try to find the user
+
+        // Check admin credentials from config first
+        if (emailOrUsername.equalsIgnoreCase(ConfigDAO.getAdminEmail()) && password.equals(ConfigDAO.getAdminPassword())) {
+            User adminUser = new User("Admin", "User", emailOrUsername, "admin", password, "admin");
+            SessionManager.getInstance().login(adminUser);
+            return AuthResult.SUCCESS;
+        }
+
+        // Try email then username
         User user = userDAO.getUserByEmail(emailOrUsername.trim());
         // 2. If not found by email, try username
         if (user == null) {
             user = userDAO.getUserByUsername(emailOrUsername.trim());
         }
-        // 3. SAFE CHECK: If user is still null, they don't exist
-        if (user == null) {
-            return AuthResult.USER_NOT_FOUND;
-        }
-        // 4. Now that we know user is not null, it is safe to check credentials
-        if (BCrypt.checkpw(password, user.getPassword())) {
-            if (outUser != null && outUser.length > 0) outUser[0] = user;
-            return AuthResult.SUCCESS;
+        if (user == null) return AuthResult.USER_NOT_FOUND;
+
+        if (!BCrypt.checkpw(password, user.getPassword())) {
+            return AuthResult.INVALID_CREDENTIALS;
         }
 
-        return AuthResult.INVALID_CREDENTIALS;
+        SessionManager.getInstance().login(user);
+        return AuthResult.SUCCESS;
     }
     /**
      * Registers a new user after validating email format, password strength, and email uniqueness.
@@ -68,15 +73,14 @@ public class AuthManager {
         user.setPassword(hashedPass);
         return userDAO.addUser(user);
     }
-    /**
-     * Permanently deletes a user account.
-     * @return true if deleted successfully, false if a DB error occurred
-     */
+
+
     public boolean deleteAccount(int userId) {
         return userDAO.deleteUser(userId);
     }
-    /** Get user by id */
+
     public User getUserById(int id) {
         return userDAO.getUserById(id);
     }
+
 }

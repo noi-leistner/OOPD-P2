@@ -46,6 +46,6 @@ public class User {
     public void setUsername(String username) { this.username = username; }
 
     public boolean isAdmin() {
-        return this.role.equals("Admin");
+        return this.role.equalsIgnoreCase("admin");
     }
 }

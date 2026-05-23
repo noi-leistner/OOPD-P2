@@ -9,6 +9,15 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * An account administration management panel for users and administrators.
+ * <p>
+ * It coordinates two distinct account termination workflows:
+ * <ul>
+ *   <li><b>Log Out:</b> Discards current session keys safely and reverts the workspace back to the login screen.</li>
+ *   <li><b>Account Deletion:</b> A cascade teardown that purges pending bookings, frees up physically occupied vehicle spots, clears history logs, and removes the core authentication record.</li>
+ * </ul>
+ */
 public class LogOutPanel extends JPanel {
 
     public LogOutPanel(MainWindow mainWindow, AuthController authController, ReservationController reservationController, ParkingSpaceController parkingSpaceController, EntryExitController entryExitController) {
@@ -64,6 +73,14 @@ public class LogOutPanel extends JPanel {
         add(card);
     }
 
+    /**
+     * Factory utility that builds a uniform action button styled with custom color schemes and interactive cursors.
+     *
+     * @param text The visual command message displayed over the action button.
+     * @param bg   The structural fill background color.
+     * @param fg   The label color layout text color.
+     * @return     A standard styled Swing JButton component optimized for modern look-and-feel themes.
+     */
     private JButton createStyledButton(String text, Color bg, Color fg) {
         JButton btn = new JButton(text);
         btn.setAlignmentX(Component.CENTER_ALIGNMENT);

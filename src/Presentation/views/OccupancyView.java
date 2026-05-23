@@ -1,6 +1,5 @@
 package Presentation.views;
 
-import Presentation.controllers.OccupancyController;
 import Presentation.theme.AppColors;
 
 import javax.swing.*;

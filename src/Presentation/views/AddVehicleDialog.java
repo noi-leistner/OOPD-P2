@@ -4,6 +4,12 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * A popup dialog box that catches unregistered license plates during booking.
+ * It alerts users that their plate isn't in the database yet and gives them
+ * a quick dropdown to choose their vehicle type (car, motorcycle, truck)
+ * so they can link it to their account.
+ */
 public class AddVehicleDialog extends JDialog {
 
     private boolean confirmed = false;
@@ -11,6 +17,10 @@ public class AddVehicleDialog extends JDialog {
 
     private static final String[] VEHICLE_TYPES = {"car", "motorcycle", "Truck"};
 
+    /**
+     * Creates and centers the registration popup over the main application frame,
+     * halting other interactions until the user chooses to save or cancel.
+     */
     public AddVehicleDialog(Frame parent, String licensePlate) {
         super(parent, "Register Vehicle", true);
         buildUI(licensePlate);
@@ -19,6 +29,11 @@ public class AddVehicleDialog extends JDialog {
         setVisible(true);
     }
 
+    /**
+     * Builds the visual components of the popup window.
+     * Lays out an alert message featuring the unrecognized license plate,
+     * inserts the vehicle category selector, and wires up the submission actions.
+     */
     private void buildUI(String licensePlate) {
         setResizable(false);
 
@@ -101,10 +116,21 @@ public class AddVehicleDialog extends JDialog {
         setContentPane(root);
     }
 
+    /**
+     * Checks if the user actually clicked the confirmation button
+     * instead of closing or cancelling the dialog.
+     *
+     * @return true if the user confirmed the new vehicle registry
+     */
     public boolean isConfirmed() {
         return confirmed;
     }
 
+    /**
+     * Grabs whichever vehicle type option is currently selected in the dropdown menu.
+     *
+     * @return the active selection string (e.g., "car", "motorcycle", "Truck")
+     */
     public String getSelectedType() {
         return (String) typeCombo.getSelectedItem();
     }

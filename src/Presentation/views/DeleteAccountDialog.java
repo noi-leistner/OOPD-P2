@@ -1,16 +1,27 @@
 package Presentation.views;
 
-import Business.SessionManager;
-import Presentation.controllers.AuthController;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * This class serves a dual purpose: it can either display an exit warning when a user
+ * logs out, or a warning when a user attempts to permanently delete
+ * their account from the system. It blocks interaction with the rest of the application
+ * until the user explicitly confirms or cancels the action.
+ */
 public class DeleteAccountDialog extends JDialog {
 
+    /** Tracks whether the user committed to the prompt (clicked Delete/LogOut) or backed away. */
     private boolean confirmed = false;
 
+    /**
+     * Spawns the confirmation window and holds processing control until the user makes a choice.
+     *
+     * @param parent     The main application frame to dim or center this modal against.
+     * @param isDeleting True if we are running the destructive "Delete Account" routine;
+     *                   false if we are merely confirming a standard "Log Out" sequence.
+     */
     public DeleteAccountDialog(Frame parent, boolean isDeleting) {
 
         String text;
@@ -24,6 +35,12 @@ public class DeleteAccountDialog extends JDialog {
         setVisible(true);
     }
 
+    /**
+     * Constructs the UI layout elements. Adjusts warnings, messaging, and action button
+     * text depending on the destructive nature of the requested action.
+     *
+     * @param isDeleting Dictates whether to inject permanent deletion warnings into the body panels.
+     */
     private void buildUI(boolean isDeleting) {
         setResizable(false);
         JPanel root = new JPanel(new BorderLayout(0, 16));
@@ -104,6 +121,11 @@ public class DeleteAccountDialog extends JDialog {
         setContentPane(root);
     }
 
+    /**
+     * Checks whether the user clicked the affirmative action button to commit the operation.
+     *
+     * @return True if the user pressed 'Delete' or 'LogOut'; false if they clicked 'Cancel' or dismissed the window frame.
+     */
     public boolean isConfirmed() {
         return confirmed;
     }
