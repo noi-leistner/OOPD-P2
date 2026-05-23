@@ -15,18 +15,17 @@ public class DashboardPanel extends JPanel {
     private final CardLayout cardLayout;
     private final JPanel contentArea;
 
-    private EntryExitController entryExitController;
 
-    private MainWindow mainWindow;
-    private AuthController authController;
-    private StatusController statusController;
-    private OccupancyController occupancyController;
+    private final MainWindow mainWindow;
+    private final AuthController authController;
+    private final StatusController statusController;
+    private final OccupancyController occupancyController;
+    private final ParkingSpaceController slotController;
+    private final ReservationController reservationController;
+    private final EntryExitController entryExitController;
 
     private final List<JButton> buttons = new java.util.ArrayList<>();
     private JButton initialButton;
-
-    private ParkingSpaceController slotController;
-    private ReservationController reservationController;
 
     private ManageSlotsPanel manageSlotsPanel;
     private CurrentStatusPanel currentStatusPanel;
@@ -44,6 +43,8 @@ public class DashboardPanel extends JPanel {
         this.occupancyController = occupancyController;
 
         setLayout(new BorderLayout());
+
+        //TODO: if error maybe need to initialize panels here
 
         cardLayout = new CardLayout();
         contentArea = new JPanel(cardLayout);
@@ -114,6 +115,7 @@ public class DashboardPanel extends JPanel {
             contentArea.add(manageSlotsPanel,   "SLOTS");
             contentArea.add(manageBookingsPanel,   "BOOKINGS");
             currentStatusPanel = new CurrentStatusPanel(statusController, reservationController, authController);
+            currentStatusPanel.loadData();
             contentArea.add(currentStatusPanel,   "STATUS");
             contentArea.add(new LogOutPanel(mainWindow, authController, reservationController, slotController, entryExitController), "LOGOUT");
 
