@@ -62,7 +62,7 @@ public class MainWindow extends JFrame {
         ReservationController reservationController = new ReservationController(reservationManager);
         EntryExitController entryExitController = new EntryExitController(parkingLotManager, reservationController, vehicleManager, parkingLogManager);
         ParkingSpaceController slotController = new ParkingSpaceController(parkingLotManager, reservationController);
-        StatusController statusController = new StatusController(parkingLotManager, parkingLogManager, simulationManager);
+        StatusController statusController = new StatusController(parkingLotManager, simulationManager);
         OccupancyController occupancyController = new OccupancyController(parkingLogManager, simulationManager, new OccupancyView());
 
         AuthPanel authPanel = new AuthPanel(this, authController);

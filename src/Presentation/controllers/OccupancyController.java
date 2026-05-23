@@ -47,9 +47,7 @@ public class OccupancyController {
      * @param view the view component to control and update
      * @throws NullPointerException if any parameter is null
      */
-    public OccupancyController(ParkingLogManager parkingLogManager,
-                               SimulationManager simulationManager,
-                               OccupancyView view) {
+    public OccupancyController(ParkingLogManager parkingLogManager, SimulationManager simulationManager, OccupancyView view) {
         this.parkingLogManager = parkingLogManager;
         this.simulationManager = simulationManager;
         this.view = view;

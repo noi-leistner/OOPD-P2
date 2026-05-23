@@ -14,12 +14,10 @@ import java.util.HashMap;
 public class StatusController {
 
     private final ParkingLotManager parkingLotManager;
-    private final ParkingLogManager parkingLogManager;
     private final SimulationManager simulationManager;
 
-    public StatusController(ParkingLotManager parkingLotManager, ParkingLogManager parkingLogManager, SimulationManager simulationManager) {
+    public StatusController(ParkingLotManager parkingLotManager,SimulationManager simulationManager) {
         this.parkingLotManager = parkingLotManager;
-        this.parkingLogManager = parkingLogManager;
         this.simulationManager = simulationManager;
     }
 
