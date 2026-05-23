@@ -13,45 +13,25 @@ import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-/**
- * A real-time vehicle entry gateway panel processing terminal gate inputs,
- * automating reservation checks, and guiding users through walk-in space assignments.
- * <p>
- * This view runs a two-step wizard to manage garage entries. Step 1 accepts and checks a
- * license plate, verifying user registry bounds or offering vehicle registration. If a live
- * reservation window matches, it bypasses manually assigning spaces. Otherwise, Step 2 displays
- * an auto-detected, non-modifiable slot selector containing available unassigned coordinates.
- */
 public class VehicleEntryPanel extends JPanel {
 
-    /** Coordination controller tracking parking terminal logic, status updates, and space checks. */
     private final EntryExitController entryExitController;
 
-    // Step 1 — Plate Input & Verification Components
-    private final JPanel stepOnePanel;
+    // Step 1 — plate input
+    private JPanel stepOnePanel;
     private JTextField plateField;
 
-    // Step 2 — Spot Optimization & Walk-in Selection Components
-    private final JPanel stepTwoPanel;
+    // Step 2 — space selection
+    private JPanel stepTwoPanel;
     private JComboBox<SpaceItem> spaceCombo;
     private JLabel vehicleTypeLabel;
     private JLabel noSpacesLabel;
 
-    // Shared Status Monitors & Cache Anchors
-    private final JLabel statusLabel;
-
-    /** Cache keeping the standardized license plate string under evaluation across steps. */
+    // Shared
+    private JLabel statusLabel;
     private String currentPlate;
-
-    /** Cache keeping the auto-detected structural size token checked against physical space traits. */
     private String currentVehicleType;
 
-    /**
-     * Initializes structural layout matrices, establishes interaction panels, and binds
-     * operational workflows to checking incoming plates.
-     *
-     * @param controller Reusable data persistence engine checking vehicle entry properties.
-     */
     public VehicleEntryPanel(EntryExitController controller) {
         this.entryExitController = controller;
         setLayout(new BorderLayout());
@@ -79,9 +59,7 @@ public class VehicleEntryPanel extends JPanel {
     // -------------------------------------------------------------------------
     // Step 1 — plate input
     // -------------------------------------------------------------------------
-    /**
-     * Standard form builder assembly containing license input components and entry checks.
-     */
+
     private JPanel buildStepOne() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -125,10 +103,7 @@ public class VehicleEntryPanel extends JPanel {
     // -------------------------------------------------------------------------
     // Step 2 — space selection (vehicle type is auto-detected, not chosen)
     // -------------------------------------------------------------------------
-    /**
-     * Contextual form builder containing manual selection rows that display unassigned
-     * space lists optimized to handle non-reserved walk-in traffic.
-     */
+
     private JPanel buildStepTwo() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -201,14 +176,9 @@ public class VehicleEntryPanel extends JPanel {
     }
 
     // -------------------------------------------------------------------------
-    // Operational Logic & Event Handlers
+    // Logic
     // -------------------------------------------------------------------------
 
-    /**
-     * Interrogates database registry layers using raw plate entries.
-     * Handles account conflicts, prompts vehicle creation flow wrappers, verifies occupancy status,
-     * and bridges automated reservation checking models directly onto physical slot assets.
-     */
     private void onCheck() {
         String plate = plateField.getText().trim().toUpperCase();
         if (plate.isEmpty()) {
@@ -296,11 +266,6 @@ public class VehicleEntryPanel extends JPanel {
         }
     }
 
-    /**
-     * Collects and processes the spot choice selected from the combo models.
-     * Evaluates future layout reservation blocks on the designated slot, showing clear warnings
-     * to walk-in clients about eviction parameters before logging structural changes.
-     */
     private void onConfirm() {
         SpaceItem selected = (SpaceItem) spaceCombo.getSelectedItem();
         if (selected == null) {
@@ -348,11 +313,6 @@ public class VehicleEntryPanel extends JPanel {
         }
     }
 
-    /**
-     * Shifts screen views to display manual step controls.
-     *
-     * @param vehicleType The size category used to sort available options.
-     */
     private void showStepTwo(String vehicleType) {
         currentVehicleType = vehicleType;
         vehicleTypeLabel.setText("Vehicle type: " + vehicleType);
@@ -362,12 +322,6 @@ public class VehicleEntryPanel extends JPanel {
         repaint();
     }
 
-    /**
-     * Queries physical unassigned slots via the layout architecture controllers
-     * and updates interactive selection boxes with the returned items.
-     *
-     * @param vehicleType Size optimization token filtered inside database queries.
-     */
     private void refreshSpaceCombo(String vehicleType) {
         List<ParkingSpace> spaces = entryExitController.getAvailableSpacesForType(vehicleType);
         spaceCombo.removeAllItems();
@@ -384,9 +338,6 @@ public class VehicleEntryPanel extends JPanel {
         }
     }
 
-    /**
-     * Resets input states, clears cached session elements, and switches views back to Step 1.
-     */
     private void resetToStepOne() {
         stepTwoPanel.setVisible(false);
         plateField.setText("");
@@ -439,10 +390,10 @@ public class VehicleEntryPanel extends JPanel {
         return btn;
     }
 
-    /**
-     * An unmodifiable component model element tracking physical lookups
-     * inside dropdown list views.
-     */
+    // -------------------------------------------------------------------------
+    // SpaceItem — display wrapper for the JComboBox
+    // -------------------------------------------------------------------------
+
     private static class SpaceItem {
         final int id;
         final int floor;

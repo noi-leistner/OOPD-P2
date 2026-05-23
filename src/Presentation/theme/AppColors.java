@@ -13,6 +13,4 @@ public class AppColors {
     public static final Color LIGHT_BLUE = new Color(30, 144, 255);
     public static final Color DARK_BLUE = new Color(0, 51, 102);
     public static final Color RED = new Color(200, 0, 0);
-    public static final Color STATUS_RESERVED   = new Color(255, 200, 200);
-    public static final Color STATUS_FREE       = new Color(200, 255, 200);
 }

@@ -12,38 +12,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * An administrative management dashboard panel enabling garage operators to add,
- * update, review, and decommission physical parking spaces.
- * <p>
- * This view provides an operations workspace for inventory control. It lists
- * physical slot attributes (such as occupancy flags, structural layout levels, and
- * intended vehicle size thresholds) while continuously correlating space records with
- * overlapping booking data models from the reservation engine.
- */
 public class ManageSlotsPanel extends BaseManagePanel {
-    /** Coordination controller engine tracking physical garage properties and spot configurations. */
-    private final ParkingSpaceController slotController;
-
-    /** Coordination controller engine querying active, historical, and overlapping reservations. */
-    private final ReservationController reservationController;
+    private ParkingSpaceController slotController;
+    private ReservationController reservationController;
 
     private DefaultTableModel tableModel;
     private JTable table;
-
-    /** Captures the row entity record highlighted by the operator's focus mouse click inside the table. */
     private ParkingSpace selectedSpace;
-
-    /** Cache keeping the local structural inventory pulled from database queries. */
     private List<ParkingSpace> currentSpaces = new ArrayList<>();
 
-    /**
-     * Bootstraps layout grids, injects structural orchestration controllers, and populates
-     * the view workspace with inventory action triggers and contextual table tracking displays.
-     *
-     * @param slotController        Reusable data persistence engine identifying individual space sizes.
-     * @param reservationController Reusable data persistence engine handling booking transactions.
-     */
     public ManageSlotsPanel(ParkingSpaceController slotController, ReservationController reservationController) {
         this.slotController = slotController;
         this.reservationController = reservationController;
@@ -54,9 +31,6 @@ public class ManageSlotsPanel extends BaseManagePanel {
         add(buildTable(), BorderLayout.CENTER);
     }
 
-    /**
-     * Dynamic button bar factory attaching action click handlers to inventory mutation tasks.
-     */
     private JPanel buildButtonArea() {
         JButton addBtn = buildButton("Add Slot");
         addBtn.addActionListener(e -> showSlotInfoDialog("Add slot", null));
@@ -82,10 +56,6 @@ public class ManageSlotsPanel extends BaseManagePanel {
         return buildButtonArea("Parking Slots", addBtn, editBtn, removeBtn);
     }
 
-    /**
-     * Initializes structural spreadsheet data grids, defining columns to track physical statuses
-     * alongside booking markers, and pairs row tracking to the selected inventory entity focus cache.
-     */
     private JScrollPane buildTable() {
         String[] columns = {"Code", "Floor", "Current Status", "Reservation Status", "Type"};
         tableModel = buildTableModel(columns);
@@ -99,21 +69,11 @@ public class ManageSlotsPanel extends BaseManagePanel {
         });
     }
 
-    /**
-     * Pulls a fresh snapshot sequence of all physical lot attributes from the database inventory
-     * layer and schedules a structural table layout redraw.
-     */
     public void refreshTable() {
         List<ParkingSpace> spaces = slotController.getAllSpaces();
         loadData(spaces);
     }
 
-    /**
-     * Overwrites layout list model views with an array of refreshed physical spot entries.
-     * Evaluates live occupancy flags against live plates to highlight active bookings.
-     *
-     * @param spaces The fresh list sequence mapping data models to rows.
-     */
     public void loadData(List<ParkingSpace> spaces) {
         currentSpaces = spaces;
         tableModel.setRowCount(0);
@@ -131,14 +91,6 @@ public class ManageSlotsPanel extends BaseManagePanel {
         }
     }
 
-    /**
-     * Displays a structured modal dialog wizard to add a new physical space or alter an existing one.
-     * Includes logical guards blocking vehicle category conversions if the targeted slot
-     * currently holds an active user reservation or vehicle presence flag.
-     *
-     * @param text  The context tracking label defining the header prompt message.
-     * @param space The optional space model entity to be mutated, or null if setting up a new entry.
-     */
     private void showSlotInfoDialog(String text, ParkingSpace space) {
         JPanel formPanel = new JPanel();
         formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
@@ -246,13 +198,6 @@ public class ManageSlotsPanel extends BaseManagePanel {
         dialog.setVisible(true);
     }
 
-    /**
-     * Builds an embedded, scrollable context viewport listing upcoming booking timeline parameters
-     * registered to this physical slot coordinate.
-     *
-     * @param space The structural slot target being interrogated for reservation bounds.
-     * @return A standalone, styled layout panel showing structured schedule data rows.
-     */
     private JComponent buildReservationInfo(ParkingSpace space) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -291,14 +236,6 @@ public class ManageSlotsPanel extends BaseManagePanel {
         return scrollPane;
     }
 
-    /**
-     * Initiates a decommissioning prompt transaction over a targeted spot coordinate.
-     * If an active reservation conflicts with the deletion window, it automatically queries
-     * alternative slots matching the vehicle category to salvage the booking before executing
-     * the permanent removal.
-     *
-     * @param spaceId The database structural primary key tracking identification records.
-     */
     private void showRemoveSlotDialog(int spaceId) {
         int confirm = JOptionPane.showConfirmDialog(this, "Delete slot " + spaceId + "?", "Confirm", JOptionPane.YES_NO_OPTION);
         if (confirm != JOptionPane.YES_OPTION) return;

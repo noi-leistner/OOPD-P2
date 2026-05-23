@@ -13,11 +13,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * An admin dashboard panel for handling customer parking bookings.
- * Lets you view a list of all current reservations, edit booking
- * timelines/assigned spaces, or cancel reservations entirely.
- */
 public class ManageBookingsPanel extends BaseManagePanel {
     private final ReservationController reservationController;
     private final ParkingSpaceController slotController;
@@ -27,10 +22,6 @@ public class ManageBookingsPanel extends BaseManagePanel {
     private Reservation selectedReservation;
     private List<Reservation> currentReservations = new ArrayList<>();
 
-    /**
-     * Initializes the manager panel layout, sets up columns,
-     * and maps out the action buttons.
-     */
     public ManageBookingsPanel(ReservationController reservationController, ParkingSpaceController slotController) {
         this.reservationController = reservationController;
         this.slotController = slotController;
@@ -42,10 +33,6 @@ public class ManageBookingsPanel extends BaseManagePanel {
         add(buildTable(), BorderLayout.CENTER);
     }
 
-    /**
-     * Creates the upper control bar. Sets up action listeners to make sure
-     * a row is actually selected before attempting an edit or cancellation.
-     */
     private JPanel buildButtonArea() {
         JButton editResBtn = buildButton("Edit Reservation");
         editResBtn.addActionListener(e -> {
@@ -80,10 +67,6 @@ public class ManageBookingsPanel extends BaseManagePanel {
         return buildButtonArea("Manage Bookings", editResBtn, cancelResBtn);
     }
 
-    /**
-     * Configures the main data table framework and tracks row selection adjustments
-     * so the control buttons know exactly which reservation is active.
-     */
     private JScrollPane buildTable() {
         String[] columns = {"User Id", "Plate", "Slot", "Type", "Start Date", "End Date"};
         tableModel = buildTableModel(columns);
@@ -97,19 +80,11 @@ public class ManageBookingsPanel extends BaseManagePanel {
         });
     }
 
-    /**
-     * Pulls the latest reservation list from the database controller
-     * and triggers a visual table redraw.
-     */
     public void refreshTable() {
         List<Reservation> reservations = reservationController.getAllReservations();
         loadData(reservations);
     }
 
-    /**
-     * Wipes the existing table data rows and rebuilds them row-by-row,
-     * matching up the raw spot IDs with detailed layout data like spot types.
-     */
     public void loadData(List<Reservation> reservations) {
         currentReservations = reservations;
         tableModel.setRowCount(0);
@@ -126,11 +101,6 @@ public class ManageBookingsPanel extends BaseManagePanel {
         }
     }
 
-    /**
-     * Pops open an editor dialog window. Gives admins time-spinners to update
-     * start/end markers and a dropdown menu to select alternative spots, verifying
-     * that reservation time windows don't overlap or fall into the past.
-     */
     private void showEditReservationDialog(Reservation reservation) {
         JPanel formPanel = new JPanel();
         formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));

@@ -7,32 +7,21 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
+import java.net.URL;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import Presentation.theme.AppColors;
 
-/**
- * The login screen panel.
- * Just like the register screen, it splits down the middle:
- * a side image on the left, and the actual login form on the right.
- */
 public class LoginForm extends BaseAuthForm {
 
-    /**
-     * Sets up the login view, splitting it half-and-half
-     * between the branding image and the form fields.
-     */
     public LoginForm(MainWindow mainWindow, AuthController auth, AuthPanel authPanel) {
         setLayout(new GridLayout(1,2));
         setOpaque(false);
-        add(buildImagePanel("/resources/image_login_1.jpg"));
+        add(buildImagePanel("/image_login_1.jpg"));
         add(buildCenterPanel(mainWindow, auth, authPanel));
     }
 
-    /**
-     * Builds the right half of the screen. Centers the login form,
-     * wires up the input fields, and handles the authentication
-     * request and popups when the user tries to sign in.
-     */
+    // ── Login Panel (Center) ──────────────────────────────────────────────────
     private JPanel buildCenterPanel(MainWindow mainWindow, AuthController auth, AuthPanel authPanel) {
         JPanel right = new JPanel(new GridBagLayout());
         right.setBackground(Color.WHITE);
@@ -97,5 +86,52 @@ public class LoginForm extends BaseAuthForm {
 
         right.add(form);
         return right;
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    public JTextField buildField(String placeholder, boolean isPassword) {
+        JTextField field = isPassword ? new JPasswordField(20) : new JTextField(20);
+        field.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        field.setForeground(new Color(60, 60, 70));
+        field.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 2, 0, AppColors.FIELD_BORDER),
+                new EmptyBorder(8, 4, 8, 4)
+        ));
+        field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
+        field.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        if (!isPassword) {
+            field.setForeground(AppColors.TEXT_MUTED);
+            field.setText(placeholder);
+            field.addFocusListener(new FocusAdapter() {
+                @Override public void focusGained(FocusEvent e) {
+                    if (field.getText().equals(placeholder)) { field.setText(""); field.setForeground(new Color(60,60,70)); }
+                }
+                @Override public void focusLost(FocusEvent e) {
+                    if (field.getText().isBlank()) { field.setForeground(AppColors.TEXT_MUTED); field.setText(placeholder); }
+                }
+            });
+        }
+        return field;
+    }
+
+    public JButton buildPrimaryButton(String text) {
+        JButton btn = new JButton(text);
+
+        // Set standard colors using your theme palette
+        btn.setBackground(AppColors.ACCENT);
+        btn.setForeground(Color.WHITE);
+
+        // Fonts and Layout
+        btn.setFont(new Font("SansSerif", Font.BOLD, 13));
+        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
+        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Behaviors and Focus styling
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        return btn;
     }
 }

@@ -11,29 +11,19 @@ import java.awt.*;
 import java.awt.event.*;
 import java.net.URL;
 
-/**
- * The registration screen panel.
- * Splits the screen in half: a background picture on the left,
- * and the actual registration form fields on the right.
- */
 public class RegisterForm extends BaseAuthForm {
 
-    /**
-     * Creates the register screen layout and sticks the image panel
-     * and the form panel side-by-side.
-     */
     public RegisterForm(MainWindow app, AuthController auth, AuthPanel authPanel) {
         setLayout(new GridLayout(1, 2));
         setOpaque(false); // let the parent background show; avoids gray bleed
-        add(buildImagePanel("/resources/image_login_1.jpg"));
+        add(buildImagePanel("/image_login_1.jpg"));
         add(buildCenterPanel(app, auth, authPanel));
     }
 
-    /**
-     * Builds the right side of the screen. Centres the signup form,
-     * sets up all input fields, runs local data validation guards,
-     * and handles talking to the backend controller when clicked.
-     */
+    // ── Right panel ───────────────────────────────────────────────────────────
+    // CHANGE: replaced the old GridLayout(14,1) flat list of labels+fields with
+    //         the same GridBagLayout→BoxLayout structure LoginForm uses.
+    //         This centres the form vertically and caps its width at 340px.
     private JPanel buildCenterPanel(MainWindow app, AuthController auth, AuthPanel authPanel) {
         // Outer panel: GridBagLayout with no constraints centres the form
         JPanel right = new JPanel(new GridBagLayout());
@@ -49,6 +39,8 @@ public class RegisterForm extends BaseAuthForm {
         JLabel title = buildTitle("REGISTER");
         JLabel sub = buildSubtitle("CREATE ACCOUNT");
 
+        // CHANGE: all fields now go through buildField() for consistent styling.
+        //         Previously each field was a raw new JTextField with no styling.
         JTextField     nameField    = buildField("First name",        false);
         JTextField     surnameField = buildField("Last name",         false);
         JTextField     emailField   = buildField("Email",             false);
@@ -56,6 +48,15 @@ public class RegisterForm extends BaseAuthForm {
         JPasswordField passField    = (JPasswordField) buildField("Password",         true);
         JPasswordField confirmField = (JPasswordField) buildField("Confirm password", true);
 
+        // Role selector — styled to match field height
+        String[] roles = {"Client", "Worker", "Admin"};
+        JComboBox<String> roleCombo = new JComboBox<>(roles);
+        roleCombo.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        roleCombo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
+        roleCombo.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // CHANGE: replaced plain JButton with buildPrimaryButton() for the same
+        //         rounded blue pill style as the LOGIN button.
         JButton registerBtn = buildPrimaryButton("REGISTER");
         registerBtn.addActionListener(e -> {
             String name     = nameField.getText().trim();
@@ -64,9 +65,11 @@ public class RegisterForm extends BaseAuthForm {
             String username  = usernameField.getText().trim();
             String password = new String(passField.getPassword()).trim();
             String confirm  = new String(confirmField.getPassword()).trim();
+            String role     = roleCombo.getSelectedItem().toString().trim();
 
             // Guard: all fields must be filled
-            if (name.isBlank() || surname.isBlank() || email.isBlank() || password.isBlank() || confirm.isBlank()) {
+            if (name.isBlank() || surname.isBlank() || email.isBlank()
+                    || password.isBlank() || confirm.isBlank()) {
                 JOptionPane.showMessageDialog(this, "Please fill in all fields.",
                         "Missing fields", JOptionPane.WARNING_MESSAGE);
                 return;
@@ -84,7 +87,7 @@ public class RegisterForm extends BaseAuthForm {
                 return;
             }
 
-            User user = new User(name, surname, email, username, password, "user");
+            User user = new User(name, surname, email, username, password, role);
             AuthResult result = auth.signUp(user);
             switch (result) {
                 case SUCCESS -> {
@@ -120,6 +123,7 @@ public class RegisterForm extends BaseAuthForm {
         JLabel loginLink = buildLink("Already have an account? Login",
                 () -> authPanel.showLogin(app, auth));
 
+        // Assembly — vertical struts control spacing between fields
         form.add(title);
         form.add(Box.createVerticalStrut(2));
         form.add(sub);
@@ -135,6 +139,8 @@ public class RegisterForm extends BaseAuthForm {
         form.add(passField);
         form.add(Box.createVerticalStrut(10));
         form.add(confirmField);
+        form.add(Box.createVerticalStrut(10));
+        form.add(roleCombo);
         form.add(Box.createVerticalStrut(18));
         form.add(registerBtn);
         form.add(Box.createVerticalStrut(14));

@@ -8,22 +8,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.net.URL;
 
-/**
- * An abstract blueprint that provides shared UI builders for authentication forms.
- * It handles boilerplate design setups, including image panels with opacity tints,
- * interactive text fields with smart input placeholders, custom primary buttons,
- * and navigation web-links.
- */
 public abstract class BaseAuthForm extends JPanel {
 
-    /**
-     * Builds an image panel used for side-branding. Loads an image file, paints
-     * a solid background base using theme brand colors, and overlays the loaded
-     * image with a 50% opacity blend configuration.
-     *
-     * @param imagePath the resource route path pointing to the background file
-     * @return a configured, self-rendering image panel instance
-     */
     protected JPanel buildImagePanel(String imagePath) {
         JPanel background = new JPanel() {
             private final Image bg = loadBackground();
@@ -53,15 +39,6 @@ public abstract class BaseAuthForm extends JPanel {
         return background;
     }
 
-    /**
-     * Generates a styled input text field or password field featuring built-in placeholder behaviors.
-     * Attaches focus adapters to automatically clear out the placeholder text on cursor entry,
-     * mask characters if it is an active password field, and restore default prompts if left blank.
-     *
-     * @param placeholder the text prompt shown inside the field when empty
-     * @param isPassword set to true to create a masked password field; false for standard inputs
-     * @return a text component armed with custom focus listeners and custom border styling
-     */
     protected JTextField buildField(String placeholder, boolean isPassword) {
         JTextField field = isPassword ? new JPasswordField(20) : new JTextField(20);
         field.setFont(new Font("SansSerif", Font.PLAIN, 13));
@@ -118,14 +95,6 @@ public abstract class BaseAuthForm extends JPanel {
         return field;
     }
 
-    /**
-     * Instantiates a standardized main submission button. Overrides default paint
-     * rendering loops to implement custom anti-aliased solid fills that swap shade values
-     * dynamically depending on active user click selections.
-     *
-     * @param text the label displayed inside the button body
-     * @return a button set up with click-state color triggers and cursor adjustments
-     */
     protected JButton buildPrimaryButton(String text) {
         JButton btn = new JButton(text) {
             @Override protected void paintComponent(Graphics g) {
@@ -140,22 +109,15 @@ public abstract class BaseAuthForm extends JPanel {
         btn.setFont(new Font("SansSerif", Font.BOLD, 13));
         btn.setForeground(Color.WHITE);
         btn.setContentAreaFilled(false);
-        btn.setOpaque(false);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
-
+        btn.setOpaque(false);
         btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
         btn.setAlignmentX(Component.CENTER_ALIGNMENT);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
     }
 
-    /**
-     * Simple label generator for large header titles.
-     *
-     * @param text the heading text string
-     * @return a bold, centered header label instance
-     */
     protected JLabel buildTitle(String text) {
         JLabel title = new JLabel(text);
         title.setFont(new Font("SansSerif", Font.BOLD, 26));
@@ -164,12 +126,6 @@ public abstract class BaseAuthForm extends JPanel {
         return title;
     }
 
-    /**
-     * Simple label generator for smaller, secondary subheadings.
-     *
-     * @param text the subheading text string
-     * @return a muted, centered descriptor label instance
-     */
     protected JLabel buildSubtitle(String text) {
         JLabel sub = new JLabel(text);
         sub.setFont(new Font("SansSerif", Font.PLAIN, 11));
@@ -178,15 +134,6 @@ public abstract class BaseAuthForm extends JPanel {
         return sub;
     }
 
-    /**
-     * Generates a clickable link label acting like a web hyperlink.
-     * Attaches mouse adapters to trigger external navigation logic callbacks
-     * whenever users register standard click actions on it.
-     *
-     * @param text the descriptive link message visible to users
-     * @param onClick the execution block runner fired on mouse click
-     * @return a text link component using hand cursors and theme accent coloring
-     */
     protected JLabel buildLink(String text, Runnable onClick) {
         JLabel link = new JLabel(text);
         link.setFont(new Font("SansSerif", Font.PLAIN, 11));

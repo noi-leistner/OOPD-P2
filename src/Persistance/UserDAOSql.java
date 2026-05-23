@@ -81,7 +81,7 @@ public class UserDAOSql implements UserDAO {
     }
 
     public User getUserByEmail(String email) {
-        String sql = "SELECT id, name, surname, email, username, password, role FROM users WHERE email = ?";
+        String sql = "SELECT id, name, surname, email, password, role FROM users WHERE email = ?";
         User user = null;
         try (Connection conn = ConfigDAO.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);){
