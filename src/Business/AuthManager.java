@@ -14,56 +14,31 @@ public class AuthManager {
         this.userDAO = userDAO;
     }
 
-    private SessionManager sessionManager;
-
-    public User login(String emailOrUsername, String password) {
-
-        if (emailOrUsername == null || emailOrUsername.trim().isEmpty() ||
-                password == null || password.trim().isEmpty()) {
-            System.out.println("FAILED: Empty fields");
-            return null;
-        }
-
-        // Intentar per email
-        User user = userDAO.getUserByEmail(emailOrUsername.trim());
-
-        // Si no existeix, intentar per username
-        if (user == null) {
-            user = userDAO.getUserByUsername(emailOrUsername.trim());
-        }
-
-        if (user == null) {
-            return null;
-        }
-
-
-        if (!BCrypt.checkpw(password, user.getPassword())) {
-            return null;
-        }
-
-        return user;
-    }
-    public AuthResult loginWithResult(String emailOrUsername, String password, User[] outUser) {
-        if (emailOrUsername == null || emailOrUsername.isEmpty() || password == null || password.isEmpty()) {
+    public AuthResult login(String emailOrUsername, String password) {
+        if (emailOrUsername == null || emailOrUsername.isBlank() || password == null || password.isBlank()) {
             return AuthResult.EMPTY_FIELDS;
         }
-        // 1. Try to find the user
-        User user = userDAO.getUserByEmail(emailOrUsername.trim());
-        // 2. If not found by email, try username
-        if (user == null) {
-            user = userDAO.getUserByUsername(emailOrUsername.trim());
-        }
-        // 3. SAFE CHECK: If user is still null, they don't exist
-        if (user == null) {
-            return AuthResult.USER_NOT_FOUND;
-        }
-        // 4. Now that we know user is not null, it is safe to check credentials
-        if (BCrypt.checkpw(password, user.getPassword())) {
-            if (outUser != null && outUser.length > 0) outUser[0] = user;
+
+        // Check admin credentials from config first
+        if (emailOrUsername.equalsIgnoreCase(ConfigDAO.getAdminEmail()) && password.equals(ConfigDAO.getAdminPassword())) {
+            User adminUser = new User("Admin", "User", emailOrUsername, "admin", password, "admin");
+            SessionManager.getInstance().login(adminUser);
             return AuthResult.SUCCESS;
         }
 
-        return AuthResult.INVALID_CREDENTIALS;
+        // Try email then username
+        User user = userDAO.getUserByEmail(emailOrUsername.trim());
+        if (user == null) {
+            user = userDAO.getUserByUsername(emailOrUsername.trim());
+        }
+        if (user == null) return AuthResult.USER_NOT_FOUND;
+
+        if (!BCrypt.checkpw(password, user.getPassword())) {
+            return AuthResult.INVALID_CREDENTIALS;
+        }
+
+        SessionManager.getInstance().login(user);
+        return AuthResult.SUCCESS;
     }
 
     public AuthResult signUp(User user) {

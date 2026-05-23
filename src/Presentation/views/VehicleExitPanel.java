@@ -9,13 +9,28 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * A user-facing exit panel processing vehicle checkout requests,
+ * verifying security constraints, and releasing occupied physical parking assets.
+ * <p>
+ * This view provides an automated checkout utility. It takes a raw license plate input string,
+ * validates ownership privileges against the active user session context, checks real-time
+ * parking status states, and triggers transaction pipelines to clear physical spaces upon operator
+ * confirmation.
+ */
 public class VehicleExitPanel extends JPanel {
-
+    /** Coordination controller engine tracking parking terminal logic, checkout routines, and space states. */
     private final EntryExitController controller;
 
     private JTextField plateField;
     private JLabel statusLabel;
 
+    /**
+     * Initializes structural layout matrices, establishes user entry fields, and binds
+     * procedural action triggers to check out operations.
+     *
+     * @param controller Reusable data persistence engine handling parking state changes.
+     */
     public VehicleExitPanel(EntryExitController controller) {
         this.controller = controller;
         setLayout(new BorderLayout());
@@ -23,6 +38,9 @@ public class VehicleExitPanel extends JPanel {
         add(buildForm(), BorderLayout.NORTH);
     }
 
+    /**
+     * Component form builder containing license entry text fields and confirmation triggers.
+     */
     private JPanel buildForm() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -68,6 +86,11 @@ public class VehicleExitPanel extends JPanel {
         return panel;
     }
 
+    /**
+     * Processes checkout requests submitted via the exit trigger.
+     * Enforces structural security checks confirming that the vehicle is currently parked and links
+     * back to the requesting user before breaking operational dependencies and freeing the slot.
+     */
     private void onExit() {
         String plate = plateField.getText().trim().toUpperCase();
         if (plate.isEmpty()) {
@@ -113,6 +136,7 @@ public class VehicleExitPanel extends JPanel {
         }
     }
 
+    // Helpers
     private void showSuccess(String msg) {
         statusLabel.setForeground(new Color(0, 140, 0));
         statusLabel.setText(msg);

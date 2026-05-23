@@ -17,16 +17,41 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * A user-facing reservation dashboard panel enabling clients to book, update, and track space holds.
+ * <p>
+ * This view acts as an administrative workspace window where individual customers manage their
+ * vehicle reservations. It links active vehicle validation checks against registered slots, enforces
+ * date-time safety rules, and updates
+ * changes in real time via an interactive, table-driven list layout.
+ */
 public class ManageReservationsPanel extends BaseManagePanel {
+    /** Coordination controller engine tracking business operations on user reservations. */
     private final ReservationController reservationController;
+
+    /** Coordination controller engine tracking physical garage properties and spot lookups. */
     private final ParkingSpaceController slotController;
+
+    /** Coordination controller engine checking vehicle registry records during reservation setup. */
     private final EntryExitController entryExitController;
 
     private DefaultTableModel tableModel;
     private JTable table;
+
+    /** Captures the row entity record highlighted by the user's focus mouse click inside the table. */
     private Reservation selectedReservation;
+
+    /** Cache keeping the local filtered list sequence pulled from database queries. */
     private List<Reservation> currentReservations = new ArrayList<>();
 
+    /**
+     * Bootstraps layout grids, injects functional controllers, and populates
+     * the view workspace with user action buttons and contextual table grids.
+     *
+     * @param reservationController Reusable data persistence engine handling booking transactions.
+     * @param slotController        Reusable data persistence engine identifying individual space sizes.
+     * @param entryExitController   Reusable data persistence engine matching vehicle owner keys.
+     */
     public ManageReservationsPanel(ReservationController reservationController, ParkingSpaceController slotController, EntryExitController entryExitController) {
         this.reservationController = reservationController;
         this.slotController = slotController;
@@ -39,6 +64,9 @@ public class ManageReservationsPanel extends BaseManagePanel {
         add(buildTable(), BorderLayout.CENTER);
     }
 
+    /**
+     * Dynamic button bar factory attaching action click handlers to booking modification tasks.
+     */
     private JPanel buildButtonArea() {
         JButton addResBtn = buildButton("Make Reservation");
         addResBtn.addActionListener(e -> showAddReservationDialog());
@@ -77,6 +105,10 @@ public class ManageReservationsPanel extends BaseManagePanel {
         return buildButtonArea("Manage Bookings", addResBtn, editResBtn, cancelResBtn);
     }
 
+    /**
+     * Initializes structural spreadsheet data grids, defining visible columns
+     * and adding field mapping handlers that link row selection changes back to the focus cache.
+     */
     private JScrollPane buildTable() {
         String[] columns = {"User Id", "Plate", "Slot", "Type", "Start Date", "End Date"};
         tableModel = buildTableModel(columns);
@@ -90,12 +122,23 @@ public class ManageReservationsPanel extends BaseManagePanel {
         });
     }
 
+    /**
+     * Looks up user profile session data models, gathers all active/pending
+     * records registered to that client ID, and schedules an inline data refresh.
+     */
     public void refreshTable() {
         User currentUser = SessionManager.getInstance().getCurrentUser();
         java.util.List<Reservation> reservations = reservationController.getReservationsByUserId(currentUser.getId());
         loadData(reservations);
     }
 
+    /**
+     * Overwrites layout list model views with an array of refreshed booking entries.
+     * Runs localized structural lookups against space IDs to show corresponding
+     * vehicle type sizes directly to the client.
+     *
+     * @param reservations The fresh list sequence mapping data models to rows.
+     */
     public void loadData(List<Reservation> reservations) {
         currentReservations = reservations;
         tableModel.setRowCount(0);
@@ -112,6 +155,11 @@ public class ManageReservationsPanel extends BaseManagePanel {
         }
     }
 
+    /**
+     * Displays a clean, structured modal overlay window to register a new vehicle booking.
+     * Enforces vehicle plate verification constraints and filters available spaces on the fly
+     * whenever a user toggles the target vehicle category selector dropdown.
+     */
     private void showAddReservationDialog() {
         JPanel formPanel = new JPanel();
         formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
@@ -249,6 +297,13 @@ public class ManageReservationsPanel extends BaseManagePanel {
         dialog.setVisible(true);
     }
 
+    /**
+     * Displays an inline context-editor window targeting an existing entry.
+     * Initializes dates and selected values automatically to match current properties,
+     * blocking execution updates if database overlap conflicts are detected.
+     *
+     * @param reservation The baseline booking reference sequence needing mutation.
+     */
     private void showEditReservationDialog(Reservation reservation) {
         JPanel formPanel = new JPanel();
         formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
@@ -349,6 +404,14 @@ public class ManageReservationsPanel extends BaseManagePanel {
         dialog.setVisible(true);
     }
 
+    /**
+     * Wipes old items out of a spots selector combobox panel and pulls down
+     * a fresh list sequence matching the targeted spatial size token type string.
+     *
+     * @param spotsCombo The targeted selection dropdown interface model requiring updating.
+     * @param type       The visual category constraint token checked against physical space traits.
+     * @param dialog     The parent form context window framework container showing alert warning modals.
+     */
     private void updateSpotsCombo(JComboBox<ParkingSpace> spotsCombo, String type, JDialog dialog) {
         List<ParkingSpace> spotsByType = slotController.getSpotsByType(type);
 
