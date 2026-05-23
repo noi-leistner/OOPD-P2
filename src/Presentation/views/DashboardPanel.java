@@ -3,11 +3,7 @@ package Presentation.views;
 import Business.Entities.Reservation;
 import Business.Entities.User;
 import Business.SessionManager;
-import Presentation.controllers.AuthController;
-import Presentation.controllers.EntryExitController;
-import Presentation.controllers.ParkingSpaceController;
-import Presentation.controllers.StatusController;
-import Presentation.controllers.ReservationController;
+import Presentation.controllers.*;
 import Presentation.theme.AppColors;
 
 import javax.swing.*;
@@ -24,6 +20,7 @@ public class DashboardPanel extends JPanel {
     private MainWindow mainWindow;
     private AuthController authController;
     private StatusController statusController;
+    private OccupancyController occupancyController;
 
     private final List<JButton> buttons = new java.util.ArrayList<>();
     private JButton initialButton;
@@ -31,14 +28,20 @@ public class DashboardPanel extends JPanel {
     private ParkingSpaceController slotController;
     private ReservationController reservationController;
 
+    private ManageSlotsPanel manageSlotsPanel;
+    private CurrentStatusPanel currentStatusPanel;
+    private ManageBookingsPanel manageBookingsPanel;
+    private ManageReservationsPanel  manageReservationsPanel;
 
-    public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController, ReservationController reservationController, StatusController statusController, EntryExitController entryExitController) {
+
+    public DashboardPanel(MainWindow mainWindow, AuthController authController, ParkingSpaceController slotController, ReservationController reservationController, StatusController statusController, EntryExitController entryExitController, OccupancyController occupancyController) {
         this.slotController = slotController;
         this.mainWindow = mainWindow;
         this.authController = authController;
         this.statusController = statusController;
         this.reservationController = reservationController;
         this.entryExitController = entryExitController;
+        this.occupancyController = occupancyController;
 
         setLayout(new BorderLayout());
 
@@ -58,6 +61,17 @@ public class DashboardPanel extends JPanel {
         add(buildSidebar(), BorderLayout.WEST);
         add(contentArea, BorderLayout.CENTER);
         showCancelledReservationNotification();
+
+        statusController.startSimulation();
+
+        statusController.setSimulationCallback(() -> {
+            if (manageSlotsPanel != null && manageSlotsPanel.isShowing())   manageSlotsPanel.refreshTable();
+            if (currentStatusPanel != null && currentStatusPanel.isShowing()) currentStatusPanel.loadData();
+            if (occupancyController.getView() != null && occupancyController.getView().isShowing()) occupancyController.refreshChart();
+            contentArea.repaint();
+            revalidate();
+        });
+
         revalidate();
         repaint();
     }
@@ -89,22 +103,20 @@ public class DashboardPanel extends JPanel {
             addButton(sidebar, "Manage Bookings",  "BOOKINGS");
             addButton(sidebar, "Last Hour Occupancy",  "OCCUPANCY");
             addButton(sidebar, "Current Parking status", "STATUS");
-            addButton(sidebar, "Log out", "LOGOUT");
+            addButton(sidebar, "Log Out", "LOGOUT");
 
-            ManageSlotsPanel manageSlotsPanel = new ManageSlotsPanel(slotController, reservationController);
+            manageSlotsPanel = new ManageSlotsPanel(slotController, reservationController);
             manageSlotsPanel.refreshTable();
 
-            OccupancyPanel occupancyPanel = new OccupancyPanel(statusController);
-            ManageBookingsPanel manageBookingsPanel = new ManageBookingsPanel(reservationController, slotController);
+            contentArea.add(occupancyController.getView(), "OCCUPANCY");
+            manageBookingsPanel = new ManageBookingsPanel(reservationController, slotController);
             manageBookingsPanel.refreshTable();
             contentArea.add(manageSlotsPanel,   "SLOTS");
             contentArea.add(manageBookingsPanel,   "BOOKINGS");
-            contentArea.add(new OccupancyPanel(statusController),  "OCCUPANCY");
-            CurrentStatusPanel currentStatusPanel = new CurrentStatusPanel(statusController, reservationController, authController);
-            currentStatusPanel.loadData();
-            contentArea.add(currentStatusPanel,  "STATUS");
+            currentStatusPanel = new CurrentStatusPanel(statusController, reservationController, authController);
+            contentArea.add(currentStatusPanel,   "STATUS");
             contentArea.add(new LogOutPanel(mainWindow, authController, reservationController, slotController, entryExitController), "LOGOUT");
-          
+
 
             sidebar.add(Box.createVerticalGlue());
             sidebar.add(buildDivider());
@@ -126,10 +138,10 @@ public class DashboardPanel extends JPanel {
 
             contentArea.add(new VehicleEntryPanel(entryExitController), "VEHICLE_ENTRY");
             contentArea.add(new VehicleExitPanel(entryExitController), "VEHICLE_EXIT");
-            ManageReservationsPanel manageReservationsPanel = new ManageReservationsPanel(reservationController, slotController, entryExitController);
+            manageReservationsPanel = new ManageReservationsPanel(reservationController, slotController, entryExitController);
             manageReservationsPanel.refreshTable();
             contentArea.add(manageReservationsPanel, "RESERVE");
-            contentArea.add(new OccupancyPanel(statusController), "OCCUPANCY");
+            contentArea.add(occupancyController.getView(), "OCCUPANCY");
             CurrentStatusPanel currentStatusPanel = new CurrentStatusPanel(statusController, reservationController, authController);
             currentStatusPanel.loadData();
             contentArea.add(currentStatusPanel,  "STATUS");

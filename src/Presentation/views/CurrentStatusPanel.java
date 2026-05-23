@@ -3,6 +3,7 @@ package Presentation.views;
 import Business.Entities.ParkingSpace;
 import Business.Entities.Reservation;
 import Business.Entities.User;
+import Business.SessionManager;
 import Presentation.controllers.AuthController;
 import Presentation.controllers.ReservationController;
 import Presentation.controllers.StatusController;
@@ -12,9 +13,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.HierarchyEvent;
 
 public class CurrentStatusPanel extends JPanel {
 
@@ -40,6 +43,14 @@ public class CurrentStatusPanel extends JPanel {
         addTableClickListener();
 
         loadData();
+        Timer timer = new Timer(5000, e -> loadData());
+
+        addHierarchyListener(e -> {
+            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                if (isShowing()) timer.start();
+                else             timer.stop();
+            }
+        });
     }
 
     private JPanel buildHeader() {
@@ -107,9 +118,11 @@ public class CurrentStatusPanel extends JPanel {
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
-                if (e.getClickCount() == 2) {
+                if (e.getClickCount() == 1) {
                     int row = table.getSelectedRow();
                     if (row != -1) {
+                        User currentUser = SessionManager.getInstance().getCurrentUser();
+                        if (!currentUser.isAdmin()) return;
                         ParkingSpace space = spaces.get(row);
                         showSpaceDetailDialog(space);
                     }
@@ -203,6 +216,7 @@ public class CurrentStatusPanel extends JPanel {
     public void loadData() {
         tableModel.setRowCount(0);
         spaces = statusController.getParkingTableData();
+        boolean isReserved = false;
         for (ParkingSpace space : spaces) {
             Reservation reservation = reservationController.getActiveReservationForPlate(space.getParkedLicensePlate());
             String plate = space.isOccupied() ? space.getParkedLicensePlate() : "-";

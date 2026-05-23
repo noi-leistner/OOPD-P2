@@ -14,34 +14,55 @@ public class AuthManager {
         this.userDAO = userDAO;
     }
 
-    public User login(String email, String password) {
-        if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
+    private SessionManager sessionManager;
+
+    public User login(String emailOrUsername, String password) {
+
+        if (emailOrUsername == null || emailOrUsername.trim().isEmpty() ||
+                password == null || password.trim().isEmpty()) {
+            System.out.println("FAILED: Empty fields");
             return null;
         }
-        User user = userDAO.getUserByEmail(email.trim());
+
+        // Intentar per email
+        User user = userDAO.getUserByEmail(emailOrUsername.trim());
+
+        // Si no existeix, intentar per username
+        if (user == null) {
+            user = userDAO.getUserByUsername(emailOrUsername.trim());
+        }
 
         if (user == null) {
             return null;
         }
 
-        if (BCrypt.checkpw(password, user.getPassword())) {
-            return user;
-        }
-        return null;
-    }
 
-    public AuthResult loginWithResult(String email, String password, User[] outUser) {
-        if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
+        if (!BCrypt.checkpw(password, user.getPassword())) {
+            return null;
+        }
+
+        return user;
+    }
+    public AuthResult loginWithResult(String emailOrUsername, String password, User[] outUser) {
+        if (emailOrUsername == null || emailOrUsername.isEmpty() || password == null || password.isEmpty()) {
             return AuthResult.EMPTY_FIELDS;
         }
-        User user = userDAO.getUserByEmail(email.trim());
+        // 1. Try to find the user
+        User user = userDAO.getUserByEmail(emailOrUsername.trim());
+        // 2. If not found by email, try username
+        if (user == null) {
+            user = userDAO.getUserByUsername(emailOrUsername.trim());
+        }
+        // 3. SAFE CHECK: If user is still null, they don't exist
         if (user == null) {
             return AuthResult.USER_NOT_FOUND;
         }
+        // 4. Now that we know user is not null, it is safe to check credentials
         if (BCrypt.checkpw(password, user.getPassword())) {
             if (outUser != null && outUser.length > 0) outUser[0] = user;
             return AuthResult.SUCCESS;
         }
+
         return AuthResult.INVALID_CREDENTIALS;
     }
 

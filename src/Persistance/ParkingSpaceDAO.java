@@ -21,4 +21,5 @@ public interface ParkingSpaceDAO {
     boolean occupySpace(int spaceId, String licensePlate);
     boolean vacateSpace(int spaceId);
     boolean vacateSpacesByUserId(int userId);
+    int getTotalUnreservedSpaces();
 }

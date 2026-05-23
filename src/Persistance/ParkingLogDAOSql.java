@@ -28,31 +28,9 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
         }
     }
-
-    /*
-    public Map<Integer, Integer> getOccupancyLastHour() {
-        int[] netChange =  new int[60];
-        String sql = "SELECT * FROM parking_log ORDER BY timestamp DESC LIMIT 60";
-        try (Connection conn = ConfigDAO.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-
-            }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    */
-    /*
-    // Gives a map with cars / minutes each minute, and displays it in statusController.
-     */
     @Override
     public Map<Integer, Integer> getOccupancyLastHour() {
         Map<Integer, Integer> netByMinute = new LinkedHashMap<>();
@@ -75,10 +53,10 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
 
         // Convert net-per-minute → cumulative running total (walk 59→0)
         Map<Integer, Integer> result = new LinkedHashMap<>();
-        int running = 0;
-        for (int m = 59; m >= 0; m--) {
-            running += netByMinute.getOrDefault(m, 0);
-            result.put(m, Math.max(running, 0));
+        int currentOccupancy = getSnapshotOccupancy();
+        for (int m = 0; m <= 59; m++) {
+            result.put(m, currentOccupancy);
+            currentOccupancy -= netByMinute.getOrDefault(m, 0);
         }
         return result;
     }
@@ -108,5 +86,39 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
             log.log(Level.SEVERE, e.getMessage(), e);
             return false;
         }
+    }
+
+    @Override
+    public boolean removeLog(int logId) {
+        String sql = "DELETE FROM parking_log WHERE id = ?";
+
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, logId);
+            int affectedRows = stmt.executeUpdate();
+
+            // Returns true if a row was actually deleted
+            return affectedRows > 0;
+
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, "Failed to remove parking log with ID: " + logId, e);
+            return false;
+        }
+    }
+
+    public int getSnapshotOccupancy() {
+        String sql = "SELECT COUNT(*) FROM parking_slots WHERE occupation_status = TRUE";
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(ParkingSpaceDAOSql.class.getName()).log(Level.SEVERE, "Failed to count occupied spaces", e);
+        }
+        return 0;
     }
 }

@@ -16,7 +16,7 @@ public class RegisterForm extends BaseAuthForm {
     public RegisterForm(MainWindow app, AuthController auth, AuthPanel authPanel) {
         setLayout(new GridLayout(1, 2));
         setOpaque(false); // let the parent background show; avoids gray bleed
-        add(buildImagePanel("/Presentation/theme/resources/image_login_1.jpg"));
+        add(buildImagePanel("/image_login_1.jpg"));
         add(buildCenterPanel(app, auth, authPanel));
     }
 
@@ -44,6 +44,7 @@ public class RegisterForm extends BaseAuthForm {
         JTextField     nameField    = buildField("First name",        false);
         JTextField     surnameField = buildField("Last name",         false);
         JTextField     emailField   = buildField("Email",             false);
+        JTextField usernameField = buildField("Username",            false);
         JPasswordField passField    = (JPasswordField) buildField("Password",         true);
         JPasswordField confirmField = (JPasswordField) buildField("Confirm password", true);
 
@@ -61,6 +62,7 @@ public class RegisterForm extends BaseAuthForm {
             String name     = nameField.getText().trim();
             String surname  = surnameField.getText().trim();
             String email    = emailField.getText().trim();
+            String username  = usernameField.getText().trim();
             String password = new String(passField.getPassword()).trim();
             String confirm  = new String(confirmField.getPassword()).trim();
             String role     = roleCombo.getSelectedItem().toString().trim();
@@ -79,19 +81,25 @@ public class RegisterForm extends BaseAuthForm {
                         "Password mismatch", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            if (username.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "USername cannot be empty.",
+                        "Username empty", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
 
-            User user = new User(name, surname, email, password, role);
+            User user = new User(name, surname, email, username, password, role);
             AuthResult result = auth.signUp(user);
             switch (result) {
-                case SUCCESS -> {JOptionPane.showMessageDialog(this,
-                        "Creation successfull",
-                        "Your account has been successfully created",
-                        JOptionPane.INFORMATION_MESSAGE);
-                        nameField.setText("");
-                        surnameField.setText("");
-                        emailField.setText("");
-                        passField.setText("");
-                        confirmField.setText("");
+                case SUCCESS -> {
+                    JOptionPane.showMessageDialog(this, "Account created successfully!");
+                    app.getDashboard().refresh();
+                    app.switchTo(MainWindow.DASHBOARD_SCREEN);
+                    nameField.setText("");
+                    surnameField.setText("");
+                    emailField.setText("");
+                    surnameField.setText("");
+                    passField.setText("");
+                    confirmField.setText("");
                 }
                 case EMAIL_ALREADY_EXISTS -> JOptionPane.showMessageDialog(this,
                         "An account with that email already exists.",
@@ -125,6 +133,8 @@ public class RegisterForm extends BaseAuthForm {
         form.add(surnameField);
         form.add(Box.createVerticalStrut(10));
         form.add(emailField);
+        form.add(Box.createVerticalStrut(10));
+        form.add(usernameField);
         form.add(Box.createVerticalStrut(10));
         form.add(passField);
         form.add(Box.createVerticalStrut(10));

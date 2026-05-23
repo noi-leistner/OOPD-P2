@@ -12,13 +12,14 @@ public class AuthController {
     private AuthManager authManager;
     private SessionManager sessionManager;
 
+
     public AuthController(AuthManager authManager, SessionManager sessionManager) {
         this.authManager = authManager;
         this.sessionManager = sessionManager;
     }
 
     public AuthResult logIn(String email, String password) {
-        if (email.isEmpty() && password.isEmpty()) { return AuthResult.EMPTY_FIELDS; }
+        if (email.isEmpty() || password.isEmpty()) { return AuthResult.EMPTY_FIELDS; }
 
         User[] outUser = new User[1];
         AuthResult result = authManager.loginWithResult(email, password, outUser);

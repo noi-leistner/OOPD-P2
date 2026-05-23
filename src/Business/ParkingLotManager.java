@@ -43,6 +43,7 @@ public class ParkingLotManager {
         return parkingSpaceDao.getParkedPlateAtSpace(id);
     }
 
+
     public ParkingSpace findAlternativeSpace(String type, int excludeId) {
         return parkingSpaceDao.getAllParkingSpaces().stream()
                 .filter(s -> s.getId() != excludeId)
@@ -65,10 +66,6 @@ public class ParkingLotManager {
 
     public List<ParkingSpace> getAllSpaces() {
         return parkingSpaceDao.getAllParkingSpaces();
-    }
-
-    public boolean slotExistById(int slotId) {
-        return parkingSpaceDao.existsById(slotId);
     }
 
     public List<ParkingSpace> getAvailableSpacesForType(String vehicleType) {
@@ -135,10 +132,11 @@ public class ParkingLotManager {
         return availableFloors;
     }
 
-    // TODO: maybe not need this function
     public boolean slotExistsById(int id) {
         return parkingSpaceDao.existsById(id);
     }
 
     public void vacateSpacesByUserId(int id) {parkingSpaceDao.vacateSpacesByUserId(id);}
+
+    public int getTotalUnreservedSpaces() {return parkingSpaceDao.getTotalUnreservedSpaces();}
 }

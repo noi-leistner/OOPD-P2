@@ -40,9 +40,9 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
             return true;
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            log.log(Level.SEVERE, "Error adding parking space in DAO", e);
         }
+        return false;
     }
 
     @Override
@@ -58,7 +58,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
             return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, "Error updating parking space in DAO", e);
             return false;
         }
     }
@@ -73,7 +73,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
             return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, "Error deleting parking space in DAO", e);
             return false;
         }
     }
@@ -90,8 +90,9 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
             while (rs.next()) {
                 spaces.add(mapRow(rs));
             }
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, "Error getting all parking spaces in DAO", e);
         }
         return spaces;
     }
@@ -106,8 +107,9 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
             try (var rs = stmt.executeQuery()) {
                 return rs.next();
             }
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, "Error getting if exists parking space in DAO", e);
             return false;
         }
     }
@@ -123,7 +125,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
                 if (rs.next()) return mapRow(rs);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, "Error getting space by Id in DAO");
         }
         return null;
     }
@@ -141,7 +143,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
                 while (rs.next()) spaces.add(mapRow(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, "Error getting available parking spaces in DAO", e);
         }
         return spaces;
     }
@@ -159,7 +161,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
                 while (rs.next()) spaces.add(mapRow(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, "Error getting available parking spaces in DAO", e);
         }
         return spaces;
     }
@@ -176,7 +178,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
                 if (rs.next()) return mapRow(rs);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, "Error getting available parking spaces in DAO", e);
         }
         return null;
     }
@@ -216,7 +218,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
                 if (rs.next()) return mapRow(rs);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
         }
         return null;
     }
@@ -234,7 +236,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
                 if (rs.next()) return mapRow(rs);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
         }
         return null;
     }
@@ -250,7 +252,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
             return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
             return false;
         }
     }
@@ -265,7 +267,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
             return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
             return false;
         }
     }
@@ -284,8 +286,25 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
             return true;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
             return false;
         }
     }
+
+    @Override
+    public int getTotalUnreservedSpaces() {
+        String sql = "SELECT COUNT(*) FROM parking_slots " +
+                "WHERE identifier NOT IN (" +
+                "  SELECT parking_slot_id FROM reservations WHERE is_cancelled = FALSE" +
+                ")";
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            Logger.getLogger(ConfigDAO.class.getName()).log(Level.SEVERE, "Get total unreserved spaces failed", e);
+        }
+        return 0;
+    }
+
 }
