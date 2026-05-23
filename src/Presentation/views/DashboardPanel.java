@@ -65,9 +65,9 @@ public class DashboardPanel extends JPanel {
         statusController.startSimulation();
 
         statusController.setSimulationCallback(() -> {
-            if (manageSlotsPanel != null)   manageSlotsPanel.refreshTable();
-            if (currentStatusPanel != null) currentStatusPanel.loadData();
-            if (occupancyController.getView() != null)     occupancyController.refreshChart();
+            if (manageSlotsPanel != null && manageSlotsPanel.isShowing())   manageSlotsPanel.refreshTable();
+            if (currentStatusPanel != null && currentStatusPanel.isShowing()) currentStatusPanel.loadData();
+            if (occupancyController.getView() != null && occupancyController.getView().isShowing()) occupancyController.refreshChart();
             contentArea.repaint();
             revalidate();
         });
