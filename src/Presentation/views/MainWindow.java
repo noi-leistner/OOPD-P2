@@ -47,6 +47,7 @@ public class MainWindow extends JFrame {
         OccupancyController occupancyController = new OccupancyController(parkingLogManager, simulationManager, new OccupancyView());
 
         AuthPanel authPanel = new AuthPanel(this, authController);
+        OccupancyView occupancyView = new OccupancyView();
 
         dashboardPanel = new  DashboardPanel(this, authController, slotController, reservationController, statusController, entryExitController, occupancyController);
 

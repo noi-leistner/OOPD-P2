@@ -30,9 +30,6 @@ public class StatusController {
         return parkingLotManager.getAllSpaces();
     }
 
-    public Map<Integer, Integer> getOccupancyChartData(){
-        return parkingLogManager.getOccupancyLastHour();
-    }
 
     public void startSimulation() { simulationManager.start(); }
     public void stopSimulation()  { simulationManager.stop();  }

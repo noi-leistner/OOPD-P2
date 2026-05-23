@@ -55,8 +55,8 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
         Map<Integer, Integer> result = new LinkedHashMap<>();
         int currentOccupancy = getSnapshotOccupancy();
         for (int m = 0; m <= 59; m++) {
-            currentOccupancy -= netByMinute.getOrDefault(m, 0);
             result.put(m, currentOccupancy);
+            currentOccupancy -= netByMinute.getOrDefault(m, 0);
         }
         return result;
     }

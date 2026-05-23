@@ -1,5 +1,6 @@
 package Presentation.views;
 
+import Presentation.controllers.OccupancyController;
 import Presentation.theme.AppColors;
 
 import javax.swing.*;
@@ -22,6 +23,7 @@ public class OccupancyView extends JPanel {
      * Manual refresh button that the controller can subscribe to.
      */
     private final JButton refreshBtn;
+
 
     /**
      * Constructs the view with all UI components initialized.
@@ -94,6 +96,7 @@ public class OccupancyView extends JPanel {
     public void updateChart(Map<Integer, Integer> data) {
         chartPanel.setData(data);
     }
+
 
     /**
      * Custom JPanel that renders a bar chart using Graphics2D.

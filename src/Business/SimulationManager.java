@@ -70,8 +70,8 @@ public class SimulationManager {
     }
 
     private void tick() {
-            List<ParkingSpace> availableMotos = parkingLotManager.getSpotsByType("motorcycle");
-            List<ParkingSpace> availableCars = parkingLotManager.getSpotsByType("car");
+            List<ParkingSpace> availableMotos = parkingLotManager.getAvailableSpacesForType("motorcycle");
+            List<ParkingSpace> availableCars = parkingLotManager.getAvailableSpacesForType("car");
             List<ParkingSpace> available = new ArrayList<>();
             available.addAll(availableMotos);
             available.addAll(availableCars);
@@ -117,17 +117,8 @@ public class SimulationManager {
             parkingLogManager.logEntry(space.getId(), plate, SIMULATED_USER_ID);
             logger.info("[ENTRY]>  " + plate + " ← slot: [" + result.getId() + "]");
         } else {
-            result = parkingLotManager.enterWithoutReservation(plate, space.getId(), SIMULATED_USER_ID);
-            logger.info("SECOND ENTRY attempt — plate: " + plate + " slot: " + space.getId());
-            if (result != null) {
-                result = parkingLotManager.enterWithoutReservation(plate, space.getId(), SIMULATED_USER_ID);
-                simulatedPlates.add(plate);
-                parkingLogManager.logEntry(result.getId(), plate, SIMULATED_USER_ID);
-                logger.info("[ENTRY]>  " + plate + " ← slot: [" + result.getId() + "]");
-            } else {
-                logger.warning("- Spot was full and the driver: " + plate + " left.");
-                vehicleManager.deleteSimulatedVehicle(plate);
-            }
+            logger.warning("- Spot was full and the driver: " + plate + " left.");
+            vehicleManager.deleteSimulatedVehicle(plate);
         }
     }
 
