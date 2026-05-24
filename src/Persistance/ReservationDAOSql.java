@@ -15,6 +15,7 @@ import java.util.logging.Logger;
  */
 public class ReservationDAOSql implements ReservationDAO {
 
+    /** Current user log */
     private static final Logger log = Logger.getLogger(ReservationDAOSql.class.getName());
 
     /** Builds a Reservation object from the current row of a ResultSet. */

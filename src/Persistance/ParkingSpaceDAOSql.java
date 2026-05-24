@@ -17,6 +17,7 @@ import java.util.logging.Logger;
  */
 public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
+    /** Current user log */
     private static final Logger log = Logger.getLogger(ParkingSpaceDAOSql.class.getName());
 
     /** Builds a ParkingSpace object from the current row of a ResultSet. */

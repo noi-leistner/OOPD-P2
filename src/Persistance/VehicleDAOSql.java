@@ -15,6 +15,7 @@ import java.util.logging.Logger;
  */
 public class VehicleDAOSql implements VehicleDAO {
 
+    /** Current user log */
     private static final Logger log = Logger.getLogger(VehicleDAOSql.class.getName());
 
     /**

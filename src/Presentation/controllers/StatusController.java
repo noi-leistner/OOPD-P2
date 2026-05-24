@@ -11,27 +11,42 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+/**
+ * Controller for the current parking lot status view.
+ * Coordinates ParkingLotManager and SimulationManager to provide
+ * real-time space data and control the traffic simulation.
+ */
 public class StatusController {
-
-    //TODO: JavaDoc
 
     private final ParkingLotManager parkingLotManager;
     private final SimulationManager simulationManager;
 
+    /**
+     * Creates new StatusController.
+     *
+     * @param parkingLotManager  provides current parking space data
+     * @param simulationManager  manages the traffic simulation lifecycle
+     */
     public StatusController(ParkingLotManager parkingLotManager,SimulationManager simulationManager) {
         this.parkingLotManager = parkingLotManager;
         this.simulationManager = simulationManager;
     }
 
-    // Returns all parking spaces with the current state. Each space already contains:
-    // id, floor, type, occupation_status, reservation_status.
-    //        (License plate is fetched separately per space)
+    /**
+     * Returns all parking spaces with their current state (id, floor, type,
+     * occupation status and reservation status).
+     */
     public List<ParkingSpace> getParkingTableData(){
         return parkingLotManager.getAllSpaces();
     }
 
-
+    /** Starts the traffic simulation. */
     public void startSimulation() { simulationManager.start(); }
+
+    /**
+     * Sets a callback to be invoked on each simulation tick,
+     * used to refresh the UI when the simulation updates the parking state.
+     */
     public void setSimulationCallback(Runnable callback) {simulationManager.setOnTickCallBack(callback);}
 
 
