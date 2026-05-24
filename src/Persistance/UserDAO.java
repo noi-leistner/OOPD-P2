@@ -3,6 +3,10 @@ package Persistance;
 import Business.AuthResult;
 import Business.Entities.User;
 
+/**
+ * DAO interface for operations of users.
+ * Implemented by UserDAOSql.
+ */
 public interface UserDAO {
     AuthResult addUser(User user);
     boolean deleteUser(int id);

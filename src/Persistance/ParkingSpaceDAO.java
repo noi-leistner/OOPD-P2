@@ -5,6 +5,10 @@ import Business.Entities.ParkingSpace;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * DAO interface for parking space operations.
+ * Implemented by ParkingSpaceDAOSql.
+ */
 public interface ParkingSpaceDAO {
     boolean addParkingSpace(ParkingSpace space);
     boolean updateParkingSpace(ParkingSpace space);

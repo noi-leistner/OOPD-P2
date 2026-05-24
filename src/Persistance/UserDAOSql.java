@@ -10,10 +10,19 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * SQL implementation of UserDAO.
+ * Handles all database operations for users.
+ */
 public class UserDAOSql implements UserDAO {
 
     private static final Logger log = Logger.getLogger(ParkingSpaceDAOSql.class.getName());
 
+    /**
+     * Inserts a new user into the database.
+     * @param user the user to add
+     * @return SUCCESS, EMAIL_ALREADY_EXISTS if the email is taken, or DATABASE_ERROR
+     */
     @Override
     public AuthResult addUser(User user) {
         if (existsByEmail(user.getEmail())) return AuthResult.EMAIL_ALREADY_EXISTS;
@@ -38,7 +47,11 @@ public class UserDAOSql implements UserDAO {
     }
 
 
-    // Information is deleted reversing the creation.
+    /**
+     * Permanently deletes a user by ID.
+     * @param id the user's ID
+     * @return true if a row was deleted, false otherwise
+     */
     @Override
     public boolean deleteUser(int id) {
         String sql = "DELETE FROM users WHERE id = ?";
@@ -55,6 +68,11 @@ public class UserDAOSql implements UserDAO {
         }
     }
 
+    /**
+     * Returns a user by their ID.
+     * @param id the user's ID
+     * @return the matching User, or null if not found
+     */
     @Override
     public User getUserById(int id) {
         String sql = "SELECT id, name, surname, email, username, password, role FROM users WHERE id = ?";
@@ -80,6 +98,11 @@ public class UserDAOSql implements UserDAO {
         return null;
     }
 
+    /**
+     * Returns a user by their email address.
+     * @param email the email to look up
+     * @return the matching User, or null if not found
+     */
     public User getUserByEmail(String email) {
         String sql = "SELECT id, name, surname, email, username, password, role FROM users WHERE email = ?";
         User user = null;
@@ -107,6 +130,11 @@ public class UserDAOSql implements UserDAO {
         return user;
     }
 
+    /**
+     * Checks whether a user with the given email already exists.
+     * @param email the email to check
+     * @return true if it exists, false otherwise
+     */
     public boolean existsByEmail(String email) {
         String sql = "SELECT 1 FROM users WHERE email = ?";
         try (Connection conn = ConfigDAO.getConnection();
@@ -122,6 +150,11 @@ public class UserDAOSql implements UserDAO {
         }
     }
 
+    /**
+     * Returns a user by their username.
+     * @param username the username to look up
+     * @return the matching User, or null if not found
+     */
     public User getUserByUsername(String username) {
         String sql = "SELECT id, name, surname, email, username, password, role " +
                 "FROM users WHERE username = ?";

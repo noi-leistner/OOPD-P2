@@ -9,10 +9,15 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * SQL implementation of ReservationDAO.
+ * Handles all database operations for parking reservations.
+ */
 public class ReservationDAOSql implements ReservationDAO {
 
     private static final Logger log = Logger.getLogger(ReservationDAOSql.class.getName());
 
+    /** Builds a Reservation object from the current row of a ResultSet. */
     private Reservation mapRow(ResultSet rs) throws SQLException {
         return new Reservation(
                 rs.getInt("id"),
@@ -25,6 +30,10 @@ public class ReservationDAOSql implements ReservationDAO {
         );
     }
 
+    /**
+     * Inserts a new reservation without checking for conflicts.
+     * @param reservation the reservation to insert
+     */
     @Override
     public void addReservation(Reservation reservation) {
         String sql = "INSERT INTO reservations (user_id, vehicle_license_plate, parking_slot_id, start_date, end_date) " +
@@ -43,6 +52,11 @@ public class ReservationDAOSql implements ReservationDAO {
         }
     }
 
+    /**
+     * Permanently deletes a reservation by ID.
+     * @param reservationId the reservation ID
+     * @return SUCCESS or DATABASE_ERROR
+     */
     @Override
     public DaoResult deleteReservation(int reservationId) {
         String sql = "DELETE FROM reservations WHERE id = ?";
@@ -59,6 +73,11 @@ public class ReservationDAOSql implements ReservationDAO {
         }
     }
 
+    /**
+     * Inserts a new reservation after checking for overlapping reservations on the same slot.
+     * @param reservation the reservation to create
+     * @return SUCCESS, ALREADY_EXISTS if the slot is taken, or DATABASE_ERROR
+     */
     @Override
     public DaoResult createReservation(Reservation reservation) {
         // Check for overlapping reservations on the same slot
@@ -104,6 +123,10 @@ public class ReservationDAOSql implements ReservationDAO {
         }
     }
 
+    /**
+     * Marks a reservation as cancelled without deleting it.
+     * @param reservationId the reservation ID
+     */
     @Override
     public void cancelReservation(int reservationId) {
         String sql = "UPDATE reservations SET is_cancelled = TRUE WHERE id = ?";
@@ -118,6 +141,10 @@ public class ReservationDAOSql implements ReservationDAO {
         }
     }
 
+    /**
+     * Returns all non-cancelled reservations.
+     * @return list of active reservations
+     */
     @Override
     public List<Reservation> getAllReservations() {
         List<Reservation> list = new ArrayList<>();
@@ -135,6 +162,11 @@ public class ReservationDAOSql implements ReservationDAO {
         return list;
     }
 
+    /**
+     * Returns all reservations (including canceled) for a given user.
+     * @param userId the user's ID
+     * @return list of the user's reservations
+     */
     @Override
     public List<Reservation> getReservationsByUserId(int userId) {
         List<Reservation> list = new ArrayList<>();
@@ -155,6 +187,11 @@ public class ReservationDAOSql implements ReservationDAO {
         return list;
     }
 
+    /**
+     * Returns all non-cancelled reservations for a given parking slot.
+     * @param slotId the slot ID
+     * @return list of active reservations for that slot
+     */
     @Override
     public List<Reservation> findReservationsBySlotId(int slotId) {
         String sql = "SELECT * FROM reservations WHERE parking_slot_id = ? AND is_cancelled = FALSE";
@@ -175,6 +212,11 @@ public class ReservationDAOSql implements ReservationDAO {
         return reservations;
     }
 
+    /**
+     * Updates an existing reservation's slot and dates, checking for conflicts with other reservations.
+     * @param reservation the reservation with updated values
+     * @return SUCCESS, ALREADY_EXISTS if the slot is taken, NOT_FOUND if the reservation doesn't exist, or DATABASE_ERROR
+     */
     @Override
     public DaoResult editReservation(Reservation reservation) {
         String checkSql = "SELECT 1 FROM reservations " +
@@ -222,6 +264,11 @@ public class ReservationDAOSql implements ReservationDAO {
         }
     }
 
+    /**
+     * Returns the first non-canceled reservation for a given license plate.
+     * @param licensePlate the vehicle's license plate
+     * @return the matching reservation, or null if not found
+     */
     @Override
     public Reservation findReservationByPlate(String licensePlate) {
         String sql = "SELECT * FROM reservations WHERE vehicle_license_plate = ? AND is_cancelled = 0";
@@ -238,6 +285,11 @@ public class ReservationDAOSql implements ReservationDAO {
         return null;
     }
 
+    /**
+     * Permanently deletes all reservations belonging to a given user.
+     * Used when deleting a user account.
+     * @param userId the user's ID
+     */
     @Override
     public void deleteReservationsByUserId(int userId) {
         String sql = "DELETE FROM reservations WHERE user_id = ?";
@@ -250,6 +302,7 @@ public class ReservationDAOSql implements ReservationDAO {
         }
     }
 
+    /** Permanently deletes all reservations whose end date has passed. */
     @Override
     public void deleteExpiredReservations() {
         String sql = "DELETE FROM reservations WHERE end_date < NOW()";
@@ -261,6 +314,12 @@ public class ReservationDAOSql implements ReservationDAO {
         }
     }
 
+    /**
+     * Returns the currently active reservation for a given license plate,
+     * i.e. one that is not cancelled and whose time window covers right now.
+     * @param plate the vehicle's license plate
+     * @return the active reservation, or null if none
+     */
     @Override
     public Reservation getActiveReservationForPlate(String plate) {
         String sql = "SELECT * FROM reservations " +
@@ -283,6 +342,10 @@ public class ReservationDAOSql implements ReservationDAO {
         return null;
     }
 
+    /**
+     * Returns all reservations that are currently active (not cancelled, within their time window).
+     * @return list of currently active reservations
+     */
     public List<Reservation> getAllActiveReservations() {
         String sql = "SELECT * FROM reservations " +
                 "WHERE is_cancelled = FALSE " +

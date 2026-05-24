@@ -11,11 +11,15 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * SQL implementation of ParkingSpaceDAO.
+ * Handles all database operations for parking spaces.
+ */
 public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     private static final Logger log = Logger.getLogger(ParkingSpaceDAOSql.class.getName());
 
-    // Helper to build a ParkingSpace from a ResultSet row
+    /** Builds a ParkingSpace object from the current row of a ResultSet. */
     private ParkingSpace mapRow(ResultSet rs) throws SQLException {
         return new ParkingSpace(
                 rs.getInt("identifier"),
@@ -26,6 +30,11 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
         );
     }
 
+    /**
+     * Inserts a new parking space into the database.
+     * @param space the parking space to add
+     * @return true if successful, false otherwise
+     */
     @Override
     public boolean addParkingSpace(ParkingSpace space) {
         String sql = "INSERT INTO parking_slots (identifier, floor, occupation_status, vehicle_type) VALUES (?, ?, ?, ?)";
@@ -45,6 +54,11 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
         return false;
     }
 
+    /**
+     * Updates an existing parking space's floor, occupation status and vehicle type.
+     * @param space the parking space with updated values
+     * @return true if a row was updated, false otherwise
+     */
     @Override
     public boolean updateParkingSpace(ParkingSpace space) {
         String sql = "UPDATE parking_slots SET floor = ?, occupation_status = ?, vehicle_type = ? WHERE identifier = ?";
@@ -63,6 +77,11 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
         }
     }
 
+    /**
+     * Deletes a parking space by its identifier.
+     * @param id the space identifier
+     * @return true if a row was deleted, false otherwise
+     */
     @Override
     public boolean deleteParkingSpace(int id) {
         String sql = "DELETE FROM parking_slots WHERE identifier = ?";
@@ -78,6 +97,10 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
         }
     }
 
+    /**
+     * Returns all parking spaces in the database.
+     * @return list of all parking spaces
+     */
     @Override
     public List<ParkingSpace> getAllParkingSpaces() {
         String sql = "SELECT identifier, floor, occupation_status, parked_license_plate, vehicle_type FROM parking_slots";
@@ -97,6 +120,11 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
         return spaces;
     }
 
+    /**
+     * Checks whether a parking space with the given ID exists.
+     * @param id the space identifier
+     * @return true if it exists, false otherwise
+     */
     @Override
     public boolean existsById(int id) {
         String sql = "SELECT 1 FROM parking_slots WHERE identifier = ?";
@@ -114,6 +142,11 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
         }
     }
 
+    /**
+     * Returns a single parking space by its identifier.
+     * @param id the space identifier
+     * @return the matching ParkingSpace, or null if not found
+     */
     @Override
     public ParkingSpace getParkingSpaceById(int id) {
         String sql = "SELECT identifier, floor, occupation_status, parked_license_plate, vehicle_type FROM parking_slots WHERE identifier = ?";
@@ -130,6 +163,11 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
         return null;
     }
 
+    /**
+     * Returns all unoccupied spaces that match the given vehicle type.
+     * @param vehicleType the type of vehicle (e.g. "car", "motorcycle")
+     * @return list of available matching spaces
+     */
     @Override
     public List<ParkingSpace> getAvailableSpacesForType(String vehicleType) {
         String sql = "SELECT identifier, floor, occupation_status, parked_license_plate, vehicle_type " +
@@ -148,6 +186,11 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
         return spaces;
     }
 
+    /**
+     * Returns all spaces (occupied or not) that match the given vehicle type.
+     * @param type the vehicle type
+     * @return list of matching spaces
+     */
     @Override
     public List<ParkingSpace> getSpotsByType(String type) {
         String sql = "SELECT identifier, floor, occupation_status, parked_license_plate, vehicle_type " +
@@ -166,6 +209,11 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
         return spaces;
     }
 
+    /**
+     * Returns the first unoccupied space for the given vehicle type.
+     * @param vehicleType the vehicle type
+     * @return the first available space, or null if none exist
+     */
     @Override
     public ParkingSpace getFirstAvailableSpaceForType(String vehicleType) {
         String sql = "SELECT identifier, floor, occupation_status, parked_license_plate, vehicle_type " +
@@ -183,6 +231,12 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
         return null;
     }
 
+    /**
+     * Returns the license plate of the vehicle currently parked at a given space,
+     * based on the most recent ENTRY log.
+     * @param id the space identifier
+     * @return the license plate, or null if no vehicle is parked there
+     */
     @Override
     public String getParkedPlateAtSpace(int id) {
         String sql = "SELECT license_plate FROM parking_log " +
@@ -203,6 +257,11 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
         return null;
     }
 
+    /**
+     * Returns the reserved space associated with a given license plate.
+     * @param licensePlate the vehicle's license plate
+     * @return the reserved ParkingSpace, or null if no active reservation exists
+     */
     @Override
     public ParkingSpace getReservedSpaceByPlate(String licensePlate) {
         String sql = "SELECT ps.identifier, ps.floor, ps.occupation_status, ps.parked_license_plate, ps.vehicle_type " +
@@ -223,6 +282,11 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
         return null;
     }
 
+    /**
+     * Returns the space currently occupied by a given license plate.
+     * @param licensePlate the vehicle's license plate
+     * @return the occupied ParkingSpace, or null if not found
+     */
     @Override
     public ParkingSpace getOccupiedSpaceByPlate(String licensePlate) {
         String sql = "SELECT identifier, floor, occupation_status, parked_license_plate, vehicle_type " +
@@ -241,6 +305,12 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
         return null;
     }
 
+    /**
+     * Marks a space as occupied by a given license plate.
+     * @param spaceId      the space to occupy
+     * @param licensePlate the vehicle's license plate
+     * @return true if successful, false otherwise
+     */
     @Override
     public boolean occupySpace(int spaceId, String licensePlate) {
         String sql = "UPDATE parking_slots SET occupation_status = TRUE, parked_license_plate = ? WHERE identifier = ?";
@@ -257,6 +327,11 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
         }
     }
 
+    /**
+     * Marks a space as vacant and clears its license plate.
+     * @param spaceId the space to vacate
+     * @return true if successful, false otherwise
+     */
     @Override
     public boolean vacateSpace(int spaceId) {
         String sql = "UPDATE parking_slots SET occupation_status = FALSE, parked_license_plate = NULL WHERE identifier = ?";
@@ -272,6 +347,12 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
         }
     }
 
+    /**
+     * Vacates all spaces currently occupied by vehicles belonging to a given user.
+     * Used when deleting a user account.
+     * @param userId the user's ID
+     * @return true if successful, false otherwise
+     */
     @Override
     public boolean vacateSpacesByUserId(int userId) {
         String sql = "UPDATE parking_slots ps " +
@@ -291,6 +372,10 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
         }
     }
 
+    /**
+     * Returns the total number of spaces that have no active reservation.
+     * @return count of unreserved spaces
+     */
     @Override
     public int getTotalUnreservedSpaces() {
         String sql = "SELECT COUNT(*) FROM parking_slots " +

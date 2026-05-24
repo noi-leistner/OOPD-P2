@@ -2,6 +2,10 @@ package Persistance;
 
 import Business.Entities.Vehicle;
 
+/**
+ * DAO interface for operations of vehicles.
+ * Implemented by VehicleDAOSql.
+ */
 public interface VehicleDAO {
     Vehicle findByPlate(String licensePlate);
     boolean deleteByUserId(int userId);

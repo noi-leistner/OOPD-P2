@@ -13,6 +13,8 @@ import java.util.HashMap;
 
 public class StatusController {
 
+    //TODO: JavaDoc
+
     private final ParkingLotManager parkingLotManager;
     private final SimulationManager simulationManager;
 

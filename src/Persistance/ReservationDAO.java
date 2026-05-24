@@ -6,6 +6,10 @@ import Business.Entities.Reservation;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * DAO interface for operations for parking reservations.
+ * Implemented by ReservationDAOSql.
+ */
 public interface ReservationDAO {
 
     void addReservation(Reservation reservation);

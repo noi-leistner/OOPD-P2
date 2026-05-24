@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class EntryExitController {
+    // TODO: JavaDoc
 
     private final ParkingLotManager parkingLotManager;
     private final ReservationController reservationController;

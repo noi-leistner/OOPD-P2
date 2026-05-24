@@ -9,11 +9,21 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
+/**
+ * SQL implementation of ParkingLogDAO.
+ * Handles all database operations related to vehicle entry/exit logs.
+ */
 public class ParkingLogDAOSql implements ParkingLogDAO {
 
     private static final Logger log = Logger.getLogger(ParkingLogDAOSql.class.getName());
 
+    /**
+     * Inserts an entry or exit log record for a vehicle.
+     * @param spaceId      the parking space involved
+     * @param licensePlate the vehicle's license plate
+     * @param userId       the user associated with the action
+     * @param action       either "ENTRY" or "EXIT"
+     */
     @Override
     public void insertLog(int spaceId, String licensePlate, int userId, String action) {
         String sql = "INSERT INTO parking_log (parking_slot_id, license_plate, user_id, action, timestamp) " +
@@ -31,6 +41,13 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
     }
+
+    /**
+     * Returns the occupancy count for each of the last 60 minutes.
+     * The map key is minutes ago (0 = now, 59 = 59 minutes ago),
+     * and the value is the number of occupied spaces at that minute.
+     * @return map of minutes-ago to occupancy count
+     */
     @Override
     public Map<Integer, Integer> getOccupancyLastHour() {
         Map<Integer, Integer> netByMinute = new LinkedHashMap<>();
@@ -61,6 +78,12 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
         return result;
     }
 
+    /**
+     * Checks whether a vehicle is currently parked, by verifying
+     * it has an ENTRY log with no EXIT log.
+     * @param licensePlate the vehicle's license plate
+     * @return true if the vehicle is currently parked, false otherwise
+     */
     @Override
     public boolean isVehicleCurrentlyParked(String licensePlate) {
         String sql = "SELECT 1 FROM parking_log " +
@@ -88,6 +111,11 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
         }
     }
 
+    /**
+     * Deletes a specific log entry by its ID.
+     * @param logId the ID of the log to delete
+     * @return true if the log was deleted, false if it wasn't found or an error occurred
+     */
     @Override
     public boolean removeLog(int logId) {
         String sql = "DELETE FROM parking_log WHERE id = ?";
@@ -107,6 +135,11 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
         }
     }
 
+    /**
+     * Returns the current number of occupied parking spaces
+     * by querying the database directly.
+     * @return count of currently occupied spaces
+     */
     public int getSnapshotOccupancy() {
         String sql = "SELECT COUNT(*) FROM parking_slots WHERE occupation_status = TRUE";
         try (Connection conn = ConfigDAO.getConnection();

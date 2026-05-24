@@ -25,7 +25,12 @@ public class SessionManager {
         return instance;
     }
 
+    /** Sets the current logged-in user. */
     public void login(User user)  { this.currentUser = user; }
+
+    /** Clears the current session, logging the user out. */
     public void logout()          { this.currentUser = null; }
+
+    /** Returns the currently logged-in user, or null if no session is active. */
     public User getCurrentUser()  { return currentUser; }
 }

@@ -161,7 +161,7 @@ public class SimulationManager {
 
     /** Generates a plate with consonants and 4 random numbers */
     private String plateGenerator() {
-        String plate = "";
+        //String plate = "";
         String letters = "BCDFGHJKLMNPQRSTVWXYZ";
         char l1 = letters.charAt(random.nextInt(letters.length()));
         char l2 = letters.charAt(random.nextInt(letters.length()));
