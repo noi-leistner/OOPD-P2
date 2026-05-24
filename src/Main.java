@@ -14,5 +14,5 @@ public class  Main {
      *
      * @param args command-line arguments (not used).
      */
-    public static void main(String[] args) {SwingUtilities.invokeLater(() -> new MainWindow().setVisible(true));}
+    static void main(String[] args) {SwingUtilities.invokeLater(() -> new MainWindow().setVisible(true));}
 }
