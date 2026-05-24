@@ -198,4 +198,18 @@ public abstract class BaseAuthForm extends JPanel {
         });
         return link;
     }
+
+    /**
+     * Extracts and cleans the data value from a specified input field.
+     * Evaluates the text against its assigned placeholder variant, returning
+     * an empty string if the field contains only the placeholder text or blank spaces.
+     *
+     * @param field       the UI text component to read from
+     * @param placeholder the text prompt string assigned to the input component
+     * @return the cleaned string content of the field, or an empty string if unedited
+     */
+    protected String getFieldValue(JTextField field, String placeholder) {
+        String text = field.getText().trim();
+        return text.equals(placeholder) ? "" : text;
+    }
 }

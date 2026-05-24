@@ -148,28 +148,24 @@ public class ManageBookingsPanel extends BaseManagePanel {
         SpinnerDateModel startDateModel = new SpinnerDateModel();
         JSpinner startDateSpinner = new JSpinner(startDateModel);
         startDateSpinner.setEditor(new JSpinner.DateEditor(startDateSpinner, "dd/MM/yyyy"));
-        addField(formPanel, "Start date:", startDateSpinner);
         startDateSpinner.setValue(reservation.getStartDateTime());
 
         // start time
         SpinnerDateModel startTimeModel = new SpinnerDateModel();
         JSpinner startTimeSpinner = new JSpinner(startTimeModel);
         startTimeSpinner.setEditor(new JSpinner.DateEditor(startTimeSpinner, "HH:mm"));
-        addField(formPanel, "Start time:", startTimeSpinner);
         startTimeSpinner.setValue(reservation.getStartDateTime());
 
         // end date
         SpinnerDateModel endDateModel = new SpinnerDateModel();
         JSpinner endDateSpinner = new JSpinner(endDateModel);
         endDateSpinner.setEditor(new JSpinner.DateEditor(endDateSpinner, "dd/MM/yyyy"));
-        addField(formPanel, "End date:", endDateSpinner);
         endDateSpinner.setValue(reservation.getEndDateTime());
 
         // end time
         SpinnerDateModel endTimeModel = new SpinnerDateModel();
         JSpinner endTimeSpinner = new JSpinner(endTimeModel);
         endTimeSpinner.setEditor(new JSpinner.DateEditor(endTimeSpinner, "HH:mm"));
-        addField(formPanel, "End time:", endTimeSpinner);
         endTimeSpinner.setValue(reservation.getEndDateTime());
 
         List<ParkingSpace> availableSpots = slotController.getSpotsByType(currentSpot.getType());

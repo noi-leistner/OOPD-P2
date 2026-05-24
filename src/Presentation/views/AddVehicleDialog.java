@@ -15,7 +15,7 @@ public class AddVehicleDialog extends JDialog {
     private boolean confirmed = false;
     private JComboBox<String> typeCombo;
 
-    private static final String[] VEHICLE_TYPES = {"car", "motorcycle", "Truck"};
+    private static final String[] VEHICLE_TYPES = {"Car", "Motorcycle", "Truck"};
 
     /**
      * Creates and centers the registration popup over the main application frame,

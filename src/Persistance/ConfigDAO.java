@@ -47,7 +47,7 @@ public class ConfigDAO {
             user       = extractString(json, "db_username");
             pass       = extractString(json, "db_password");
             adminPass  = extractString(json, "admin_password");
-            adminEmail = extractString(json, "user_email");
+            adminEmail = extractString(json, "admin_email");
             entryTime  = Integer.parseInt(extractNumber(json, "vehicle_entry_time"));
             maxStay    = Integer.parseInt(extractNumber(json, "max_stay_minutes"));
         } catch (Exception e) {
