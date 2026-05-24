@@ -19,7 +19,9 @@ public class VehicleDAOSql implements VehicleDAO {
 
     /**
      * Returns a vehicle by its license plate (case-insensitive).
+     *
      * @param licensePlate the plate to look up
+     *
      * @return the matching Vehicle, or null if not found
      */
     @Override
@@ -47,7 +49,9 @@ public class VehicleDAOSql implements VehicleDAO {
     /**
      * Deletes all vehicles belonging to a given user.
      * Used when deleting a user account.
+     *
      * @param userId the user's ID
+     *
      * @return true if any rows were deleted, false otherwise
      */
     @Override
@@ -65,9 +69,11 @@ public class VehicleDAOSql implements VehicleDAO {
 
     /**
      * Inserts a new vehicle using individual fields.
+     *
      * @param licensePlate the vehicle's license plate
      * @param userId       the owner's user ID
      * @param vehicleType  the type of vehicle
+     *
      * @return true if successful, false otherwise
      */
     @Override
@@ -87,7 +93,9 @@ public class VehicleDAOSql implements VehicleDAO {
 
     /**
      * Checks whether a vehicle with the given license plate already exists (case-insensitive).
+     *
      * @param licensePlate the plate to check
+     *
      * @return true if it exists, false otherwise
      */
     @Override
@@ -107,6 +115,7 @@ public class VehicleDAOSql implements VehicleDAO {
 
     /**
      * Inserts a new vehicle using a Vehicle object.
+     *
      * @param vehicle the vehicle to insert
      */
     @Override
@@ -127,8 +136,10 @@ public class VehicleDAOSql implements VehicleDAO {
 
     /**
      * Inserts a simulated vehicle with user_id = -1 to distinguish it from real users.
+     *
      * @param plate       the randomly generated license plate
      * @param vehicleType the type of vehicle
+     *
      * @return true if successful, false otherwise
      */
     @Override
@@ -148,7 +159,9 @@ public class VehicleDAOSql implements VehicleDAO {
     /**
      * Deletes a simulated vehicle by plate. Only deletes entries with user_id = -1
      * to avoid accidentally removing real user vehicles.
+     *
      * @param plate the simulated vehicle's license plate
+     *
      * @return true if successful, false otherwise
      */
     @Override

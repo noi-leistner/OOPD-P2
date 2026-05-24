@@ -20,7 +20,9 @@ public class UserDAOSql implements UserDAO {
 
     /**
      * Inserts a new user into the database.
+     *
      * @param user the user to add
+     *
      * @return SUCCESS, EMAIL_ALREADY_EXISTS if the email is taken, or DATABASE_ERROR
      */
     @Override
@@ -49,7 +51,9 @@ public class UserDAOSql implements UserDAO {
 
     /**
      * Permanently deletes a user by ID.
+     *
      * @param id the user's ID
+     *
      * @return true if a row was deleted, false otherwise
      */
     @Override
@@ -70,7 +74,9 @@ public class UserDAOSql implements UserDAO {
 
     /**
      * Returns a user by their ID.
+     *
      * @param id the user's ID
+     *
      * @return the matching User, or null if not found
      */
     @Override
@@ -100,7 +106,9 @@ public class UserDAOSql implements UserDAO {
 
     /**
      * Returns a user by their email address.
+     *
      * @param email the email to look up
+     *
      * @return the matching User, or null if not found
      */
     public User getUserByEmail(String email) {
@@ -132,7 +140,9 @@ public class UserDAOSql implements UserDAO {
 
     /**
      * Checks whether a user with the given email already exists.
+     *
      * @param email the email to check
+     *
      * @return true if it exists, false otherwise
      */
     public boolean existsByEmail(String email) {
@@ -152,7 +162,9 @@ public class UserDAOSql implements UserDAO {
 
     /**
      * Returns a user by their username.
+     *
      * @param username the username to look up
+     *
      * @return the matching User, or null if not found
      */
     public User getUserByUsername(String username) {

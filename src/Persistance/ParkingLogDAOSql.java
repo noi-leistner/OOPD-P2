@@ -19,6 +19,7 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
 
     /**
      * Inserts an entry or exit log record for a vehicle.
+     *
      * @param spaceId      the parking space involved
      * @param licensePlate the vehicle's license plate
      * @param userId       the user associated with the action
@@ -46,6 +47,7 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
      * Returns the occupancy count for each of the last 60 minutes.
      * The map key is minutes ago (0 = now, 59 = 59 minutes ago),
      * and the value is the number of occupied spaces at that minute.
+     *
      * @return map of minutes-ago to occupancy count
      */
     @Override
@@ -81,7 +83,9 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
     /**
      * Checks whether a vehicle is currently parked, by verifying
      * it has an ENTRY log with no EXIT log.
+     *
      * @param licensePlate the vehicle's license plate
+     *
      * @return true if the vehicle is currently parked, false otherwise
      */
     @Override
@@ -113,7 +117,9 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
 
     /**
      * Deletes a specific log entry by its ID.
+     *
      * @param logId the ID of the log to delete
+     *
      * @return true if the log was deleted, false if it wasn't found or an error occurred
      */
     @Override
@@ -138,6 +144,7 @@ public class ParkingLogDAOSql implements ParkingLogDAO {
     /**
      * Returns the current number of occupied parking spaces
      * by querying the database directly.
+     *
      * @return count of currently occupied spaces
      */
     public int getSnapshotOccupancy() {

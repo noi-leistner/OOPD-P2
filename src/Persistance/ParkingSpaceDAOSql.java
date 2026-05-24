@@ -32,7 +32,9 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     /**
      * Inserts a new parking space into the database.
+     *
      * @param space the parking space to add
+     *
      * @return true if successful, false otherwise
      */
     @Override
@@ -56,7 +58,9 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     /**
      * Updates an existing parking space's floor, occupation status and vehicle type.
+     *
      * @param space the parking space with updated values
+     *
      * @return true if a row was updated, false otherwise
      */
     @Override
@@ -79,7 +83,9 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     /**
      * Deletes a parking space by its identifier.
+     *
      * @param id the space identifier
+     *
      * @return true if a row was deleted, false otherwise
      */
     @Override
@@ -99,6 +105,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     /**
      * Returns all parking spaces in the database.
+     *
      * @return list of all parking spaces
      */
     @Override
@@ -122,7 +129,9 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     /**
      * Checks whether a parking space with the given ID exists.
+     *
      * @param id the space identifier
+     *
      * @return true if it exists, false otherwise
      */
     @Override
@@ -144,7 +153,9 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     /**
      * Returns a single parking space by its identifier.
+     *
      * @param id the space identifier
+     *
      * @return the matching ParkingSpace, or null if not found
      */
     @Override
@@ -165,7 +176,9 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     /**
      * Returns all unoccupied spaces that match the given vehicle type.
+     *
      * @param vehicleType the type of vehicle (e.g. "car", "motorcycle")
+     *
      * @return list of available matching spaces
      */
     @Override
@@ -188,7 +201,9 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     /**
      * Returns all spaces (occupied or not) that match the given vehicle type.
+     *
      * @param type the vehicle type
+     *
      * @return list of matching spaces
      */
     @Override
@@ -211,7 +226,9 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     /**
      * Returns the first unoccupied space for the given vehicle type.
+     *
      * @param vehicleType the vehicle type
+     *
      * @return the first available space, or null if none exist
      */
     @Override
@@ -234,7 +251,9 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
     /**
      * Returns the license plate of the vehicle currently parked at a given space,
      * based on the most recent ENTRY log.
+     *
      * @param id the space identifier
+     *
      * @return the license plate, or null if no vehicle is parked there
      */
     @Override
@@ -259,7 +278,9 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     /**
      * Returns the reserved space associated with a given license plate.
+     *
      * @param licensePlate the vehicle's license plate
+     *
      * @return the reserved ParkingSpace, or null if no active reservation exists
      */
     @Override
@@ -284,7 +305,9 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     /**
      * Returns the space currently occupied by a given license plate.
+     *
      * @param licensePlate the vehicle's license plate
+     *
      * @return the occupied ParkingSpace, or null if not found
      */
     @Override
@@ -307,8 +330,10 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     /**
      * Marks a space as occupied by a given license plate.
+     *
      * @param spaceId      the space to occupy
      * @param licensePlate the vehicle's license plate
+     *
      * @return true if successful, false otherwise
      */
     @Override
@@ -329,7 +354,9 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     /**
      * Marks a space as vacant and clears its license plate.
+     *
      * @param spaceId the space to vacate
+     *
      * @return true if successful, false otherwise
      */
     @Override
@@ -350,7 +377,9 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
     /**
      * Vacates all spaces currently occupied by vehicles belonging to a given user.
      * Used when deleting a user account.
+     *
      * @param userId the user's ID
+     *
      * @return true if successful, false otherwise
      */
     @Override
@@ -374,6 +403,7 @@ public class ParkingSpaceDAOSql implements ParkingSpaceDAO {
 
     /**
      * Returns the total number of spaces that have no active reservation.
+     *
      * @return count of unreserved spaces
      */
     @Override

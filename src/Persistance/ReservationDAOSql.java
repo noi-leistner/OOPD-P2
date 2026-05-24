@@ -32,6 +32,7 @@ public class ReservationDAOSql implements ReservationDAO {
 
     /**
      * Inserts a new reservation without checking for conflicts.
+     *
      * @param reservation the reservation to insert
      */
     @Override
@@ -54,7 +55,9 @@ public class ReservationDAOSql implements ReservationDAO {
 
     /**
      * Permanently deletes a reservation by ID.
+     *
      * @param reservationId the reservation ID
+     *
      * @return SUCCESS or DATABASE_ERROR
      */
     @Override
@@ -75,7 +78,9 @@ public class ReservationDAOSql implements ReservationDAO {
 
     /**
      * Inserts a new reservation after checking for overlapping reservations on the same slot.
+     *
      * @param reservation the reservation to create
+     *
      * @return SUCCESS, ALREADY_EXISTS if the slot is taken, or DATABASE_ERROR
      */
     @Override
@@ -125,6 +130,7 @@ public class ReservationDAOSql implements ReservationDAO {
 
     /**
      * Marks a reservation as cancelled without deleting it.
+     *
      * @param reservationId the reservation ID
      */
     @Override
@@ -143,6 +149,7 @@ public class ReservationDAOSql implements ReservationDAO {
 
     /**
      * Returns all non-cancelled reservations.
+     *
      * @return list of active reservations
      */
     @Override
@@ -164,7 +171,9 @@ public class ReservationDAOSql implements ReservationDAO {
 
     /**
      * Returns all reservations (including canceled) for a given user.
+     *
      * @param userId the user's ID
+     *
      * @return list of the user's reservations
      */
     @Override
@@ -188,8 +197,10 @@ public class ReservationDAOSql implements ReservationDAO {
     }
 
     /**
-     * Returns all non-cancelled reservations for a given parking slot.
+     * Returns all non-canceled reservations for a given parking slot.
+     *
      * @param slotId the slot ID
+     *
      * @return list of active reservations for that slot
      */
     @Override
@@ -214,7 +225,9 @@ public class ReservationDAOSql implements ReservationDAO {
 
     /**
      * Updates an existing reservation's slot and dates, checking for conflicts with other reservations.
+     *
      * @param reservation the reservation with updated values
+     *
      * @return SUCCESS, ALREADY_EXISTS if the slot is taken, NOT_FOUND if the reservation doesn't exist, or DATABASE_ERROR
      */
     @Override
@@ -266,7 +279,9 @@ public class ReservationDAOSql implements ReservationDAO {
 
     /**
      * Returns the first non-canceled reservation for a given license plate.
+     *
      * @param licensePlate the vehicle's license plate
+     *
      * @return the matching reservation, or null if not found
      */
     @Override
@@ -288,6 +303,7 @@ public class ReservationDAOSql implements ReservationDAO {
     /**
      * Permanently deletes all reservations belonging to a given user.
      * Used when deleting a user account.
+     *
      * @param userId the user's ID
      */
     @Override
@@ -317,7 +333,9 @@ public class ReservationDAOSql implements ReservationDAO {
     /**
      * Returns the currently active reservation for a given license plate,
      * i.e. one that is not cancelled and whose time window covers right now.
+     *
      * @param plate the vehicle's license plate
+     *
      * @return the active reservation, or null if none
      */
     @Override
@@ -343,7 +361,8 @@ public class ReservationDAOSql implements ReservationDAO {
     }
 
     /**
-     * Returns all reservations that are currently active (not cancelled, within their time window).
+     * Returns all reservations that are currently active (not canceled, within their time window).
+     *
      * @return list of currently active reservations
      */
     public List<Reservation> getAllActiveReservations() {
