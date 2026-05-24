@@ -129,6 +129,7 @@ public class ReservationManager {
     public void deleteExpiredReservations() {
         reservationDao.deleteExpiredReservations();
     }
+
     /**
      * Checks if a plate has a reservation whose time window includes right now.
      * @return true only if start ≤ now ≤ end; false if reservation not found
@@ -142,11 +143,20 @@ public class ReservationManager {
 
         return reservation.getStartDateTime().before(now) && reservation.getEndDateTime().after(now);
     }
+
     /**
      * Returns the active (currently ongoing) reservation for the given plate.
      * @return the reservation, or null if none is currently active
      */
     public Reservation getActiveReservationForPlate(String plate) {
         return reservationDao.getActiveReservationForPlate(plate);
+    }
+
+    /**
+     * Returns all active (currently ongoing) reservations in the system.
+     * @return a list of reservation
+     */
+    public List<Reservation> getAllActiveReservations() {
+        return reservationDao.getAllActiveReservations();
     }
 }

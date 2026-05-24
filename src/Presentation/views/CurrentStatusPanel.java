@@ -13,17 +13,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.swing.*;
-import javax.swing.Timer;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.HierarchyEvent;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A real-time overview dashboard tracking live garage activity.
  * Displays a color-coded data grid showing exactly which spots are physically occupied,
  * which ones have an active reservation holding them, and which cars are currently parked.
- * It auto-refreshes every 5 seconds and pauses itself when the user switches tabs to save resources.
  */
 public class CurrentStatusPanel extends JPanel {
 
@@ -235,14 +234,32 @@ public class CurrentStatusPanel extends JPanel {
     }
 
     /**
-     * Wipes current grid items, fetches the latest operational dataset from the database controller,
-     * pairs active sensor plates up with reservation schedules, and displays the fresh entries.
+     * Wipes the current UI table rows, pulls a fresh snapshot layout from the status orchestration
+     * layers, and reconciles space properties against overlapping active scheduling indices.
+     * <p>
+     * This method builds a synchronized matrix view of the garage footprint by performing three sequential steps:
+     * <ol>
+     *   <li>Clears out the spreadsheet layout model to prevent historical row duplicates.</li>
+     *   <li>Queries live system bookings, streaming them into a temporary set tracking space IDs
+     *       whose start and end timestamps bounds match the current time.</li>
+     *   <li>Iterates through retrieved space instances, evaluates live occupancy states to shows matching
+     *       vehicle license numbers.</li>
+     * </ol>
      */
     public void loadData() {
         tableModel.setRowCount(0);
         spaces = statusController.getParkingTableData();
+
+        List<Reservation> allActiveReservations = reservationController.getAllActiveReservations();
+        Date now = new Date();
+
+        Set<Integer> reservedSlotIds = allActiveReservations.stream()
+                .filter(r -> r.getStartDateTime().before(now) && r.getEndDateTime().after(now))
+                .map(Reservation::getParkingSlotId)
+                .collect(Collectors.toSet());
+
         for (ParkingSpace space : spaces) {
-            Reservation reservation = reservationController.getActiveReservationForPlate(space.getParkedLicensePlate());
+            boolean hasActiveReservation = reservedSlotIds.contains(space.getId());
             String plate = space.isOccupied() ? space.getParkedLicensePlate() : "-";
 
             tableModel.addRow(new Object[]{
@@ -250,7 +267,7 @@ public class CurrentStatusPanel extends JPanel {
                     space.getFloor(),
                     space.getType(),
                     space.isOccupied() ? "Occupied" : "Free",
-                    reservation != null ? "Reserved" : "Unreserved",
+                    hasActiveReservation ? "Reserved" : "Unreserved",
                     plate
             });
         }

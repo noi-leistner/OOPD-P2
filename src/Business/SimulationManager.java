@@ -1,14 +1,9 @@
 package Business;
 
-import Business.*;
 import Business.Entities.ParkingSpace;
 import Persistance.ConfigDAO;
-import Persistance.ParkingLogDAO;
-import Persistance.ParkingSpaceDAO;
-import Persistance.VehicleDAO;
 
 import javax.swing.SwingUtilities;
-import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -24,30 +19,36 @@ import java.util.logging.Logger;
 public class SimulationManager {
     /** Logger */
     private static final Logger logger = Logger.getLogger(SimulationManager.class.getName());
+
     /** Simulated user ID for all simulated */
     private static final int SIMULATED_USER_ID = -1;
+
     /** Managers */
     private final ParkingLotManager parkingLotManager;
     private final ParkingLogManager parkingLogManager;
     private final VehicleManager vehicleManager;
+
     /** Simulation variables */
     private final List<String> simulatedPlates = new ArrayList<>();
     private final Random random = new Random();
     private volatile boolean running = false;
     private Thread simulationThread;
     private Runnable onTickCallBack;
+
     /** Constructor */
     public SimulationManager(ParkingLotManager parkingLotManager, ParkingLogManager parkingLogManager, VehicleManager vehicleManager) {
         this.parkingLotManager = parkingLotManager;
         this.parkingLogManager = parkingLogManager;
         this.vehicleManager = vehicleManager;
     }
+
     /** Sets the callback executed on the EDT after each simulation tick.
      * @param onTickCallBack Runnable to refresh UI.
      */
     public void setOnTickCallBack(Runnable onTickCallBack) {
         this.onTickCallBack = onTickCallBack;
     }
+
     /** Starts simulation on a background daemon thread. */
     public void start() {
         if (running) return;
@@ -84,38 +85,44 @@ public class SimulationManager {
      * Then notifies the UI callback on the EDT.
      */
     private void tick() {
-            List<ParkingSpace> availableMotos = parkingLotManager.getAvailableSpacesForType("motorcycle");
-            List<ParkingSpace> availableCars = parkingLotManager.getAvailableSpacesForType("car");
-            List<ParkingSpace> available = new ArrayList<>();
-            available.addAll(availableMotos);
-            available.addAll(availableCars);
-            int totalUnreserved = parkingLotManager.getTotalUnreservedSpaces();
+        List<ParkingSpace> availableMotos = parkingLotManager.getAvailableSpacesForType("Motorcycle");
+        List<ParkingSpace> availableCars = parkingLotManager.getAvailableSpacesForType("Car");
+        List<ParkingSpace> availableTrucks = parkingLotManager.getAvailableSpacesForType("Truck");
+        List<ParkingSpace> available = new ArrayList<>();
+        available.addAll(availableMotos);
+        available.addAll(availableCars);
+        available.addAll(availableTrucks);
+        int totalUnreserved = parkingLotManager.getTotalUnreservedSpaces();
 
-            // decide entry or exit based on current occupancy
-            boolean parkingEmpty = simulatedPlates.isEmpty();
+        // decide entry or exit based on current occupancy
+        boolean parkingEmpty = simulatedPlates.isEmpty();
 
-            if (totalUnreserved == 0) return;
+        if (totalUnreserved == 0) {
+            return;
+        }
 
-            double pEntry = (double) available.size() / totalUnreserved;
+        if (available.isEmpty()) {
+            if (!simulatedPlates.isEmpty()) simulateExit();
+            return;
+        }
 
-            if (simulatedPlates.isEmpty()){
+        double pEntry = (double) available.size() / totalUnreserved;
+
+        if (simulatedPlates.isEmpty()){
+            simulateEntry(available);
+        } else {
+            if (random.nextDouble() < pEntry) {
                 simulateEntry(available);
             } else {
-                if (available.isEmpty()) {
-                    simulateExit();
-                } else {
-                    if (random.nextDouble() < pEntry) {
-                        simulateEntry(available);
-                    } else {
-                        simulateExit();
-                    }
-                }
+                simulateExit();
             }
 
-            // notify UI to refresh chart
-            if (onTickCallBack != null) {
-                SwingUtilities.invokeLater(onTickCallBack);
-            }
+        }
+
+        // notify UI to refresh chart
+        if (onTickCallBack != null) {
+            SwingUtilities.invokeLater(onTickCallBack);
+        }
     }
 
     /** Picks a random available space, generates a plate, and enters without reservation.
@@ -137,6 +144,7 @@ public class SimulationManager {
             vehicleManager.deleteSimulatedVehicle(plate);
         }
     }
+
     /** Picks a random simulated plate and exists; cleans up vehicle record and log. */
     private void simulateExit() {
         if (simulatedPlates.isEmpty()) return;
@@ -150,6 +158,7 @@ public class SimulationManager {
             logger.info("<[EXIT]  " + plate + " ← slot: [ " + result.getId() + "]");
         }
     }
+
     /** Generates a plate with consonants and 4 random numbers */
     private String plateGenerator() {
         String plate = "";

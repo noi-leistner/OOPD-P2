@@ -282,4 +282,20 @@ public class ReservationDAOSql implements ReservationDAO {
         }
         return null;
     }
+
+    public List<Reservation> getAllActiveReservations() {
+        String sql = "SELECT * FROM reservations " +
+                "WHERE is_cancelled = FALSE " +
+                "AND start_date <= NOW() " +
+                "AND end_date >= NOW()";
+        List<Reservation> list = new ArrayList<>();
+        try (Connection conn = ConfigDAO.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) list.add(mapRow(rs));
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return list;
+    }
 }

@@ -4,7 +4,6 @@ import Business.Entities.ParkingSpace;
 import Business.Entities.Reservation;
 import Business.SessionManager;
 import Presentation.controllers.EntryExitController;
-import Presentation.controllers.ParkingSpaceController;
 import Presentation.theme.AppColors;
 
 import javax.swing.*;
@@ -440,23 +439,14 @@ public class VehicleEntryPanel extends JPanel {
     }
 
     /**
-     * An unmodifiable component model element tracking physical lookups
-     * inside dropdown list views.
-     */
-    private static class SpaceItem {
-        final int id;
-        final int floor;
-        final String type;
-
-        SpaceItem(int id, int floor, String type) {
-            this.id = id;
-            this.floor = floor;
-            this.type = type;
-        }
+         * An unmodifiable component model element tracking physical lookups
+         * inside dropdown list views.
+         */
+        private record SpaceItem(int id, int floor, String type) {
 
         @Override
-        public String toString() {
-            return "Space #" + id + "  —  Floor " + floor + "  (" + type + ")";
+            public String toString() {
+                return "Space #" + id + "  —  Floor " + floor + "  (" + type + ")";
+            }
         }
-    }
 }

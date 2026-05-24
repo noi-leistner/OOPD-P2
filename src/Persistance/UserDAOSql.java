@@ -84,11 +84,11 @@ public class UserDAOSql implements UserDAO {
         String sql = "SELECT id, name, surname, email, username, password, role FROM users WHERE email = ?";
         User user = null;
         try (Connection conn = ConfigDAO.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);){
+            PreparedStatement stmt = conn.prepareStatement(sql)){
 
             if (conn == null) return null;
             stmt.setString(1, email);
-            try(var rs = stmt.executeQuery();) {
+            try(var rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     user = new User(
                             rs.getInt("id"),
@@ -130,7 +130,7 @@ public class UserDAOSql implements UserDAO {
         try (Connection conn = ConfigDAO.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);
-            try(var rs = stmt.executeQuery();) {
+            try(var rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     user = new User(
                             rs.getInt("id"),

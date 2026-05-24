@@ -58,10 +58,10 @@ public class RegisterForm extends BaseAuthForm {
 
         JButton registerBtn = buildPrimaryButton("REGISTER");
         registerBtn.addActionListener(e -> {
-            String name     = nameField.getText().trim();
-            String surname  = surnameField.getText().trim();
-            String email    = emailField.getText().trim();
-            String username  = usernameField.getText().trim();
+            String name     = getFieldValue(nameField,     "First name");
+            String surname  = getFieldValue(surnameField,  "Last name");
+            String email    = getFieldValue(emailField,    "Email");
+            String username = getFieldValue(usernameField, "Username");
             String password = new String(passField.getPassword()).trim();
             String confirm  = new String(confirmField.getPassword()).trim();
 
@@ -79,7 +79,7 @@ public class RegisterForm extends BaseAuthForm {
                 return;
             }
             if (username.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "USername cannot be empty.",
+                JOptionPane.showMessageDialog(this, "Username cannot be empty.",
                         "Username empty", JOptionPane.WARNING_MESSAGE);
                 return;
             }

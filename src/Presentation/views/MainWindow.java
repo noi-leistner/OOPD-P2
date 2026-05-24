@@ -24,7 +24,7 @@ public class MainWindow extends JFrame {
     private final JPanel mainPanel;
 
     /** The operational application control deck panel, swapped in upon validation of active sessions. */
-    private DashboardPanel dashboardPanel;
+    private final DashboardPanel dashboardPanel;
 
     /** Unique dictionary key mapping identifier tracking the authentication screen card. */
     public static final String AUTH_SCREEN = "AUTH";

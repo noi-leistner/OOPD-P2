@@ -31,10 +31,6 @@ public class ParkingSpaceController {
         return parkingLotManager.editSpace(space);
     }
 
-    public String getParkedPlateAtSpace(int spaceId) {
-        return parkingLotManager.getParkedPlateAtSpace(spaceId);
-    }
-
     public DaoResult removeSpace(int spaceId) {
         ParkingSpace space = parkingLotManager.getSpaceDetails(spaceId);
         if (space == null) return DaoResult.NOT_FOUND;
@@ -56,21 +52,12 @@ public class ParkingSpaceController {
         return parkingLotManager.getSpaceDetails(spaceId);
     }
 
-    // TODO: maybe not need this function
-    public boolean slotExists(int id) {
-        return parkingLotManager.slotExistsById(id);
-    }
-
     public List<ParkingSpace> getAllSpaces() {
         return parkingLotManager.getAllSpaces();
     }
 
     public List<Integer> getAvailableFloors(int currentFloor) {
         return parkingLotManager.getAvailableFloors(currentFloor);
-    }
-
-    public List<ParkingSpace> getAvailableSpotsByType(String type) {
-        return parkingLotManager.getAvailableSpacesForType(type);
     }
 
     public List<ParkingSpace> getSpotsByType(String type) {

@@ -65,7 +65,7 @@ public class EntryExitController {
     }
 
     public ParkingSpace enterWithoutReservation(String plate, int spaceId, int userId) {
-        ParkingSpace space = parkingLotManager.enterWithoutReservation(plate, userId);
+        ParkingSpace space = parkingLotManager.enterWithoutReservation(plate, spaceId);
         if (space != null) {
             parkingLogManager.logEntry(space.getId(), plate, userId);
         }
